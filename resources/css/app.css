@@ -1,0 +1,84 @@
+@import "./fonts.css";
+@import "./typography.css";
+@import "tailwindcss" theme(static);
+@source "../views/";
+@source "../../app/";
+
+@theme {
+  --font-heading: 'Poppins', sans-serif;
+  --color-red-25: #ece6e6;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #e8edf5;
+  --color-gray-200: #cfd5e2;
+  --color-gray-300: #b0bace;
+  --color-gray-400: #909ebb;
+  --color-gray-500: #7183a7;
+  --color-gray-600: #586a8d;
+  --color-gray-700: #4a5565;
+  --color-gray-800: #313b4e;
+  --color-gray-900: #1d232f;
+  --color-gray-950: #070708;
+
+  --color-red-50:  #fdd9D9;
+  --color-red-100: #fbc0c0;
+  --color-red-500: #e10e0e;
+  --color-red-600: #b10b0b;
+  --color-red-900: #210202;
+
+  --color-amber-600: #ffcB00;
+
+  --color-green-100: #c2f3d6;
+  --color-green-200: #82e6ac;
+  --color-green-300: #55dd8e;
+  --color-green-400: #22aa5b;
+  --color-green-500: #1E9952;
+  --color-green-600: #1a8245;
+  --color-green-700: #11582f;
+  --color-green-800: #092d18;
+}
+
+@layer base {
+  button {
+    cursor: pointer;
+  }
+  body {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    color: var(--color-gray-900);
+  }
+}
+
+@layer components {
+  .container {
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  .card {
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-xl);
+    background-color: white;
+  }
+  .grid > * {
+    min-width: 0;
+  }
+
+  .swiper-pagination {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .swiper-pagination-bullet {
+    position: relative;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+
+  .swiper-pagination-bullet-active {
+    opacity: 1;
+  }
+}
