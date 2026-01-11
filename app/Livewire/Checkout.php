@@ -9,6 +9,7 @@ use Livewire\Component;
 
 use App\Livewire\Forms\CheckoutForm;
 use App\Services\KadasterService;
+use App\Services\MailchimpService;
 use App\Services\MollieService;
 
 use WC_Order;
@@ -267,6 +268,163 @@ class Checkout extends Component
         return $state !== false;
     }
 
+    /**
+     * Handle Apple Pay payment submission
+     */
+    public function saveApplePayPayment(string $applePayToken)
+    {
+        $this->validate();
+
+        $this->isProcessing = true;
+
+        try {
+            // Create order using shared method
+            $order = $this->createOrder();
+
+            // Create Mollie payment with Apple Pay token
+            $redirectUrl = route('payment.return', [
+                'order_id' => $order->get_id(),
+                'key' => $order->get_order_key(),
+            ]);
+
+            $webhookUrl = home_url('/wp-json/mollie/v1/webhook');
+
+            $payment = $this->mollieService->createPayment(
+                method: 'applepay',
+                amount: $order->get_total(),
+                description: sprintf('Bestelling #%s', $order->get_order_number()),
+                redirect_url: $redirectUrl,
+                webhook_url: $webhookUrl,
+                metadata: [
+                    'order_id' => $order->get_id(),
+                    'order_key' => $order->get_order_key(),
+                ],
+                args: ['applePayPaymentToken' => $applePayToken],
+            );
+
+            if (! $payment) {
+                throw new Exception('Kan geen betaling aanmaken. Probeer het later opnieuw.');
+            }
+
+            // Store Mollie payment ID
+            $order->update_meta_data('_mollie_payment_id', $payment->id);
+            $order->add_order_note(sprintf(
+                __('Mollie Apple Pay payment created (Payment ID: %s)', 'sage'),
+                $payment->id
+            ));
+            $order->save();
+
+            // Clear cart and session
+            WC()->cart->empty_cart();
+            WC()->session->set(self::PENDING_ORDER_KEY, null);
+            WC()->session->set(self::SESSION_KEY, null);
+
+            // Redirect to thank you page
+            return $this->redirect($redirectUrl);
+
+        } catch (Throwable $e) {
+            $this->isProcessing = false;
+            Log::error('Apple Pay checkout error: ' . $e->getMessage());
+            $this->addError('order', 'Er is een fout opgetreden bij het plaatsen van uw bestelling: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Create a WooCommerce order from the current form data and cart.
+     */
+    private function createOrder(): WC_Order
+    {
+        $order = wc_create_order();
+
+        // Assign user if logged in
+        if (is_user_logged_in()) {
+            $order->set_customer_id(get_current_user_id());
+        }
+
+        // Add products from cart
+        if (WC()->cart && !WC()->cart->is_empty()) {
+            foreach (WC()->cart->get_cart() as $cart_item) {
+                $order->add_product(
+                    $cart_item['data'],
+                    $cart_item['quantity'],
+                    [
+                        'subtotal' => $cart_item['line_subtotal'],
+                        'total'    => $cart_item['line_total'],
+                        'subtotal_tax' => $cart_item['line_subtotal_tax'],
+                        'total_tax'    => $cart_item['line_tax'],
+                    ]
+                );
+            }
+        }
+
+        // Add fees
+        foreach (WC()->cart->get_fees() as $fee) {
+            $item = new WC_Order_Item_Fee();
+            $item->set_name($fee->name);
+            $item->set_total($fee->amount);
+            $item->set_tax_class($fee->tax_class);
+            $item->set_total_tax($fee->tax);
+            $order->add_item($item);
+        }
+
+        // Add shipping method (if any)
+        $chosen_shipping = WC()->session->get('chosen_shipping_methods');
+        if ($chosen_shipping) {
+            foreach ($chosen_shipping as $method_id) {
+                $rate = new WC_Shipping_Rate($method_id);
+                $order->add_shipping($rate);
+            }
+        }
+
+        // Set addresses
+        $order->set_address($this->billingAddressArray());
+
+        if ($this->form->ship_to_different_address) {
+            $order->set_address($this->shippingAddressArray(), 'shipping');
+        } else {
+            $order->set_address($this->billingAddressArray(), 'shipping');
+        }
+
+        // Business data meta
+        if ($this->form->is_business_order) {
+            $order->set_billing_company($this->form->billing_company);
+            $order->update_meta_data('_vat_number', $this->form->vat_number);
+            $order->update_meta_data('_customer_reference', $this->form->customer_reference);
+        } else {
+            // Reset business fields to null/empty
+            $this->form->billing_company = '';
+            $this->form->vat_number = '';
+            $this->form->customer_reference = '';
+        }
+
+        // Delivery options
+        if (!empty($this->deliverySelection)) {
+            $order->update_meta_data(
+                '_myparcel_delivery_options',
+                json_encode($this->deliverySelection, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            );
+        }
+
+        // Payment method
+        $gateway = WC()->payment_gateways()->payment_gateways()[$this->form->payment_method] ?? null;
+        if ($gateway) {
+            $order->set_payment_method($this->form->payment_method);
+            $order->set_payment_method_title($gateway->title);
+        }
+
+        $order->calculate_totals();
+
+        // Set status to pending payment
+        $order->set_status('pending');
+
+        // Save order
+        $order->save();
+
+        return $order;
+    }
+
     public function save($cardToken = '')
     {
         $this->validate();
@@ -275,91 +433,16 @@ class Checkout extends Component
 
         try {
             // Create order
-            $order = wc_create_order();
+            $order = $this->createOrder();
 
-            // Assign user if logged in
-            if (is_user_logged_in()) {
-                $order->set_customer_id(get_current_user_id());
-            }
-
-            // Add products from cart
-            if (WC()->cart && !WC()->cart->is_empty()) {
-                foreach (WC()->cart->get_cart() as $cart_item) {
-                    $order->add_product(
-                        $cart_item['data'],
-                        $cart_item['quantity'],
-                        [
-                            'subtotal' => $cart_item['line_subtotal'],
-                            'total'    => $cart_item['line_total'],
-                            'subtotal_tax' => $cart_item['line_subtotal_tax'],
-                            'total_tax'    => $cart_item['line_tax'],
-                        ]
-                    );
+            // Subscribe to newsletter if opted in
+            if ($this->form->newsletter) {
+                try {
+                    app(MailchimpService::class)->subscribe($this->form->billing_email);
+                } catch (Throwable $e) {
+                    Log::warning('Newsletter subscription failed: ' . $e->getMessage());
                 }
             }
-
-            // Add fees
-            foreach (WC()->cart->get_fees() as $fee) {
-                $item = new WC_Order_Item_Fee();
-                $item->set_name($fee->name);
-                $item->set_total($fee->amount);
-                $item->set_tax_class($fee->tax_class);
-                $item->set_total_tax($fee->tax);
-                $order->add_item($item);
-            }
-
-            // Add shipping method (if any)
-            $chosen_shipping = WC()->session->get('chosen_shipping_methods');
-            if ($chosen_shipping) {
-                foreach ($chosen_shipping as $method_id) {
-                    $rate = new WC_Shipping_Rate($method_id);
-                    $order->add_shipping($rate);
-                }
-            }
-
-            // Set addresses
-            $order->set_address($this->billingAddressArray());
-
-            if ($this->form->ship_to_different_address) {
-                $order->set_address($this->shippingAddressArray(), 'shipping');
-            } else {
-                $order->set_address($this->billingAddressArray(), 'shipping');
-            }
-
-            // Business data meta
-            if ($this->form->is_business_order) {
-                $order->set_billing_company($this->form->billing_company);
-                $order->update_meta_data('_vat_number', $this->form->vat_number);
-                $order->update_meta_data('_customer_reference', $this->form->customer_reference);
-            } else {
-                // Reset business fields to null/empty
-                $this->form->billing_company = '';
-                $this->form->vat_number = '';
-                $this->form->customer_reference = '';
-            }
-
-            // Delivery options
-            if (!empty($this->deliverySelection)) {
-                $order->update_meta_data(
-                    '_myparcel_delivery_options',
-                    json_encode($this->deliverySelection, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
-                );
-            }
-
-            // Payment method
-            $gateway = WC()->payment_gateways()->payment_gateways()[$this->form->payment_method] ?? null;
-            if ($gateway) {
-                $order->set_payment_method($this->form->payment_method);
-                $order->set_payment_method_title($gateway->title);
-            }
-
-            $order->calculate_totals();
-
-            // Set status to pending payment
-            $order->set_status('pending');
-
-            // Save order
-            $order->save();
 
             // Create Mollie payment
             $mollieMethod = $this->mollieService->getMollieMethodFromGateway($this->form->payment_method);
@@ -452,6 +535,6 @@ class Checkout extends Component
     public function render()
     {
         return view('livewire.checkout')
-            ->layoutData(['header' => false, 'breadcrumbs' => false]);
+            ->layoutData(['header' => false, 'breadcrumbs' => false, 'footer' => false]);
     }
 }

@@ -42,8 +42,6 @@
   >
 </div>
 
-@pushonce('scripts')
-<script src="{{ Vite::asset('resources/js/lib/swiper-bundle.min.js') }}"></script>
 <script>
 function deliveryOptions(config) {
   return {
@@ -107,7 +105,7 @@ function deliveryOptions(config) {
           class="swiper-slide rounded-lg border-2 p-4 text-left transition-all cursor-pointer ${this.selectedIndex === index ? 'border-gray-900 bg-white' : 'bg-gray-100 hover:bg-gray-200 border-transparent'}"
         >
           <div class="font-semibold capitalize">${option.display_date}</div>
-          <div class="mt-1 capitalize text-gray-800">${option.date_string}</div>
+          <div class="mt-1 text-gray-800">${option.date_string}</div>
           <div class="mt-1 text-sm font-medium text-gray-800 flex items-center gap-2">
             ${this.isLoading ? loading : (option.time_string || '')}
           </div>
@@ -151,6 +149,8 @@ function deliveryOptions(config) {
         slidesPerView: 1.5,
         spaceBetween: 16,
         loop: this.options.length > 4,
+        slideToClickedSlide: true,
+        watchSlidesProgress: true,
         navigation: {
           nextEl: '.swiper-button-next-custom',
           prevEl: '.swiper-button-prev-custom',
@@ -328,4 +328,3 @@ function deliveryOptions(config) {
   };
 }
 </script>
-@endpushonce

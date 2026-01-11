@@ -11,27 +11,36 @@ final class CartItem implements Wireable
         public string  $key,
         public Product $product,
         public int     $quantity,
-        public Price   $price,
+        public ?Price  $lineRegularTotal,
         public Price   $lineSubtotal,
         public Price   $lineTotal,
+        public int     $minQuantity,
         public int     $maxQuantity,
         public bool    $isInStock,
+        public bool    $soldAsPack = false,
+        public int     $packSize = 1,
     ) {}
 
     public static function fromCartItem(array $cartItem, string $cartItemKey): self
     {
-        /** @var WC_Product $product */
-        $product = $cartItem['data'];
+        $wc_product = $cartItem['data'];
+        /** @var Product $product */
+        $product = Product::find($wc_product);
+
+        $regularTotal = $wc_product->get_regular_price() * $cartItem['quantity'];
 
         return new self(
             key: $cartItemKey,
-            product: Product::find($product),
+            product: $product,
             quantity: $cartItem['quantity'],
-            price: Price::from($product->get_price()),
+            lineRegularTotal: Price::from($regularTotal),
             lineSubtotal: Price::from($cartItem['line_subtotal']),
             lineTotal: Price::from($cartItem['line_total']),
-            maxQuantity: $product->get_stock_quantity() ?: 99,
-            isInStock: $product->is_in_stock(),
+            minQuantity: $product->soldAsPack ? $product->packSize : 1,
+            maxQuantity: $product->stockQuantity ?: 99,
+            isInStock: $product->is_in_stock,
+            soldAsPack: $product->soldAsPack,
+            packSize: $product->packSize,
         );
     }
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace app\Services\Woocommerce;
+namespace App\Services\Woocommerce;
 
 use Illuminate\Support\Facades\Cache;
 use WC_Shipping_Zones;
 
-final readonly class ShippingZoneService {
-
+final readonly class ShippingZoneService
+{
     /**
      * Get the free shipping minimum amount from WooCommerce settings
      * Falls back to theme option or default value
@@ -33,13 +33,13 @@ final readonly class ShippingZoneService {
     public static function flatRateCost(): float
     {
         $shipping_zones = WC_Shipping_Zones::get_zones();
-        return Cache::remember('free_shipping_amount', 43200 , function () use ($shipping_zones) {
+        return Cache::remember('flat_rate_cost', 43200 , function () use ($shipping_zones) {
             foreach ($shipping_zones as $zone) {
                 foreach ($zone['shipping_methods'] as $method) {
-                    if ($method->id === 'flate_rate' && $method->enabled === 'yes') {
-                        $costs = $method->get_option('costs');
-                        if ($costs) {
-                            return (float) $costs;
+                    if ($method->id === 'flat_rate' && $method->enabled === 'yes') {
+                        $cost = $method->get_option('cost');
+                        if ($cost) {
+                            return (float) $cost;
                         }
                     }
                 }

@@ -15,12 +15,10 @@ export default defineConfig((config) => ({
         // CSS
         'resources/css/app.css',
         'resources/css/editor.css',
-        'resources/css/lib/swiper-bundle.min.css',
 
         // JS
         'resources/js/app.js',
         'resources/js/editor.js',
-        'resources/js/lib/swiper-bundle.min.js',
       ],
       refresh: true,
     }),

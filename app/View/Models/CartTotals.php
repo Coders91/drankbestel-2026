@@ -10,11 +10,15 @@ final readonly class CartTotals
         public Price        $subtotal,
         public Price        $subtotalExclTax,
         public Price        $subtotalInclTax,
+        public Price        $subtotalBeforeDiscounts,
+        public Price        $subtotalAfterDiscounts,
 
         public Price        $shipping,
         public Price|string $shippingDisplay,
         public bool         $hasFreeShipping,
 
+        public Price        $saleDiscount,
+        public Price        $couponDiscount,
         public Price        $discount,
         public Price        $tax,
         public Price        $total,
@@ -29,6 +33,24 @@ final readonly class CartTotals
         $cart = WC()->cart;
         $cart->calculate_totals();
 
+        // Calculate sale discount from cart items
+        $saleDiscount = 0;
+        $subtotalBeforeDiscounts = 0;
+
+        foreach ($cart->get_cart() as $cartItem) {
+            $product = $cartItem['data'];
+            $quantity = $cartItem['quantity'];
+
+            if ($product->is_on_sale() && $product->get_regular_price()) {
+                $regularPrice = (float) $product->get_regular_price();
+                $salePrice = (float) $product->get_price();
+                $saleDiscount += ($regularPrice - $salePrice) * $quantity;
+                $subtotalBeforeDiscounts += $regularPrice * $quantity;
+            } else {
+                $subtotalBeforeDiscounts += (float) $product->get_price() * $quantity;
+            }
+        }
+
         // Subtotals
         $subtotalExclTax = $cart->get_subtotal();
         $subtotalTax     = $cart->get_subtotal_tax();
@@ -37,6 +59,11 @@ final readonly class CartTotals
         // Shipping
         $shippingExclTax = $cart->get_shipping_total();
         $hasFreeShipping = $shippingExclTax <= 0;
+
+        // Discounts
+        $couponDiscount = $cart->get_discount_total();
+        $totalDiscount = $saleDiscount + $couponDiscount;
+        $subtotalAfterDiscounts = $subtotalBeforeDiscounts - $totalDiscount;
 
         // Tax (products + shipping)
         $taxTotal =
@@ -49,6 +76,8 @@ final readonly class CartTotals
             subtotal: Price::from($subtotalInclTax),
             subtotalExclTax: Price::from($subtotalExclTax),
             subtotalInclTax: Price::from($subtotalInclTax),
+            subtotalBeforeDiscounts: Price::from($subtotalBeforeDiscounts),
+            subtotalAfterDiscounts: Price::from($subtotalAfterDiscounts),
 
             shipping: Price::from($shippingExclTax),
             shippingDisplay: $hasFreeShipping
@@ -56,7 +85,9 @@ final readonly class CartTotals
                 : Price::from($shippingExclTax),
             hasFreeShipping: $hasFreeShipping,
 
-            discount: Price::from($cart->get_discount_total()),
+            saleDiscount: Price::from($saleDiscount),
+            couponDiscount: Price::from($couponDiscount),
+            discount: Price::from($totalDiscount),
             tax: Price::from($taxTotal),
             total: Price::from($cart->get_total('edit')),
         );
@@ -70,11 +101,15 @@ final readonly class CartTotals
             subtotal: Price::from(0),
             subtotalExclTax: Price::from(0),
             subtotalInclTax: Price::from(0),
+            subtotalBeforeDiscounts: Price::from(0),
+            subtotalAfterDiscounts: Price::from(0),
 
             shipping: Price::from(0),
             shippingDisplay: Price::from(0),
             hasFreeShipping: false,
 
+            saleDiscount: Price::from(0),
+            couponDiscount: Price::from(0),
             discount: Price::from(0),
             tax: Price::from(0),
             total: Price::from(0),

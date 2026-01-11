@@ -1,6 +1,6 @@
 @php(the_content())
 
-@if ($pagination())
+@if (isset($pagination) && $pagination)
   <nav class="page-nav" aria-label="Page">
     {!! $pagination !!}
   </nav>

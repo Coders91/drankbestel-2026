@@ -14,7 +14,7 @@ the readme will list any important changes.
 @version     1.6.4
 --}}
 
-<x-app>
+<x-layouts.app>
   @php
     do_action('get_header', 'shop');
     do_action('woocommerce_before_main_content');
@@ -26,10 +26,10 @@ the readme will list any important changes.
       wc_get_template_part('content', 'single-product');
     @endphp
   @endwhile
-
+  <livewire:recently-viewed :excludeId="get_the_ID()" />
   @php
     do_action('woocommerce_after_main_content');
     do_action('get_sidebar', 'shop');
     do_action('get_footer', 'shop');
   @endphp
-</x-app>
+</x-layouts.app>

@@ -33,18 +33,14 @@
             </div>
             <div class="flex-1 flex flex-wrap justify-between mt-2 gap-y-1.5">
               <h2 class="text-gray-800 text-lg font-medium">{{ $item->quantity . 'x ' . $item->product->title }}</h2>
-              <p class="text-gray-900 text-xl font-bold whitespace-nowrap">{{ $item->subtotal_formatted }}</p>
+              <p class="text-gray-900 text-xl font-bold whitespace-nowrap">{{ $item->subtotal->formatted() }}</p>
             </div>
           </div>
         </div>
       @endforeach
       </div>
-      <div class="bg-gray-50 rounded-xl py-4 px-6 flex items-center justify-between flex-wrap">
-        <p class="text-gray-800 text-lg font-medium">Aantal producten</p>
-        <p class="text-gray-700 font-heading text-xl font-semibold">{{ $order->total_quantity }}</p>
-      </div>
       <div class="rounded-xl py-4 px-6 flex items-center justify-between flex-wrap">
-        <p class="text-gray-800 text-lg font-medium">Subtotaal</p>
+        <p class="text-gray-800 text-lg font-medium">Subtotaal ({{ $order->total_quantity }})</p>
         <p class="text-gray-700 font-heading text-xl font-semibold">{{ $order->subtotal->formatted() }}</p>
       </div>
       <div class="bg-gray-50 rounded-xl py-4 px-6 flex items-center justify-between flex-wrap">

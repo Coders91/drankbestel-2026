@@ -4,6 +4,7 @@
       <label
         for="payment_{{ $gateway->id }}"
         class="block w-full border-2 rounded-lg p-4 cursor-pointer border-gray-200 has-checked:border-gray-700"
+        data-payment-gateway="{{ $gateway->id }}"
       >
         <x-radio
           id="payment_{{ $gateway->id }}"

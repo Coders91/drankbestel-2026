@@ -10,7 +10,6 @@ readonly class ProductPrice
     public function __construct(
         public Money $regular,
         public ?Money $sale,
-        public bool $is_on_sale,
     ) {}
 
     public static function fromProduct(WC_Product $product): self
@@ -23,7 +22,6 @@ readonly class ProductPrice
         return new self(
             regular: $regular,
             sale: $sale,
-            is_on_sale: $product->is_on_sale(),
         );
     }
 }

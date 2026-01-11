@@ -12,10 +12,7 @@
 
   {{-- Loading State --}}
   <div x-show="!loaded" x-cloak class="bg-white rounded-lg p-12 shadow-sm text-center">
-    <svg class="animate-spin h-12 w-12 mx-auto text-red-600 mb-4" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-    </svg>
+    @svg('resources.images.icons.loader', 'animate-spin h-12 w-12 mx-auto text-red-600 mb-4')
     <p class="text-gray-600">{{ __('Favorieten laden...', 'sage') }}</p>
   </div>
 

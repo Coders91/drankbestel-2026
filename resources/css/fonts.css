@@ -54,3 +54,10 @@
   src: url('../fonts/inter-v20-latin-regular.woff2') format('woff2');
 }
 
+@font-face {
+  font-display: swap;
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/bebas-neue-v16-latin-regular.woff2');
+}

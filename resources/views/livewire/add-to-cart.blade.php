@@ -1,15 +1,68 @@
-<div>
-  <x-button
-    wire:click="add"
-    wire:loading.attr="disabled"
-    wire:target="add"
+<div
+  x-data="{ showError: false, errorMessage: '' }"
+  x-on:add-to-cart-with-qty.window="if ($event.detail.productId === {{ $productId }}) { $wire.add($event.detail.quantity) }"
+  x-on:add-to-cart-pack.window="if ($event.detail.productId === {{ $productId }}) { $wire.addPack($event.detail.multiplier || 1) }"
+  x-on:add-to-cart-error.window="if ($event.detail.productId === {{ $productId }}) { showError = true; errorMessage = $event.detail.message; setTimeout(() => showError = false, 4000) }"
+  x-on:product-added-to-cart.window="if ($event.detail.productId === {{ $productId }}) { showError = false }"
+  class="relative"
+>
+  {{-- Error tooltip --}}
+  <div
+    x-show="showError"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 translate-y-1"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 translate-y-1"
+    x-cloak
+    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50"
   >
-    <span wire:loading.remove wire:target="add">{{ __('Bestel', 'sage') }}</span>
-    <span wire:loading wire:target="add" class="flex items-center gap-2">
-      <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-      </svg>
-    </span>
-  </x-button>
+    <div class="bg-red-600 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap max-w-xs text-center">
+      <span x-text="errorMessage"></span>
+      <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-red-600"></div>
+    </div>
+  </div>
+
+  @if ($this->soldAsPack)
+      <x-button
+        wire:click="addPack"
+        wire:loading.attr="disabled"
+        wire:target="addPack"
+        class="w-full h-full"
+        :disabled="$this->disabled"
+      >
+        <span wire:loading.remove wire:target="addPack">
+           @if($this->disabled)
+            {{ __('Uitverkocht', 'sage') }}
+          @else
+            {{ __('Bestel', 'sage') }} ({{ $this->packSize }})
+          @endif
+        </span>
+        <span wire:loading wire:target="addPack" class="flex items-center gap-2">
+          @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+        </span>
+      </x-button>
+  @else
+    {{-- Normal individual sale --}}
+    <x-button
+      wire:click="add"
+      wire:loading.attr="disabled"
+      wire:target="add"
+      class="w-full h-full"
+      :size="is_product() ? 'regular' : ''"
+      :disabled="$this->disabled"
+    >
+      <span wire:loading.remove wire:target="add">
+        @if($this->disabled)
+          @svg('resources.images.icons.slash-circle-01')
+        @else
+          {{ __('Bestel', 'sage') }}
+        @endif
+      </span>
+      <span wire:loading wire:target="add" class="flex items-center gap-2">
+        @svg('resources.images.icons.loader', 'animate-spin h-6 w-6')
+      </span>
+    </x-button>
+  @endif
 </div>

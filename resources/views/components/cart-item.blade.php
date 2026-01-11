@@ -7,14 +7,16 @@
 ])
 
 <div
-  {{ $attributes->merge(['class' => 'relative bg-white border border-gray-100 shadow-sm rounded-lg p-4 mb-6']) }}
+  {{ $attributes->merge(['class' => 'relative bg-white border border-gray-200 shadow-sm rounded-lg p-4 mb-6']) }}
   wire:key="{{ $item->key }}"
   data-quantity="{{ $item->quantity }}"
   data-max-quantity="{{ $item->maxQuantity }}"
+  data-min-quantity="{{ $item->minQuantity }}"
+  data-step="{{ $item->packSize }}"
   x-data="{
     loading: false,
     removing: false,
-    get atMin() { return parseInt(this.$el.dataset.quantity) <= 1 },
+    get atMin() { return parseInt(this.$el.dataset.quantity) <= parseInt(this.$el.dataset.minQuantity) },
     get atMax() { return parseInt(this.$el.dataset.quantity) >= parseInt(this.$el.dataset.maxQuantity) }
   }"
 >
@@ -24,10 +26,7 @@
     x-cloak
     class="absolute inset-0 bg-white/80 rounded-lg flex items-center justify-center z-10"
   >
-    <svg class="animate-spin h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-    </svg>
+    @svg('resources.images.icons.loader', 'animate-spin h-8 w-8 text-red-600')
   </div>
 
   <div class="flex flex-col sm:flex-row gap-3">
@@ -39,18 +38,23 @@
         <div>
           <div class="flex flex-grow  justify-between">
           <a href="{{ $item->product->url }}" class="hover:text-red-600 transition">
-            <h3 class="text-lg font-semibold font-heading">{{ $item->product->name }}</h3>
+            <h3 class="text-lg font-semibold">{{ $item->product->name }}</h3>
           </a>
           </div>
           @if ($item->product->contents)
             <p class="text-gray-600">{{ $item->product->contents }}</p>
+          @endif
+          @if ($item->soldAsPack)
+            <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded">
+              {{ sprintf(__('%d-pack', 'sage'), $item->packSize) }}
+            </span>
           @endif
         </div>
         <button
           type="button"
           x-on:click="removing = true; $wire.removeItem('{{ $item->key }}')"
           x-bind:disabled="removing"
-          class="text-gray-400 hover:text-red-600 transition p-1 disabled:opacity-50"
+          class="text-gray-700 hover:text-red-600 transition p-1 disabled:opacity-50"
           title="{{ __('Verwijderen', 'sage') }}"
         >
           @svg('resources.images.icons.trash-01')
@@ -74,10 +78,9 @@
             <span x-show="loading !== 'decrease'">
               @svg('resources.images.icons.minus', 'size-4')
             </span>
-            <svg x-show="loading === 'decrease'" x-cloak class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
+            <span x-show="loading === 'decrease'" x-cloak>
+              @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+            </span>
           </button>
           <span class="w-10 h-10 text-sm flex items-center justify-center border-x border-gray-300 text-center">
                       {{ $item->quantity }}
@@ -92,13 +95,19 @@
             <span x-show="loading !== 'increase'">
               @svg('resources.images.icons.plus', 'size-4')
             </span>
-            <svg x-show="loading === 'increase'" x-cloak class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
+            <span x-show="loading === 'increase'" x-cloak>
+              @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+            </span>
           </button>
         </div>
-        <span class="text-base pr-4 font-medium font-heading text-gray-900">{{ $item->lineTotal->formatted() }}</span>
+        @if($item->product->is_on_sale)
+          <div class="flex flex-col">
+            <span class="text-base pr-4 font-medium font-heading line-through text-gray-700">{{ $item->lineRegularTotal->formatted() }}</span>
+            <span class="font-semibold text-red-600 text-base">{{ $item->lineSubtotal->formatted() }}</span>
+          </div>
+        @else
+          <span class="text-base pr-4 font-medium font-heading text-gray-900">{{ $item->lineSubtotal->formatted() }}</span>
+        @endif
       </div>
     </div>
   </div>

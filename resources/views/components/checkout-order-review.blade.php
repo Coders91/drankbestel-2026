@@ -3,8 +3,8 @@
   /** @var App\View\Models\CartTotals $totals */
 @endphp
 
-<div {{ $attributes->merge(['class' => 'h-fit grid content-center m-auto max-w-[560px]']) }}>
-  <h2 class="text-gray-900 text-xl mt-22 mb-4 font-semibold">Overzicht</h2>
+<div {{ $attributes->merge(['class' => 'grid content-center m-auto']) }}>
+  <h2 class="text-gray-900 text-xl mb-4 font-semibold">Overzicht</h2>
 
   {{-- Order Items --}}
   <div class="space-y-4 mb-6">
@@ -24,7 +24,7 @@
           @endif
           <div class="flex items-center justify-between mt-1">
             <span class="text-sm text-gray-500">{{ $item->quantity }}x</span>
-            <span class="font-medium text-gray-900">{{ $item->lineTotal->formatted() }}</span>
+            <span class="font-medium text-gray-900">{{ $item->lineSubtotal->formatted() }}</span>
           </div>
         </div>
       </div>
@@ -33,17 +33,23 @@
 
   {{-- Totals --}}
   <div class="space-y-3 pt-4 border-t border-gray-200">
-    {{-- Subtotal --}}
-    <div class="flex justify-between text-gray-900">
-      <span>{{ __('Subtotaal', 'sage') }} ({{ $totals->itemCount }} {{ $totals->itemCount === 1 ? 'product' : 'producten' }})</span>
-      <span>{{ $totals->subtotal->amount->formatted() }}</span>
-    </div>
-
-    {{-- Discount (if any) --}}
+    {{-- Subtotal before discounts (only show if there are discounts) --}}
     @if ($totals->discount->amount->amount > 0)
+      <div class="flex justify-between text-gray-900">
+        <span>{{ __('Subtotaal', 'sage') }} ({{ $totals->itemCount }} {{ $totals->itemCount === 1 ? 'product' : 'producten' }})</span>
+        <span>{{ $totals->subtotalBeforeDiscounts->amount->formatted() }}</span>
+      </div>
+
+      {{-- Discount --}}
       <div class="flex justify-between text-gray-900">
         <span>{{ __('Korting', 'sage') }}</span>
         <span class="text-green-600">-{{ $totals->discount->amount->formatted() }}</span>
+      </div>
+    @else
+      {{-- Subtotal (no discounts) --}}
+      <div class="flex justify-between text-gray-900">
+        <span>{{ __('Subtotaal', 'sage') }} ({{ $totals->itemCount }} {{ $totals->itemCount === 1 ? 'product' : 'producten' }})</span>
+        <span>{{ $totals->subtotal->amount->formatted() }}</span>
       </div>
     @endif
 
@@ -60,7 +66,7 @@
     </div>
 
     {{-- Total --}}
-    <div class="flex justify-between items-center pt-4">
+    <div class="flex justify-between items-center pt-4" data-checkout-total="{{ number_format($totals->total->amount->decimal(), 2, '.', '') }}">
       <span class="text-lg font-semibold font-heading text-gray-900">{{ __('Totaal', 'sage') }}</span>
       <span class="text-lg font-semibold font-heading text-gray-900">{{ $totals->total->amount->formatted() }}</span>
     </div>
@@ -98,14 +104,12 @@
       wire:loading.attr="disabled"
       wire:loading.class="opacity-50 cursor-not-allowed"
       wire:target="save"
+      @click="$dispatch('place-order')"
       size="regular"
     >
       <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
       <span wire:loading wire:target="save" class="flex items-center gap-2">
-        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
+        @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
         Bestelling plaatsen..
       </span>
     </x-button>

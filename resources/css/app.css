@@ -1,12 +1,13 @@
 @import "./fonts.css";
 @import "./typography.css";
+@import "./swiper.css";
 @import "tailwindcss" theme(static);
 @source "../views/";
 @source "../../app/";
 
 @theme {
   --font-heading: 'Poppins', sans-serif;
-  --color-red-25: #ece6e6;
+  --font-body: 'Inter', sans-serif;
   --color-gray-50: #fafafa;
   --color-gray-100: #e8edf5;
   --color-gray-200: #cfd5e2;
@@ -19,6 +20,7 @@
   --color-gray-900: #1d232f;
   --color-gray-950: #070708;
 
+  --color-red-25: #ece6e6;
   --color-red-50:  #fdd9D9;
   --color-red-100: #fbc0c0;
   --color-red-500: #e10e0e;
@@ -26,6 +28,8 @@
   --color-red-900: #210202;
 
   --color-amber-600: #ffcB00;
+
+  --color-cyan-600: #4EA1A6;
 
   --color-green-100: #c2f3d6;
   --color-green-200: #82e6ac;
@@ -38,23 +42,35 @@
 }
 
 @layer base {
-  button {
-    cursor: pointer;
+  :root {
+    --breakpoint-sm: theme(--breakpoint-sm);
+    --breakpoint-md: theme(--breakpoint-md);
+    --breakpoint-lg: theme(--breakpoint-lg);
+    --breakpoint-xl: theme(--breakpoint-xl);
   }
   body {
-    font-family: "Inter", sans-serif;
+    font-family: var(--font-body), sans-serif;
     font-weight: 400;
     font-style: normal;
     color: var(--color-gray-900);
   }
+  input[type="search" i]::-webkit-search-cancel-button {
+    display: none;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+  label {
+    cursor: pointer;
+  }
 }
 
 @layer components {
-  .container {
-    max-width: 1280px;
-    margin-inline: auto;
-    padding-inline: 1rem;
-  }
   .card {
     border: 1px solid var(--color-gray-200);
     border-radius: var(--radius-xl);
@@ -81,4 +97,44 @@
   .swiper-pagination-bullet-active {
     opacity: 1;
   }
+
+  /* Mega Menu Styles */
+  .mega-menu {
+    position: relative;
+  }
+
+  .mega-menu::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--color-gray-100);
+  }
+
+  /* Smooth header transitions */
+  .sticky {
+    will-change: transform, box-shadow;
+  }
+
+  /* Mobile menu backdrop blur support */
+  @supports (backdrop-filter: blur(4px)) {
+    .mobile-menu-backdrop {
+      backdrop-filter: blur(4px);
+    }
+  }
+}
+
+@utility container {
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+}
+
+/* Search result highlighting */
+mark {
+  background-color: rgb(254 249 195); /* yellow-100 */
+  padding: 0 2px;
+  border-radius: 2px;
 }

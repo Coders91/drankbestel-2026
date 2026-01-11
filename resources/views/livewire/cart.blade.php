@@ -14,12 +14,12 @@
     </div>
   @else
     <p class="text-gray-600 mb-8">
-      {{ sprintf(_n('%d product in uw winkelwagen', '%d producten in uw winkelwagen', $this->totals->itemCount, 'sage'), $this->totals->itemCount) }}
+      {{ sprintf(_n('Je hebt %d product in je winkelwagen', 'Je hebt %d producten in je winkelwagen', $this->totals->itemCount, 'sage'), $this->totals->itemCount) }}
     </p>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid lg:grid-cols-[768px_1fr] gap-8">
       {{-- Cart Items --}}
-      <div class="lg:col-span-2">
+      <div>
         @foreach ($this->items as $item)
           <x-cart-item :item="$item" />
         @endforeach
@@ -36,16 +36,30 @@
       </div>
 
       {{-- Order Summary --}}
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-lg p-6 border border-gray-100 shadow-sm sticky top-4">
+      <div>
+        <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm sticky top-4">
           <h2 class="text-gray-900 text-xl font-heading mb-4 font-semibold">{{ __('Overzicht', 'sage') }}</h2>
 
           <div class="space-y-4 mb-6">
-            {{-- Subtotal --}}
-            <div class="flex justify-between text-gray-600">
-              <span class="text-gray-600">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
-              <span class="">{{ $this->totals->subtotal->amount->formatted() }}</span>
-            </div>
+            {{-- Subtotal before discounts (only show if there are discounts) --}}
+            @if ($this->totals->discount->amount->amount > 0)
+              <div class="flex justify-between text-gray-600">
+                <span class="text-gray-600">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
+                <span class="">{{ $this->totals->subtotalBeforeDiscounts->amount->formatted() }}</span>
+              </div>
+
+              {{-- Discount --}}
+              <div class="flex justify-between text-green-600">
+                <span>{{ __('Korting', 'sage') }}</span>
+                <span class="font-medium">-{{ $this->totals->discount->amount->formatted() }}</span>
+              </div>
+            @else
+              {{-- Subtotal (no discounts) --}}
+              <div class="flex justify-between text-gray-600">
+                <span class="text-gray-600">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
+                <span class="">{{ $this->totals->subtotal->amount->formatted() }}</span>
+              </div>
+            @endif
 
             {{-- Shipping --}}
             <div class="flex justify-between text-gray-600">
@@ -59,21 +73,12 @@
               </span>
             </div>
 
-            {{-- Discount (if any) --}}
-            @if ($this->totals->discount->amount->amount > 0)
-              <div class="flex justify-between text-green-600">
-                <span>{{ __('Korting', 'sage') }}</span>
-                <span class="font-medium">-{{ $this->totals->discount->amount->formatted() }}</span>
-              </div>
-            @endif
-
             {{-- Total --}}
             <div class="border-t border-gray-200 pt-4">
               <div class="flex justify-between items-center">
                 <span class="text-lg font-semibold font-heading">{{ __('Totaal', 'sage') }}</span>
                 <span class="text-lg font-semibold font-heading">{{ $this->totals->total->amount->formatted() }}</span>
               </div>
-              <p class="text-sm text-gray-500 mt-1">{{ __('Inclusief BTW', 'sage') }}</p>
             </div>
           </div>
 

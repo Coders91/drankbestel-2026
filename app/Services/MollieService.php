@@ -103,4 +103,17 @@ class MollieService
 
         return $this->mollie->payments->create($payment);
     }
+
+    /**
+     * Request Apple Pay payment session for merchant validation.
+     *
+     * @throws ApiException
+     * @throws RequestException
+     */
+    public function requestApplePaySession(string $validationUrl): object
+    {
+        $domain = parse_url(home_url(), PHP_URL_HOST);
+
+        return $this->mollie->wallets->requestApplePayPaymentSession($domain, $validationUrl);
+    }
 }

@@ -9,12 +9,12 @@
 ])
 
 @php($class = match($theme) {
+  'lightgray' => 'bg-gray-100',
   'gray' => 'bg-gray-50',
   default => 'bg-white'
 })
 
 <section {{ $attributes->merge(['class' => "py-16 lg:py-24 {$class}"]) }}>
-
   <div
   @class([
       'grid gap-6 lg:gap-10',

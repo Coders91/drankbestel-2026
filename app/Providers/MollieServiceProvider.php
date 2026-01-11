@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Woocommerce\Gateways\ApplePayGateway;
 use App\Woocommerce\Gateways\IdealGateway;
 use App\Woocommerce\Gateways\CreditcardGateway;
 use App\Woocommerce\Gateways\PaypalGateway;
@@ -41,6 +42,8 @@ class MollieServiceProvider extends ServiceProvider
             $gateways[] = IdealGateway::class;
             $gateways[] = CreditcardGateway::class;
             $gateways[] = PaypalGateway::class;
+            $gateways[] = ApplePayGateway::class;
+
             return $gateways;
         });
 
@@ -49,6 +52,13 @@ class MollieServiceProvider extends ServiceProvider
             register_rest_route('mollie/v1', '/webhook', [
                 'methods' => 'POST',
                 'callback' => [$this, 'handleWebhook'],
+                'permission_callback' => '__return_true',
+            ]);
+
+            // Apple Pay merchant validation endpoint
+            register_rest_route('mollie/v1', '/applepay/session', [
+                'methods' => 'POST',
+                'callback' => [$this, 'handleApplePaySession'],
                 'permission_callback' => '__return_true',
             ]);
         });
@@ -161,6 +171,39 @@ class MollieServiceProvider extends ServiceProvider
                 __('Mollie payment is pending (Payment ID: %s)', 'sage'),
                 $payment->id
             ));
+        }
+    }
+
+    /**
+     * Handle Apple Pay session request for merchant validation.
+     */
+    public function handleApplePaySession(WP_REST_Request $request): WP_REST_Response
+    {
+        $validationUrl = $request->get_param('validationUrl');
+
+        if (! $validationUrl) {
+            Log::warning('Apple Pay session request without validation URL');
+
+            return new WP_REST_Response(['error' => 'Missing validationUrl'], 400);
+        }
+
+        // Validate that the URL is from Apple (security check)
+        $parsedUrl = parse_url($validationUrl);
+        if (! isset($parsedUrl['host']) || ! str_ends_with($parsedUrl['host'], '.apple.com')) {
+            Log::warning('Apple Pay session request with invalid validation URL', ['url' => $validationUrl]);
+
+            return new WP_REST_Response(['error' => 'Invalid validation URL'], 400);
+        }
+
+        try {
+            $mollieService = app(MollieService::class);
+            $session = $mollieService->requestApplePaySession($validationUrl);
+
+            return new WP_REST_Response($session, 200);
+        } catch (\Exception $e) {
+            Log::error('Apple Pay session error: ' . $e->getMessage());
+
+            return new WP_REST_Response(['error' => 'Failed to create session'], 500);
         }
     }
 }

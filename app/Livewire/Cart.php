@@ -110,7 +110,7 @@ class Cart extends Component
     }
 
     /**
-     * Increase item quantity by 1
+     * Increase item quantity (respects pack size)
      */
     public function increaseQuantity(string $cartItemKey): void
     {
@@ -121,12 +121,20 @@ class Cart extends Component
         $cartItem = WC()->cart->get_cart_item($cartItemKey);
 
         if ($cartItem) {
-            $this->updateQuantity($cartItemKey, $cartItem['quantity'] + 1);
+            $productId = $cartItem['product_id'];
+            $soldAsPack = (bool) get_field('product_sold_as_pack', $productId);
+            $allowIndividual = (bool) get_field('product_allow_individual', $productId);
+            $packSize = (int) (get_field('product_pack_size', $productId) ?: 1);
+
+            // Increment by pack size if it's a pack-only product
+            $increment = ($soldAsPack && ! $allowIndividual) ? $packSize : 1;
+
+            $this->updateQuantity($cartItemKey, $cartItem['quantity'] + $increment);
         }
     }
 
     /**
-     * Decrease item quantity by 1
+     * Decrease item quantity (respects pack size)
      */
     public function decreaseQuantity(string $cartItemKey): void
     {
@@ -137,9 +145,18 @@ class Cart extends Component
         $cartItem = WC()->cart->get_cart_item($cartItemKey);
 
         if ($cartItem) {
-            $newQuantity = $cartItem['quantity'] - 1;
+            $productId = $cartItem['product_id'];
+            $soldAsPack = (bool) get_field('product_sold_as_pack', $productId);
+            $allowIndividual = (bool) get_field('product_allow_individual', $productId);
+            $packSize = (int) (get_field('product_pack_size', $productId) ?: 1);
 
-            if ($newQuantity <= 0) {
+            // Decrement by pack size if it's a pack-only product
+            $decrement = ($soldAsPack && ! $allowIndividual) ? $packSize : 1;
+            $minQuantity = ($soldAsPack && ! $allowIndividual) ? $packSize : 1;
+
+            $newQuantity = $cartItem['quantity'] - $decrement;
+
+            if ($newQuantity < $minQuantity) {
                 $this->removeItem($cartItemKey);
             } else {
                 $this->updateQuantity($cartItemKey, $newQuantity);

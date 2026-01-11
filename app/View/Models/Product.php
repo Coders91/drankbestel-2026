@@ -8,60 +8,136 @@ use App\View\Models\ProductPrice;
 
 use WC_Product;
 
-readonly class Product implements Wireable
+class Product implements Wireable
 {
-    public function __construct(
-        public int          $id,
-        public string       $name,
-        public string       $title,
-        public string       $url,
-        public bool         $is_on_sale,
-        public bool         $boxed,
-        public ?string      $contents,
-        public ProductPrice $price,
-        public int|string   $imageId,
-    ) {}
+    /**
+     * Cache for aggregated ratings by product name to avoid repeated queries.
+     */
+    protected static array $ratingCache = [];
+
+    public readonly int $id;
+    public readonly string $name;
+    public readonly string $title;
+    public readonly string $url;
+    public readonly array $categories;
+    public readonly bool $is_on_sale;
+    public readonly ?float $discountPercentage;
+    public readonly bool $boxed;
+    public readonly ?string $contents;
+    public readonly ProductPrice $price;
+    public readonly int|string $imageId;
+    public readonly ?int $stockQuantity;
+    public readonly bool $is_in_stock;
+    public readonly float $rating;
+    public readonly int $reviewCount;
+    public readonly bool $soldAsPack;
+    public readonly int $packSize;
+
+    public function __construct(WC_Product $product)
+    {
+        $this->id = $product->get_id();
+        $this->name = $product->get_name();
+        $this->url = $product->get_permalink();
+        $this->contents = get_field('product_contents', $this->id);
+        $this->title = $this->name . ' ' . trim($this->contents);
+        $this->categories = wc_get_product_terms($this->id, 'product_cat', ['orderby' => 'parent', 'order' => 'ASC']);
+        $this->boxed = $product->get_attribute('pa_doos') === 'Ja';
+        $this->is_on_sale = $product->is_on_sale();
+
+        $regular_price = $product->get_regular_price();
+        $sale_price = $product->get_sale_price();
+
+        $this->discountPercentage = $this->is_on_sale
+            ? round((($regular_price - $sale_price) / $regular_price) * 100)
+            : null;
+
+        $this->price = new ProductPrice(
+            regular: Money::from($regular_price),
+            sale: $this->is_on_sale ? Money::from($sale_price) : null,
+        );
+
+        $this->imageId = $product->get_image_id();
+        $this->stockQuantity = $product->get_stock_quantity();
+        $this->is_in_stock = $product->is_in_stock();
+
+        // Use aggregated rating from all size variants (products with same name)
+        $aggregatedRating = self::getAggregatedRating($this->name);
+        $this->rating = $aggregatedRating['average_rating'];
+        $this->reviewCount = $aggregatedRating['review_count'];
+
+        $this->soldAsPack = (bool) get_field('product_sold_as_pack', $this->id);
+        $this->packSize = (int) (get_field('product_pack_size', $this->id) ?: 1);
+    }
+
+    /**
+     * Get aggregated rating data for all products with the same name.
+     * Results are cached to avoid repeated queries for products in grids.
+     */
+    protected static function getAggregatedRating(string $productName): array
+    {
+        // Return cached result if available
+        if (isset(self::$ratingCache[$productName])) {
+            return self::$ratingCache[$productName];
+        }
+
+        global $wpdb;
+
+        // Find all product IDs with the same name
+        $productIds = $wpdb->get_col($wpdb->prepare(
+            "SELECT ID FROM $wpdb->posts
+             WHERE post_title = %s
+             AND post_type = 'product'
+             AND post_status = 'publish'",
+            $productName
+        ));
+
+        if (empty($productIds)) {
+            self::$ratingCache[$productName] = [
+                'average_rating' => 0.0,
+                'review_count' => 0,
+            ];
+
+            return self::$ratingCache[$productName];
+        }
+
+        // Get all approved reviews for these products
+        $reviews = get_comments([
+            'post__in' => $productIds,
+            'status' => 'approve',
+            'type' => 'review',
+        ]);
+
+        $reviewCount = count($reviews);
+        $averageRating = 0.0;
+
+        if ($reviewCount > 0) {
+            $totalRating = 0;
+            foreach ($reviews as $review) {
+                $totalRating += (int) get_comment_meta($review->comment_ID, 'rating', true);
+            }
+            $averageRating = $totalRating / $reviewCount;
+        }
+
+        self::$ratingCache[$productName] = [
+            'average_rating' => $averageRating,
+            'review_count' => $reviewCount,
+        ];
+
+        return self::$ratingCache[$productName];
+    }
 
     public static function find(int|WC_Product $product): ?self
     {
-        // Already a typed product → return as-is
         if ($product instanceof self) {
             return $product;
         }
 
-        // Convert ID to WC_Product
         if (is_int($product)) {
             $product = wc_get_product($product);
         }
 
-        if (! $product instanceof WC_Product) {
-            return null;
-        }
-
-        $product_id = $product->get_id();
-        $product_contents = get_field('product_contents', $product_id);
-
-        $is_on_sale = $product->is_on_sale();
-
-        return new self(
-            id: $product_id,
-            name: $product->get_name(),
-            title: $product->get_name() . ' ' . $product_contents,
-            url: $product->get_permalink(),
-            is_on_sale: $is_on_sale,
-            boxed: $product->get_attribute('pa_doos') === 'Ja',
-            contents: $product_contents,
-            price: new ProductPrice(
-                regular: Money::from($product->get_regular_price()),
-                sale: $is_on_sale
-                    ? Money::from($product->get_sale_price())
-                    : null,
-                is_on_sale: $is_on_sale,
-            ),
-            imageId: $product->get_image_id(),
-        );
+        return $product instanceof WC_Product ? new self($product) : null;
     }
-
 
     public function toLivewire(): array
     {

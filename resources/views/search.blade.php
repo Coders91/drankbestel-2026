@@ -1,4 +1,4 @@
-<x-app>
+<x-layouts.app>
   @include('partials.page-header')
 
   @if (! have_posts())
@@ -14,4 +14,4 @@
   @endwhile
 
   {!! get_the_posts_navigation() !!}
-</x-app>
+</x-layouts.app>

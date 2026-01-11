@@ -62,6 +62,5 @@ return [
 
     'google' => [
         'merchant_center_id' => 737478831,
-    ]
-
+    ],
 ];

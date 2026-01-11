@@ -2,9 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\Woocommerce\ProductSlugService;
 use Illuminate\Support\ServiceProvider;
-
-use App\Woocommerce\Gateways\IdealGateway;
 
 class WoocommerceServiceProvider extends ServiceProvider
 {
@@ -21,6 +20,6 @@ class WoocommerceServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        ProductSlugService::register();
     }
 }

@@ -5,5 +5,7 @@
   @php(wp_head())
   @livewireStyles
   @vite(['resources/css/app.css'])
-  <style id="swiper">{{ Vite::content('resources/css/lib/swiper-bundle.min.css') }}</style>
+  @isset($structuredData)
+    {!! $structuredData !!}
+  @endisset
 </head>

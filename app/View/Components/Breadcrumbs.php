@@ -5,84 +5,163 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
 use Closure;
+use App\View\Models\Product;
 
 class Breadcrumbs extends Component
 {
-    /**
-     * The breadcrumb items.
-     *
-     * @var array
-     */
     public array $crumbs = [];
 
-    /**
-     * Create a new component instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
-        $this->crumbs = $this->generate_breadcrumbs();
+        $this->crumbs = $this->generateBreadcrumbs();
     }
 
-    /**
-     * Generate the breadcrumbs.
-     *
-     * @return array
-     */
-    protected function generate_breadcrumbs(): array
+    protected function generateBreadcrumbs(): array
     {
-        $url_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $segments = array_values(array_filter(explode('/', $url_path))); // remove empty segments
-        $home_url = home_url('/');
-
         $crumbs = [
             [
-                'name' => get_svg('resources.images.icons.site.home', 'w-5 h-5 stroke-gray-500', ['aria-hidden' => 'true']),
-                'url'  => $home_url,
+                'name' => get_svg(
+                    'resources.images.icons.home-03',
+                    'w-5 h-5 stroke-gray-700',
+                    ['aria-hidden' => 'true']
+                ),
+                'url' => home_url('/'),
             ],
         ];
 
-        $path = '';
-        $total_segments = count($segments);
+        if (is_product()) {
+            return array_merge($crumbs, $this->productCrumbs());
+        }
+
+        if (is_product_category()) {
+            return array_merge($crumbs, $this->productCategoryCrumbs());
+        }
+
+        return array_merge($crumbs, $this->urlCrumbs());
+    }
+
+    /**
+     * Breadcrumbs for single products
+     */
+    protected function productCrumbs(): array
+    {
+        $crumbs = [];
+
+        $product = Product::find(get_the_ID());
+
+        $categories = $product->categories;
+
+        if (!empty($categories)) {
+            // Safely get the deepest category (readonly-safe)
+            $primary = $categories[count($categories) - 1];
+
+            // Parent hierarchy
+            $ancestors = array_reverse(
+                get_ancestors($primary->term_id, 'product_cat')
+            );
+
+            foreach ($ancestors as $ancestorId) {
+                $term = get_term($ancestorId, 'product_cat');
+                $crumbs[] = [
+                    'name' => $term->name,
+                    'url'  => get_term_link($term),
+                ];
+            }
+
+            // Primary category
+            $crumbs[] = [
+                'name' => $primary->name,
+                'url'  => get_term_link($primary),
+            ];
+        }
+
+        // Product title (current page)
+        $crumbs[] = [
+            'name' => $product->title,
+            'url'  => null,
+        ];
+
+        return $crumbs;
+    }
+
+    /**
+     * Breadcrumbs for product category archives
+     */
+    protected function productCategoryCrumbs(): array
+    {
+        $crumbs = [];
+
+        $term = get_queried_object();
+
+        // Parent categories
+        $ancestors = array_reverse(
+            get_ancestors($term->term_id, 'product_cat')
+        );
+
+        foreach ($ancestors as $ancestorId) {
+            $ancestor = get_term($ancestorId, 'product_cat');
+            $crumbs[] = [
+                'name' => $ancestor->name,
+                'url'  => get_term_link($ancestor),
+            ];
+        }
+
+        // Current category (no link)
+        $crumbs[] = [
+            'name' => $term->name,
+            'url'  => null,
+        ];
+
+        return $crumbs;
+    }
+
+    /**
+     * Fallback URL-based breadcrumbs
+     */
+    protected function urlCrumbs(): array
+    {
+        $crumbs = [];
+
+        $urlPath  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $segments = array_values(array_filter(explode('/', $urlPath)));
+        $homeUrl  = home_url('/');
+        $path     = '';
 
         foreach ($segments as $i => $segment) {
-            // Handle pagination URLs
-            if ($segment === 'page' && isset($segments[$i + 1]) && is_numeric($segments[$i + 1])) {
-                $page_num = $segments[$i + 1];
-
-                $display_title = 'Pagina ' . $page_num;
-
-                $crumbs[] = [
-                    'name' => $display_title,
+            // Pagination
+            if ($segment === 'page' && isset($segments[$i + 1])) {
+            $crumbs[] = [
+                    'name' => 'Pagina ' . (int) $segments[$i + 1],
                     'url'  => null,
                 ];
                 break;
             }
 
             $path .= $segment . '/';
-            $is_last = ($i === $total_segments - 1);
+            $isLast = $i === array_key_last($segments);
 
-            $display_title = ucfirst(str_replace('-', ' ', $segment));
-
-            if ($is_last && !is_archive() && get_the_title() !== '') {
-                $display_title = get_the_title();
+            if ($isLast) {
+                if (is_tax()) {
+                    $term  = get_queried_object();
+                    $title = $term->name ?? ucfirst(str_replace('-', ' ', $segment));
+                } elseif (is_singular()) {
+                    $title = get_the_title();
+                } else {
+                    $title = ucfirst(str_replace('-', ' ', $segment));
+                }
+            } else {
+                $title = ucfirst(str_replace('-', ' ', $segment));
             }
 
             $crumbs[] = [
-                'name' => $display_title,
-                'url'  => $is_last ? null : trailingslashit($home_url . $path),
+                'name' => $title,
+                'url'  => $isLast ? null : trailingslashit($homeUrl . $path),
             ];
         }
 
         return $crumbs;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     *
-     * @return View|\Closure|string
-     */
     public function render(): View|Closure|string
     {
         return view('components.breadcrumbs');

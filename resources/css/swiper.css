@@ -1,0 +1,50 @@
+/* Allow variable height slides for card sliders */
+.swiper-slide {
+  height: unset !important;
+}
+
+/* Product gallery needs fixed height to prevent infinite sizing */
+.product-gallery-slider {
+  container-type: inline-size;
+}
+
+.product-gallery-slider .swiper {
+  height: 100%;
+}
+
+.product-gallery-slider .swiper-wrapper {
+  height: 100%;
+}
+
+.product-gallery-slider .swiper-slide,
+.product-gallery-slider .swiper-slide > div {
+  height: 100% !important;
+}
+
+.swiper button[disabled] {
+  display: none;
+}
+
+/* USP bar vertical slider */
+.usp-slider .swiper {
+  height: 2rem;
+}
+
+.usp-slider .swiper-slide {
+  height: 2rem !important;
+  display: flex;
+  align-items: center;
+  translate: none;
+}
+
+/* Category selector scrollbar styling */
+.category-selector-slider .swiper-scrollbar {
+  background: var(--color-gray-100);
+  height: 4px;
+  border-radius: 2px;
+}
+
+.category-selector-slider .swiper-scrollbar-drag {
+  background: var(--color-red-600);
+  border-radius: 2px;
+}
