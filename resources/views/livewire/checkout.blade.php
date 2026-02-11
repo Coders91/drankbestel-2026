@@ -1,22 +1,21 @@
 <div>
-
-<div class="container px-4 grid lg:grid-cols-[768px_1fr] lg:gap-8">
-  <x-page-header class="col-span-full pt-12" title="Afrekenen" />
-  {{-- Left side: Form --}}
-  <div class="bg-white">
-    <form id="checkout" class="grid gap-y-8 lg:gap-12 max-w-3xl" name="checkout" method="post" novalidate x-data="checkout()" @submit.prevent="submitForm()" @place-order.window="submitForm()">
-      {{-- Order Error Message --}}
-      @error('order')
-        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-            </svg>
-            <p class="text-red-700 font-medium">{{ $message }}</p>
+  <div class="container px-4">
+    <x-page-header class="col-span-full pt-12" title="Afrekenen" />
+    <form id="checkout" class="grid lg:grid-cols-[768px_1fr] lg:gap-x-8" name="checkout" method="post" novalidate x-data="checkout()" @submit.prevent="submitForm()" @place-order.window="submitForm()">
+      {{-- Left side: Form sections --}}
+      <div class="grid gap-y-8 lg:gap-y-12 min-w-0">
+        {{-- Order Error Message --}}
+        @error('order')
+          <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <p class="text-red-700 font-medium">{{ $message }}</p>
+            </div>
           </div>
-        </div>
-      @enderror
-      <div class="min-w-0 shadow-xs">
+        @enderror
+
         <x-checkout-section
           title="Persoonlijke gegevens"
           title-class="mb-2"
@@ -57,48 +56,47 @@
             @include('partials.billing-fields')
           </div>
         </x-checkout-section>
+
+        <x-checkout-section title="Verzendadres">
+          @include('partials.shipping-fields')
+        </x-checkout-section>
+
+        <x-checkout-section title="Bezorgmoment">
+          <livewire:delivery-options
+            :postalCode="$form->billing_postcode"
+            :houseNumber="$form->billing_house_number"
+            :houseNumberSuffix="$form->billing_house_number_suffix"
+            wire:model="deliverySelection"
+          />
+        </x-checkout-section>
+
+        <x-checkout-section title="Betaalmethoden">
+          @include('woocommerce.checkout.payment-options')
+        </x-checkout-section>
+
+        <x-button
+          hidden
+          type="submit"
+          class="flex items-center"
+          wire:loading.attr="disabled"
+          wire:loading.class="opacity-50 cursor-not-allowed"
+          wire:target="save"
+        >
+          <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
+          <span wire:loading wire:target="save" class="flex items-center gap-2">
+            @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+            Bestelling plaatsen..
+          </span>
+        </x-button>
       </div>
 
-      <x-checkout-section title="Verzendadres">
-        @include('partials.shipping-fields')
-      </x-checkout-section>
-
-      <x-checkout-section title="Bezorgmoment">
-        <livewire:delivery-options
-          :postalCode="$form->billing_postcode"
-          :houseNumber="$form->billing_house_number"
-          :houseNumberSuffix="$form->billing_house_number_suffix"
-          wire:model="deliverySelection"
-        />
-      </x-checkout-section>
-
-      <x-checkout-section title="Betaalmethoden">
-        @include('woocommerce.checkout.payment-options')
-      </x-checkout-section>
-
-      <x-button
-        hidden
-        type="submit"
-        class="flex items-center"
-        wire:loading.attr="disabled"
-        wire:loading.class="opacity-50 cursor-not-allowed"
-        wire:target="save"
-      >
-        <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
-        <span wire:loading wire:target="save" class="flex items-center gap-2">
-          @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
-          Bestelling plaatsen..
-        </span>
-      </x-button>
+      {{-- Right side: Order Review --}}
+      <aside class="h-fit">
+        <x-icon-link class="text-sm mb-6" :href="route('cart')">Winkelwagen bewerken</x-icon-link>
+        <x-checkout-order-review class="bg-white border border-gray-300 p-6 rounded-xl" />
+      </aside>
     </form>
   </div>
-
-  {{-- Right side: Order Review --}}
-  <aside class="h-fit">
-    <x-icon-link class="text-sm mb-6" :href="route('cart')">Winkelwagen bewerken</x-icon-link>
-    <x-checkout-order-review class="bg-white border border-gray-300 p-6 rounded-xl" />
-  </aside>
-</div>
 </div>
 
 @pushonce('scripts')
