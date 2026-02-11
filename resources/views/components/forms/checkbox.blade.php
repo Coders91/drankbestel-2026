@@ -10,6 +10,7 @@
         <input
           type="checkbox"
           id="{{ $id }}"
+          name={{ $name }}
           class="before:content[''] peer relative size-5 appearance-none overflow-hidden rounded
           border border-gray-800 bg-white before:absolute before:inset-0
           checked:border-gray-800 checked:before:bg-white focus:outline-2 focus:outline-offset-2
@@ -21,7 +22,7 @@
   {{ $slot }}
 </label>
 @if($withErrors)
-  <template x-if="errors.{{ $attributes['name'] }}">
-    <p class="text-red-600 text-sm mt-1" x-text="errors.{{ $attributes['name'] }}"></p>
+  <template x-if="errors.{{ $name }}">
+    <p class="text-red-600 text-sm mt-1" x-text="errors.{{ $name }}"></p>
   </template>
 @endif

@@ -81,8 +81,8 @@ class CheckoutForm extends Form
             'vat_number' => 'sometimes|regex:/^NL\d{9}B\d{2}$/',
             'customer_reference' => 'nullable',
             'payment_method' => 'required',
-            'newsletter' => 'nullable|boolean',
-            'age_check' => 'required|accepted',
+            'newsletter' => 'nullable',
+            'age_check' => 'accepted|required',
         ];
     }
 

@@ -126,9 +126,10 @@
 
         const rulesString = this.rules[fieldName];
 
-        // Handle radio buttons - get the checked value
         let value;
-        if (element && element.type === 'radio') {
+        if (element && element.type === 'checkbox') {
+          value = element.checked;
+        } else if (element && element.type === 'radio') {
           const checkedRadio = document.querySelector(`[name="${fieldName}"]:checked`);
           value = checkedRadio ? checkedRadio.value : '';
         } else {

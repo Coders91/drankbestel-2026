@@ -4,7 +4,7 @@
   <x-field-group class="mt-1 cursor-pointer">
     <x-checkbox   id="ship_to_different_address"
                   name="ship_to_different_address"
-                  @change="form.ship_to_different_address = $event.target.value"
+                  @change="form.ship_to_different_address = $event.target.checked"
                   wire:model.boolean.live="form.ship_to_different_address"
     >
       Verzenden naar een ander adres?

@@ -39,7 +39,6 @@
         <span>{{ __('Subtotaal', 'sage') }} ({{ $totals->itemCount }} {{ $totals->itemCount === 1 ? 'product' : 'producten' }})</span>
         <span>{{ $totals->subtotalBeforeDiscounts->amount->formatted() }}</span>
       </div>
-
       {{-- Discount --}}
       <div class="flex justify-between text-gray-900">
         <span>{{ __('Korting', 'sage') }}</span>
@@ -81,6 +80,7 @@
         name="age_check"
         x-model="form.age_check"
         wire:model="form.age_check"
+        @change="markTouched('age_check'); validateField($el)"
       >
         <span class="text-gray-700">Ik bevestig dat ik 18 jaar of ouder ben</span> <span class="text-red-600">*</span>
       </x-checkbox>

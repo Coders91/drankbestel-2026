@@ -40,7 +40,14 @@ export function formValidator(config = {}) {
       }
 
       const rulesString = this.rules[fieldName];
-      const value = element ? element.value : this.form[fieldName];
+
+      let value;
+      if (element && (element.type === 'radio' || element.type === 'checkbox')) {
+        const checked = document.querySelector(`[name="${fieldName}"]:checked`);
+        value = checked ? checked.value : '';
+      } else {
+        value = element ? element.value : this.form[fieldName];
+      }
       let hasError = false;
 
       this.errors[fieldName] = '';
