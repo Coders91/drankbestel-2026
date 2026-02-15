@@ -13,11 +13,11 @@ use App\Livewire\ProductReviewPage;
 use App\Livewire\SiteSearch;
 
 // Livewire page components
-Route::get('/winkelwagen/', Cart::class)->name('cart');
-Route::get('/afrekenen/', Checkout::class)->name('checkout');
-Route::get('/favorieten/', Favorites::class)->name('favorites');
-Route::get('/account/', MyAccount::class)->name('account');
-Route::get('/contact/', Contact::class)->name('contact');
+Route::livewire('/winkelwagen/', Cart::class)->name('cart');
+Route::livewire('/afrekenen/', Checkout::class)->name('checkout');
+Route::livewire('/favorieten/', Favorites::class)->name('favorites');
+Route::livewire('/account/', MyAccount::class)->name('account');
+Route::livewire('/contact/', Contact::class)->name('contact');
 
 // Checkout payment flow
 Route::get('/afrekenen/betaling/{order_id}/', [CheckoutController::class, 'paymentReturn'])->name('payment.return');
@@ -28,7 +28,7 @@ Route::get('/factuur/{order_id}/preview/', [InvoiceController::class, 'preview']
 Route::get('/factuur/{order_id}/download/', [InvoiceController::class, 'download'])->name('invoice.download');
 
 // Search
-Route::get('/zoeken/', SiteSearch::class)->name('search');
+Route::livewire('/zoeken/', SiteSearch::class)->name('search');
 
 // Product review page (for email campaigns)
-Route::get('/{product_slug}/beoordeling', ProductReviewPage::class)->name('review');
+Route::livewire('/{product_slug}/beoordeling', ProductReviewPage::class)->name('review');

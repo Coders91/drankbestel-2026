@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'layout' => 'components.layouts.app',
+    'component_layout' => 'components.layouts.app',
 
     /*
     |---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ return [
     |
     */
 
-    'lazy_placeholder' => null,
+    'component_placeholder' => null,
 
     /*
     |---------------------------------------------------------------------------
@@ -92,19 +92,6 @@ return [
 
     /*
     |---------------------------------------------------------------------------
-    | Eloquent Model Binding
-    |---------------------------------------------------------------------------
-    |
-    | Previous versions of Livewire supported binding directly to eloquent model
-    | properties using wire:model by default. However, this behavior has been
-    | deemed too "magical" and has therefore been put under a feature flag.
-    |
-    */
-
-    'legacy_model_binding' => false,
-
-    /*
-    |---------------------------------------------------------------------------
     | Auto-inject Frontend Assets
     |---------------------------------------------------------------------------
     |
@@ -131,19 +118,6 @@ return [
         'show_progress_bar' => true,
         'progress_bar_color' => '#2299dd',
     ],
-
-    /*
-    |---------------------------------------------------------------------------
-    | HTML Morph Markers
-    |---------------------------------------------------------------------------
-    |
-    | Livewire intelligently "morphs" existing HTML into the newly rendered HTML
-    | after each update. To make this process more reliable, Livewire injects
-    | "markers" into the rendered Blade surrounding @if, @class & @foreach.
-    |
-    */
-
-    'inject_morph_markers' => true,
 
     /*
     |---------------------------------------------------------------------------

@@ -4,7 +4,7 @@
       <x-form-field
                     id="billing_company"
                     name="billing_company"
-                    wire:model.blur="form.billing_company"
+                    wire:model.live.blur="form.billing_company"
                     placeholder="Bedrijfsnaam"
                     @blur="validateField($el)"
       >
@@ -15,7 +15,7 @@
       <x-form-field
                       id="vat_number"
                       name="vat_number"
-                      wire:model.blur="form.vat_number"
+                      wire:model.live.blur="form.vat_number"
                       placeholder="NL123456789B01"
                       @blur="validateField($el)"
         >
@@ -26,7 +26,7 @@
   <div>
     <x-form-field id="customer_reference"
                   name="customer_reference"
-                  wire:model.blur="form.customer_reference"
+                  wire:model.live.blur="form.customer_reference"
                   placeholder="Referentie"
                   @blur="validateField($el)"
     >

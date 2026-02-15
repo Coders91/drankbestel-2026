@@ -5,7 +5,7 @@
     <div class="flex-1">
       <x-form-field id="billing_first_name"
                     name="billing_first_name"
-                    wire:model.blur="form.billing_first_name"
+                    wire:model.live.blur="form.billing_first_name"
                     placeholder="Voornaam"
                     autocomplete="given-name"
                     @input="touched[$el.name] = true"
@@ -19,7 +19,7 @@
     <div class="flex-1">
       <x-form-field id="billing_last_name"
                     name="billing_last_name"
-                    wire:model.blur="form.billing_last_name"
+                    wire:model.live.blur="form.billing_last_name"
                     placeholder="Achternaam"
                     autocomplete="family-name"
                     @input="touched[$el.name] = true"
@@ -35,7 +35,7 @@
   <x-field-group>
     <x-form-field id="billing_email"
                   name="billing_email"
-                  wire:model.blur="form.billing_email"
+                  wire:model.live.blur="form.billing_email"
                   placeholder="E-mailadres"
                   autocomplete="email"
                   @input="touched[$el.name] = true"
@@ -49,7 +49,7 @@
   <x-field-group>
     <x-form-field id="billing_phone"
                   name="billing_phone"
-                  wire:model.blur="form.billing_phone"
+                  wire:model.live.blur="form.billing_phone"
                   type="tel"
                   placeholder="06123456789"
                   autocomplete="tel"

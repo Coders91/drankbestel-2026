@@ -10,7 +10,7 @@
           id="payment_{{ $gateway->id }}"
           name="payment_method"
           value="{{ $gateway->id }}"
-          wire:model.defer="form.payment_method"
+          wire:model="form.payment_method"
         >
           <span class="font-medium">{{ $gateway->title }}</span>
           {!! $gateway->icon !!}
