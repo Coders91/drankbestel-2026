@@ -8,18 +8,23 @@
     placeholderOptions: @js($placeholderOptions),
     initialSelection: @js($initialSelection),
   })"
-  x-init="init()"
   @fetch-delivery-options.window="fetchOptions()"
 >
   <div x-show="options.length > 0">
     <div class="max-sm:hidden flex flex-wrap items-center gap-4 w-full justify-between mt-4 md:mt-0 mb-4">
-      Kies een bezorgdatum
+      <span class="font-semibold text-sm" x-text="selectedLabel"></span>
       <div class="flex items-center gap-2">
-        <button type="button" class="swiper-button-prev-custom flex items-center justify-center size-10 rounded-full border border-gray-300 hover:bg-gray-100 transition-colors">
-          @svg('resources.images.icons.chevron-left')
+        <button
+          type="button"
+          class="swiper-button-prev-custom size-10 rounded-full border border-gray-300 transition-colors disabled:opacity-50 disabled:bg-gray-50 disabled:border-gray-100"
+        >
+          @svg('resources.images.icons.chevron-left', 'size-5 m-auto')
         </button>
-        <button type="button" class="swiper-button-next-custom flex items-center justify-center size-10 rounded-full border border-gray-300 hover:bg-gray-100 transition-colors">
-          @svg('resources.images.icons.chevron-right')
+        <button
+          type="button"
+          class="swiper-button-next-custom size-10 rounded-full border border-gray-300 transition-colors disabled:opacity-50 disabled:bg-gray-50 disabled:border-gray-100"
+        >
+          @svg('resources.images.icons.chevron-right', 'size-5 m-auto')
         </button>
       </div>
     </div>
@@ -30,7 +35,7 @@
       </div>
     </div>
 
-    <p class="mt-4 text-sm text-gray-900">Bij aflevering vindt leeftijdscontrole plaats.</p>
+      <p class="mt-4 text-sm text-gray-900">Bij aflevering vindt leeftijdscontrole plaats.</p>
   </div>
 
   {{-- Hidden input for form submission --}}
@@ -45,7 +50,6 @@
 <script>
 function deliveryOptions(config) {
   return {
-    // State
     options: config.placeholderOptions || [],
     selectedIndex: 0,
     selection: config.initialSelection || null,
@@ -53,51 +57,58 @@ function deliveryOptions(config) {
     error: null,
     swiper: null,
 
-    // Config
     postalCode: config.postalCode || '',
     houseNumber: config.houseNumber || '',
     houseNumberSuffix: config.houseNumberSuffix || '',
     settings: config.settings || {},
 
+    get selectedLabel() {
+      if (this.selectedIndex >= 0 && this.options[this.selectedIndex]) {
+        const option = this.options[this.selectedIndex];
+        return `Bezorgdatum: ${option.display_date} ${option.date_string}`;
+      }
+      return 'Kies een bezorgdatum';
+    },
+
     init() {
-      // Render initial slides and init swiper
       this.renderSlides();
       this.initSwiper();
 
-      // Set initial selection
-      if (this.selection?.date) {
-        this.restoreSelectionByDate(this.selection.date);
+      if (this.postalCode && this.houseNumber) {
+        this.prePositionToSelection();
+        this.fetchOptions();
+      } else if (this.selection?.date) {
+        this.restoreSelection();
       } else if (this.options.length > 0) {
         this.selectByIndex(0);
       }
+    },
 
-      // Initial fetch if we have address
-      if (this.postalCode && this.houseNumber) {
-        this.fetchOptions();
-      }
+    prePositionToSelection() {
+      if (!this.selection?.date) return;
+
+      const index = this.findIndexByDate(this.selection.date);
+      if (index < 0) return;
+
+      this.selectedIndex = index;
+      this.updateSlideStyles();
+      this.swiper?.slideTo(index, 0);
     },
 
     renderSlides(reinit = false) {
       const wrapper = this.$refs.swiperWrapper;
       if (!wrapper) return;
 
-      const loading = `Laden...`;
-
-      // If just updating loading state and Swiper exists, update slide content only
       if (this.swiper && !reinit) {
-        const slides = wrapper.querySelectorAll('.swiper-slide');
-        slides.forEach((slide, index) => {
-          if (this.options[index]) {
-            const timeSlot = slide.querySelector('.mt-1.text-sm');
-            if (timeSlot) {
-              timeSlot.innerHTML = this.isLoading ? loading : (this.options[index].time_string || '');
-            }
+        wrapper.querySelectorAll('.swiper-slide').forEach((slide, i) => {
+          const timeSlot = slide.querySelector('[data-time]');
+          if (timeSlot && this.options[i]) {
+            timeSlot.innerHTML = this.isLoading ? 'Laden...' : (this.options[i].time_string || '');
           }
         });
         return;
       }
 
-      // Full render for init or when options change
       wrapper.innerHTML = this.options.map((option, index) => `
         <button
           type="button"
@@ -106,17 +117,15 @@ function deliveryOptions(config) {
         >
           <div class="font-semibold capitalize">${option.display_date}</div>
           <div class="mt-1 text-gray-800">${option.date_string}</div>
-          <div class="mt-1 text-sm font-medium text-gray-800 flex items-center gap-2">
-            ${this.isLoading ? loading : (option.time_string || '')}
+          <div data-time class="mt-1 text-sm font-medium text-gray-800 flex items-center gap-2">
+            ${this.isLoading ? 'Laden...' : (option.time_string || '')}
           </div>
         </button>
       `).join('');
 
-      // Add click handlers
       wrapper.querySelectorAll('.swiper-slide').forEach(slide => {
         slide.addEventListener('click', () => {
-          const index = parseInt(slide.dataset.index, 10);
-          this.selectByIndex(index);
+          this.selectByIndex(parseInt(slide.dataset.index, 10));
         });
       });
     },
@@ -126,14 +135,12 @@ function deliveryOptions(config) {
       if (!wrapper) return;
 
       wrapper.querySelectorAll('.swiper-slide').forEach(slide => {
-        const index = parseInt(slide.dataset.index, 10);
-        if (index === this.selectedIndex) {
-          slide.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'border-transparent');
-          slide.classList.add('border-gray-900', 'bg-white');
-        } else {
-          slide.classList.remove('border-gray-900', 'bg-white');
-          slide.classList.add('bg-gray-100', 'hover:bg-gray-200', 'border-transparent');
-        }
+        const isSelected = parseInt(slide.dataset.index, 10) === this.selectedIndex;
+        slide.classList.toggle('border-gray-900', isSelected);
+        slide.classList.toggle('bg-white', isSelected);
+        slide.classList.toggle('bg-gray-100', !isSelected);
+        slide.classList.toggle('hover:bg-gray-200', !isSelected);
+        slide.classList.toggle('border-transparent', !isSelected);
       });
     },
 
@@ -148,25 +155,14 @@ function deliveryOptions(config) {
       this.swiper = new Swiper(container, {
         slidesPerView: 1.5,
         spaceBetween: 16,
-        loop: this.options.length > 4,
-        slideToClickedSlide: true,
-        watchSlidesProgress: true,
+        freeMode: true,
         navigation: {
           nextEl: '.swiper-button-next-custom',
           prevEl: '.swiper-button-prev-custom',
         },
         breakpoints: {
-          575: {
-            slidesPerView: 3,
-          },
-          768: {
-            slidesPerView: 4,
-          }
-        },
-        on: {
-          slideChangeTransitionStart: (swiper) => {
-            this.selectByIndex(swiper.realIndex);
-          },
+          575: { slidesPerView: 3, slidesPerGroup: 3 },
+          768: { slidesPerView: 4, slidesPerGroup: 4 },
         },
       });
     },
@@ -176,13 +172,11 @@ function deliveryOptions(config) {
       const houseNumber = this.$wire.houseNumber || this.houseNumber;
       const suffix = this.$wire.houseNumberSuffix || this.houseNumberSuffix || '';
 
-      if (!postalCode || !houseNumber) {
-        return;
-      }
+      if (!postalCode || !houseNumber) return;
 
       this.isLoading = true;
       this.error = null;
-      this.renderSlides(); // Just update time slots to show spinners (doesn't reinit Swiper)
+      this.renderSlides();
 
       const preservedDate = this.selection?.date || null;
 
@@ -202,10 +196,7 @@ function deliveryOptions(config) {
         });
 
         const response = await fetch(`https://api.myparcel.nl/delivery_options?${params}`);
-
-        if (!response.ok) {
-          throw new Error('API request failed');
-        }
+        if (!response.ok) throw new Error('API request failed');
 
         const data = await response.json();
         const deliveryData = data?.data?.delivery || data?.delivery || [];
@@ -213,29 +204,24 @@ function deliveryOptions(config) {
         if (!deliveryData.length) {
           this.error = 'Geen bezorgopties gevonden voor dit adres.';
           this.isLoading = false;
-          this.renderSlides(); // Update to remove spinners
+          this.renderSlides();
           return;
         }
 
         this.options = this.formatDeliveryOptions(deliveryData);
         this.isLoading = false;
 
-        // Re-render with new options and reinit swiper
-        this.renderSlides(true); // true = full reinit
+        this.renderSlides(true);
         this.initSwiper();
 
-        // Restore or select first
-        if (preservedDate && !this.restoreSelectionByDate(preservedDate)) {
-          this.selectByIndex(0);
-        } else if (!preservedDate && this.options.length > 0) {
+        if (!preservedDate || !this.restoreSelection(preservedDate)) {
           this.selectByIndex(0);
         }
-
       } catch (e) {
         console.error('Delivery options fetch error:', e);
         this.error = 'Kon bezorgtijden niet ophalen.';
         this.isLoading = false;
-        this.renderSlides(); // Update to remove spinners
+        this.renderSlides();
       }
     },
 
@@ -247,24 +233,16 @@ function deliveryOptions(config) {
         .map(option => {
           const date = new Date(option.date);
           date.setHours(0, 0, 0, 0);
-
           if (date < today) return null;
 
           const daysDiff = Math.floor((date - today) / (1000 * 60 * 60 * 24));
           const dayName = date.toLocaleDateString('nl-NL', { weekday: 'long' });
 
-          let displayDate;
-          if (daysDiff === 0) {
-            displayDate = 'vandaag';
-          } else if (daysDiff === 1) {
-            displayDate = `morgen (${dayName})`;
-          } else if (daysDiff === 2) {
-            displayDate = `overmorgen (${dayName})`;
-          } else {
-            displayDate = dayName;
-          }
+          const displayDate = daysDiff === 0 ? 'vandaag'
+            : daysDiff === 1 ? `morgen`
+            : daysDiff === 2 ? `overmorgen`
+            : dayName;
 
-          // Find standard delivery time slot (type 2)
           const timeSlot = (option.time || []).find(slot => (slot.type || 2) === 2);
           if (!timeSlot) return null;
 
@@ -275,7 +253,6 @@ function deliveryOptions(config) {
             time_string: `${timeSlot.start.slice(0, -3)} - ${timeSlot.end.slice(0, -3)}`,
             start: timeSlot.start,
             end: timeSlot.end,
-            is_placeholder: false,
           };
         })
         .filter(Boolean);
@@ -306,23 +283,25 @@ function deliveryOptions(config) {
         end: option.end,
       };
 
-      // Update visual selection
       this.updateSlideStyles();
-
-      // Sync to Livewire
       this.$wire.updateSelection(this.selection);
     },
 
-    restoreSelectionByDate(dateToFind) {
-      const search = dateToFind.substring(0, 10);
+    restoreSelection(dateToFind) {
+      const date = dateToFind || this.selection?.date;
+      if (!date) return false;
 
-      for (let i = 0; i < this.options.length; i++) {
-        if (this.options[i].date.substring(0, 10) === search) {
-          this.selectByIndex(i);
-          return true;
-        }
-      }
-      return false;
+      const index = this.findIndexByDate(date);
+      if (index < 0) return false;
+
+      this.selectByIndex(index);
+      this.swiper?.slideTo(index, 0);
+      return true;
+    },
+
+    findIndexByDate(date) {
+      const search = date.substring(0, 10);
+      return this.options.findIndex(o => o.date.substring(0, 10) === search);
     },
   };
 }
