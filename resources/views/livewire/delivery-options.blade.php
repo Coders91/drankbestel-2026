@@ -11,9 +11,9 @@
   @fetch-delivery-options.window="fetchOptions()"
 >
   <div x-show="options.length > 0">
-    <div class="max-sm:hidden flex flex-wrap items-center gap-4 w-full justify-between mt-4 md:mt-0 mb-4">
+    <div class="flex flex-wrap items-center gap-4 w-full justify-between mt-4 md:mt-0 mb-4">
       <span class="font-semibold text-sm" x-text="selectedLabel"></span>
-      <div class="flex items-center gap-2">
+      <div class="max-sm:hidden flex items-center gap-2">
         <button
           type="button"
           class="swiper-button-prev-custom size-10 rounded-full border border-gray-300 transition-colors disabled:opacity-50 disabled:bg-gray-50 disabled:border-gray-100"
@@ -113,7 +113,7 @@ function deliveryOptions(config) {
         <button
           type="button"
           data-index="${index}"
-          class="swiper-slide rounded-lg border-2 p-4 text-left transition-all cursor-pointer ${this.selectedIndex === index ? 'border-gray-900 bg-white' : 'bg-gray-100 hover:bg-gray-200 border-transparent'}"
+          class="swiper-slide rounded-lg border-2 p-4 text-left transition-all cursor-pointer"
         >
           <div class="font-semibold capitalize">${option.display_date}</div>
           <div class="mt-1 text-gray-800">${option.date_string}</div>
@@ -136,7 +136,7 @@ function deliveryOptions(config) {
 
       wrapper.querySelectorAll('.swiper-slide').forEach(slide => {
         const isSelected = parseInt(slide.dataset.index, 10) === this.selectedIndex;
-        slide.classList.toggle('border-gray-900', isSelected);
+        slide.classList.toggle('border-red-600', isSelected);
         slide.classList.toggle('bg-white', isSelected);
         slide.classList.toggle('bg-gray-100', !isSelected);
         slide.classList.toggle('hover:bg-gray-200', !isSelected);

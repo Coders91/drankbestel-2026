@@ -3,7 +3,7 @@
     @if($gateway->enabled === 'yes')
       <label
         for="payment_{{ $gateway->id }}"
-        class="block w-full border-2 rounded-lg p-4 cursor-pointer border-gray-200 has-checked:border-gray-700"
+        class="block w-full border rounded-lg p-4 cursor-pointer border-gray-200 has-checked:border-red-600 has-checked:border-2 has-checked:p-[14px]"
         data-payment-gateway="{{ $gateway->id }}"
       >
         <x-radio
@@ -12,7 +12,7 @@
           value="{{ $gateway->id }}"
           wire:model="form.payment_method"
         >
-          <span class="font-medium">{{ $gateway->title }}</span>
+          <span>{{ $gateway->title }}</span>
           <span class="ml-auto">{!! $gateway->icon !!}</span>
         </x-radio>
 
