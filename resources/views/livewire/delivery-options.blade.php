@@ -318,8 +318,7 @@ function deliveryOptions(config) {
 
       for (let i = 0; i < this.options.length; i++) {
         if (this.options[i].date.substring(0, 10) === search) {
-          this.selectedIndex = i;
-          this.updateSlideStyles();
+          this.selectByIndex(i);
           return true;
         }
       }
