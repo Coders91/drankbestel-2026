@@ -61,7 +61,6 @@ add_filter('woocommerce_enqueue_styles', '__return_empty_array');
 // Remove inline styles that WooCommerce adds
 add_filter('woocommerce_inline_styles', '__return_empty_string');
 
-
 add_filter( 'woocommerce_structured_data_product', function( $markup, $product ){
     if( is_product() ) {
         $markup = [];

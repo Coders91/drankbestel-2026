@@ -211,7 +211,7 @@ add_action('wp_enqueue_scripts', function() {
     wp_deregister_script('jquery-migrate');
 }, 99);
 
-// Filtereverything plugin - remove CSS
+// Filtereverything plugin
 add_action( 'wp_print_styles', function () {
     wp_dequeue_style( 'wpc-filter-everything' );
     wp_deregister_style( 'wpc-filter-everything' );
@@ -219,6 +219,11 @@ add_action( 'wp_print_styles', function () {
     wp_dequeue_style( 'wpc-widgets' );
     wp_deregister_style( 'wpc-widgets' );
 }, 999 );
+
+add_action('wp_print_scripts', function () {
+    wp_deregister_script('wpc-filter-everything');
+    wp_dequeue_script('wpc-filter-everything');
+}, 999);
 
 // Remove block assets
 add_action('init', function() {
