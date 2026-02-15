@@ -18,6 +18,11 @@
 </div>
 
 <style>
+  body:not(.has-applepay) [data-payment-gateway="mollie_applepay"],
+  body:not(.has-applepay) [data-payment-gateway="applepay"] {
+    display: none !important;
+  }
+
   .apple-pay-button {
     -webkit-appearance: -apple-pay-button;
     -apple-pay-button-type: buy;
@@ -54,18 +59,17 @@
             .then((canMake) => {
               this.available = canMake || ApplePaySession.canMakePayments();
               this.checked = true;
-              this.togglePaymentGateway();
+              if (this.available) document.body.classList.add('has-applepay');
             })
             .catch(() => {
               // Fallback: just check basic capability
               this.available = ApplePaySession.canMakePayments();
               this.checked = true;
-              this.togglePaymentGateway();
+              if (this.available) document.body.classList.add('has-applepay');
             });
         } else {
           this.available = false;
           this.checked = true;
-          this.togglePaymentGateway();
         }
 
         // Listen for checkout submit when Apple Pay is selected
@@ -79,21 +83,6 @@
             this.startPayment();
           }
         });
-      },
-
-      togglePaymentGateway() {
-        // Hide the entire payment method if Apple Pay is not available
-        // Try both possible gateway IDs
-        const gatewayElement = document.querySelector('[data-payment-gateway="mollie_applepay"]') ||
-                              document.querySelector('[data-payment-gateway="applepay"]');
-
-        if (gatewayElement) {
-          if (!this.available) {
-            gatewayElement.style.display = 'none';
-          } else {
-            gatewayElement.style.display = '';
-          }
-        }
       },
 
       async startPayment() {
