@@ -3,8 +3,6 @@
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Log;
-
-use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 use App\Livewire\Forms\CheckoutForm;

@@ -104,11 +104,10 @@
       wire:loading.attr="disabled"
       wire:loading.class="opacity-50 cursor-not-allowed"
       wire:target="save"
-      @click="$dispatch('place-order')"
       size="regular"
     >
       <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
-      <span wire:loading wire:target="save" class="flex items-center gap-2">
+      <span wire:loading.flex wire:target="save" class="flex items-center gap-2">
         @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
         Bestelling plaatsen..
       </span>

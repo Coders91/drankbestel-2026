@@ -1,7 +1,21 @@
 <div>
+  <header class="container py-6 border-b border-gray-100">
+    <a
+      class="block"
+      href="{{ home_url('/') }}"
+    >
+      @svg('resources.images.logos.drankbestel', 'h-6 w-auto')
+    </a>
+  </header>
   <div class="container px-4">
-    <x-page-header class="col-span-full pt-12" title="Afrekenen" />
-    <form id="checkout" class="grid lg:grid-cols-[768px_1fr] lg:gap-x-8" name="checkout" method="post" novalidate x-data="checkout()" @submit.prevent="submitForm()" @place-order.window="submitForm()">
+    <form method="post"
+          id="checkout"
+          name="checkout"
+          class="grid lg:grid-cols-[768px_1fr] lg:gap-x-8"
+          x-data="checkout()"
+          @submit.prevent="submitForm()"
+          @pageshow.window="$event.persisted && window.location.reload()"
+    >
       {{-- Left side: Form sections --}}
       <div class="grid gap-y-8 lg:gap-y-12 min-w-0">
         {{-- Order Error Message --}}
