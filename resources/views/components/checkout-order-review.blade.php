@@ -7,7 +7,7 @@
   <h2 class="text-gray-900 text-xl mb-4 font-semibold">Overzicht</h2>
 
   {{-- Order Items --}}
-  <div class="space-y-4 mb-6">
+  <div class="space-y-4">
     @foreach ($items as $item)
       <div class="flex gap-3 pb-4 border-b border-gray-200 last:border-b-0">
         <div class="shrink-0 w-26 h-26 bg-white rounded-lg border border-gray-100 flex items-center justify-center">

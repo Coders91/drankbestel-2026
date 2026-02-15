@@ -14,7 +14,7 @@
     name="{{ $name }}"
     value="{{ $value }}"
     {{ $attributes->merge([
-        'class' => "flex-shrink-0 peer before:content[''] relative size-5 appearance-none rounded-full border border-gray-800 bg-white
+        'class' => "flex-shrink-0 peer before:content[''] relative size-5 appearance-none rounded-full border bg-white
         before:invisible before:absolute before:left-1/2 before:top-1/2 before:size-2 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-gray-50
         checked:border-red-600 checked:bg-red-600 checked:before:visible focus:outline-0
         focus:outline-offset-2 disabled:cursor-not-allowed"

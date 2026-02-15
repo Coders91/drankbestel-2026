@@ -8,4 +8,5 @@
   @if($description)
     <p class="text-gray-700 max-w-2xl">{{ $description }}</p>
   @endif
+  {{ $slot }}
 </section>

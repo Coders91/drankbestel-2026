@@ -1,3 +1,7 @@
+@props([
+  'titleClass' => 'mb-4',
+])
+
 <div>
   <h3 class="text-xl font-semibold {{ $titleClass }}" {!! $attributes->only(['x-text']) !!}>{{ $title }}</h3>
 

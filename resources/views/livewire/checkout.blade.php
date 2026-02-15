@@ -1,17 +1,11 @@
 <div>
-  <header class="container py-6 border-b border-gray-100">
-    <a
-      class="block"
-      href="{{ home_url('/') }}"
-    >
-      @svg('resources.images.logos.drankbestel', 'h-6 w-auto')
-    </a>
-  </header>
+  <x-checkout-header />
   <div class="container px-4">
+    <x-page-header class="flex lg:justify-center mt-8 mb-4" title="Afrekenen" />
     <form method="post"
           id="checkout"
           name="checkout"
-          class="grid lg:grid-cols-[768px_1fr] lg:gap-x-8"
+          class="grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8"
           x-data="checkout()"
           @submit.prevent="submitForm()"
           @pageshow.window="$event.persisted && window.location.reload()"
@@ -32,7 +26,7 @@
 
         <x-checkout-section
           title="Persoonlijke gegevens"
-          title-class="mb-2"
+          titleClass="mb-2"
           x-text="form.is_business_order ? 'Zakelijke gegevens' : 'Persoonlijke gegevens'"
         >
           <x-slot:header>
@@ -106,10 +100,10 @@
 
       {{-- Right side: Order Review --}}
       <aside class="h-fit">
-        <x-icon-link class="text-sm mb-6" :href="route('cart')">Winkelwagen bewerken</x-icon-link>
         <x-checkout-order-review class="bg-white border border-gray-300 p-6 rounded-xl" />
       </aside>
     </form>
+    <x-checkout-footer class="-mx-4 px-4" />
   </div>
 </div>
 

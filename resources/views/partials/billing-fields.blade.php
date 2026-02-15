@@ -1,5 +1,5 @@
 <div class="grid gap-4">
-  <h3 class="text-lg font-semibold mb-4" x-show="form.is_business_order" x-cloak>Persoonsgegevens</h3>
+  <h3 class="text-lg font-semibold" x-show="form.is_business_order" x-cloak>Persoonsgegevens</h3>
   <x-field-group class="flex gap-4">
     {{-- First name --}}
     <div class="flex-1">

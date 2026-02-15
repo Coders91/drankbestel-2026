@@ -11,6 +11,7 @@
           name="payment_method"
           value="{{ $gateway->id }}"
           wire:model="form.payment_method"
+          class="border-gray-300"
         >
           <span>{{ $gateway->title }}</span>
           <span class="ml-auto">{!! $gateway->icon !!}</span>
