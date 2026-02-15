@@ -13,7 +13,7 @@
           wire:model="form.payment_method"
         >
           <span class="font-medium">{{ $gateway->title }}</span>
-          {!! $gateway->icon !!}
+          <span class="ml-auto">{!! $gateway->icon !!}</span>
         </x-radio>
 
         @if($gateway->has_fields)
