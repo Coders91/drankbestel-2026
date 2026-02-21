@@ -10,7 +10,7 @@
 @endphp
 
 <div class="py-1">
-    <x-radio
+    <x-forms.radio
         autocomplete="off"
         :id="$inputId"
         :name="'filter-' . $taxonomy"
@@ -21,5 +21,5 @@
         class="text-sm"
     >
       <x-filters.item :count="$term['count']">{{ $term['label'] }}</x-filters.item>
-    </x-radio>
+    </x-forms.radio>
 </div>
