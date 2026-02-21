@@ -201,6 +201,13 @@ add_action('wp_enqueue_scripts', function() {
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
 remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 
+// Clear the entire WP script queue right before output so no plugin scripts (including jQuery dependents) ever print
+add_action('wp_print_scripts', function () {
+    if (is_admin()) return;
+    global $wp_scripts;
+    $wp_scripts->queue = [];
+}, PHP_INT_MAX);
+
 // Remove jQuery
 add_action('wp_enqueue_scripts', function() {
     if (is_admin()) return;
