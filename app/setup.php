@@ -297,3 +297,9 @@ add_action('init', function() {
     }
 
 }, 99);
+
+add_action('admin_footer', function() {
+   echo '<style> .woo-permalink-manager-banner { display: none !important; }
+                 .fs-has-title.fs-slug-woo-permalink-manager.fs-type-plugin { display: none !important; }
+        </style>}';
+}, 100);
