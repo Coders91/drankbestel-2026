@@ -17,7 +17,7 @@
 
 <div class="py-1">
 
-  <x-radio
+  <x-forms.radio
     :id="$inputId"
     :name="'filter-' . $taxonomy"
     :value="$term['slug'] ?? ''"
@@ -36,5 +36,5 @@
               & hoger
             @endif
     </x-filters.item>
-  </x-radio>
+  </x-forms.radio>
 </div>
