@@ -219,6 +219,8 @@ add_action('wp_enqueue_scripts', function() {
     wp_dequeue_script('jquery-ui-button');
     wp_deregister_script('jquery-ui-draggable');
     wp_dequeue_script('jquery-ui-draggable');
+    wp_deregister_script('jquery-ui-slider');
+    wp_dequeue_script('jquery-ui-slider');
 }, 99);
 
 // Filtereverything plugin
