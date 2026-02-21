@@ -29,6 +29,6 @@
       {{ $header }}
       </div>
     @endif
-  {{ $slot }}
+  {!! $slot !!}
   </div>
 </section>

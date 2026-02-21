@@ -2,7 +2,7 @@
   x-data="{ showError: false, errorMessage: '' }"
   x-on:add-to-cart-with-qty.window="if ($event.detail.productId === {{ $productId }}) { $wire.add($event.detail.quantity) }"
   x-on:add-to-cart-pack.window="if ($event.detail.productId === {{ $productId }}) { $wire.addPack($event.detail.multiplier || 1) }"
-  x-on:add-to-cart-error.window="if ($event.detail.productId === {{ $productId }}) { showError = true; errorMessage = $event.detail.message; setTimeout(() => showError = false, 4000) }"
+  x-on:add-to-cart-error.window="if ($event.detail.productId === {{ $productId }}) { showError = true; errorMessage = $event.detail.message; setTimeout(function() { showError = false }, 4000) }"
   x-on:product-added-to-cart.window="if ($event.detail.productId === {{ $productId }}) { showError = false }"
   class="relative"
 >

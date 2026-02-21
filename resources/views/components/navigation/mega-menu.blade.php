@@ -106,6 +106,7 @@
                         @endif
                     </li>
                 @endforeach
+                <a class="ml-auto text-red-600" href="/aanbiedingen">Aanbiedingen</a>
             </ul>
         </div>
     </nav>

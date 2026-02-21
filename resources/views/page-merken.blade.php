@@ -2,7 +2,7 @@
   Template Name: Merken (Brands)
 --}}
 
-<x-app>
+<x-layouts.app>
     @php
         // Get available letters for navigation
         $availableLetters = array_keys($all_brands_grouped_alphabetically);
@@ -178,4 +178,4 @@
             @endif
         </div>
     </section>
-</x-app>
+</x-layouts.app>

@@ -2,7 +2,7 @@
   /** @var App\View\Models\Order $order */
 @endphp
 
-<x-app :header="false" :hero="false" :breadcrumbs="false">
+<x-layouts.app :header="false" :hero="false" :breadcrumbs="false">
   <section class="py-12">
     <div class="container mx-auto max-w-screen-lg px-4">
       <div class="flex justify-center mb-6">
@@ -56,4 +56,4 @@
     </div>
     </div>
   </section>
-</x-app>
+</x-layouts.app>
