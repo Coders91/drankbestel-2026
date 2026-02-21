@@ -26,6 +26,15 @@ class ArchiveProduct extends Composer
                 'totalProducts' => 0,
                 'proposedFilters' => [],
                 'soortCategories' => [],
+                'filters' => [],
+                'activeFilterCount' => 0,
+                'selectedChips' => [],
+                'resetUrl' => '',
+                'moreLessCount' => 0,
+                'sortOptions' => [],
+                'currentSort' => '',
+                'queryVars' => [],
+                'maxPages' => 0,
             ];
         }
 
