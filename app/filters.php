@@ -21,6 +21,13 @@ add_filter('excerpt_more', function () {
  */
 remove_filter('admin_head', 'wp_check_widget_editor_deps');
 
+
+/**
+ * Prevent per block global css from being added. Since WordPress 6.9
+ */
+add_filter( 'should_load_separate_core_block_assets', '__return_false' );
+
+
 /**
  * Set out of stock products last
  */
