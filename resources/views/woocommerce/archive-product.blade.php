@@ -98,10 +98,10 @@ the readme will list any important changes.
 
           <div class="lg:hidden">
             <livewire:product-load-more
-              :query-vars="$queryVars"
-              :max-pages="$maxPages"
-              :initial-count="$products->count()"
-              :total-products="$totalProducts"
+              :query-vars="$queryVars ?? []"
+              :max-pages="$maxPages ?? 0"
+              :initial-count="$products->count() ?? 0"
+              :total-products="$totalProducts ?? 0"
             />
           </div>
 
