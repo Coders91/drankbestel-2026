@@ -1,25 +1,22 @@
 <div
-  class="header-search relative"
+  {{ $attributes->merge(['class' => 'header-search relative']) }}
   x-data="{ open: @entangle('showDropdown'), focused: false }"
   @click.outside="if (!focused) open = false; dropdown = false"
 >
-  {{-- Mobile search trigger --}}
-  <button
-    type="button"
-    wire:click="openMobileSearch"
-    class="md:hidden p-2 -m-2"
-    aria-label="{{ __('Zoeken', 'sage') }}"
-  >
-    @svg('resources.images.icons.search-sm', 'stroke-gray-700 size-6')
-  </button>
+
+    <button type="button" class="flex items-center gap-2 md:hidden w-full p-2 pb-3 text-gray-600 hover:text-red-600 transition-colors"
+      wire:click="openMobileSearch" aria-label="{{ __('Zoeken', 'sage') }}">
+      @svg('resources.images.icons.search-sm', 'size-6')
+      Zoeken...
+    </button>
 
   {{-- Desktop search form --}}
-  <form wire:submit.prevent="goToSearch" class="relative hidden md:flex min-w-[640px]">
+  <form wire:submit.prevent="goToSearch" class="relative hidden md:flex lg:min-w-[640px]">
     <input
       type="search"
       id="header-search"
       name="header-search"
-      class="w-full py-3 px-6 rounded-xl bg-gray-50 placeholder:text-gray-700 outline-0"
+      class="w-full py-3 px-6 rounded-full h-10  lg:rounded-xl bg-gray-50 placeholder:text-gray-700 outline-0"
       placeholder="{{ __('Zoeken...', 'sage') }}"
       wire:model.live.debounce.300ms="query"
       @focus="focused = true; $wire.focusInput(); setTimeout(() => { backdrop = true }, 100);"
@@ -36,7 +33,7 @@
       </span>
     @endif
 
-    <button type="submit" class="absolute right-4 -translate-y-1/2 top-1/2">
+    <button type="submit" class="absolute right-3 -translate-y-1/2 top-1/2">
       @svg('resources.images.icons.search-sm', 'stroke-gray-700')
     </button>
   </form>

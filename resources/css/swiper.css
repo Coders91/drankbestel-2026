@@ -1,6 +1,10 @@
-/* Allow variable height slides for card sliders */
+/* Allow variable height slides but stretch to tallest */
+.swiper-wrapper {
+  align-items: stretch;
+}
+
 .swiper-slide {
-  height: unset !important;
+  height: auto !important;
 }
 
 /* Product gallery needs fixed height to prevent infinite sizing */
@@ -21,20 +25,31 @@
   height: 100% !important;
 }
 
-.swiper button[disabled] {
+/* Hide disabled swiper navigation buttons (start/end of slides) */
+.swiper > button[disabled] {
   display: none;
 }
 
 /* USP bar vertical slider */
 .usp-slider .swiper {
-  height: 2rem;
+  height: 1.5rem;
+
+  @media(min-width: 992px) {
+    height: 32px;
+  }
+
 }
 
 .usp-slider .swiper-slide {
-  height: 2rem !important;
+  height: 1.5rem !important;
   display: flex;
   align-items: center;
   translate: none;
+
+  @media(min-width: 992px) {
+    height: 32px;
+  }
+
 }
 
 /* Category selector scrollbar styling */

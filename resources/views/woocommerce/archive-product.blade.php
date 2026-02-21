@@ -82,7 +82,7 @@ the readme will list any important changes.
             @endif
           </div>
 
-          <div id="products-grid" class="products grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+          <div id="products-grid" class="products grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
             @forelse ($products as $product)
               <x-product :product="$product" />
             @empty

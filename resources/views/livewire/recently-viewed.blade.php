@@ -11,11 +11,15 @@
     <x-section theme="gray" title="Recent bekeken">
       <x-slider
         :options="[
-           'slidesPerView' => 4,
+           'slidesPerView' => 2,
            'spaceBetween' => 16,
            'navigation' => true,
-        ],
-      ">
+           'breakpoints' => [
+             768 => ['slidesPerView' => 3],
+             1024 => ['slidesPerView' => 4],
+           ],
+        ]"
+      >
           @foreach ($this->products as $product)
           <div class="swiper-slide">
             <x-woocommerce.product :product="$product" />
