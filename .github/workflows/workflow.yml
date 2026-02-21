@@ -24,25 +24,9 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Poll until composer.lock is updated (max 120s)
-            TIMEOUT=120
-            ELAPSED=0
-            LOCK_FILE=~staging.drankbestel.nl/public_html/wp-content/drankbestel-2026/composer.lock
-            INITIAL_HASH=$(md5sum "$LOCK_FILE" 2>/dev/null | cut -d' ' -f1)
-
-            while [ $ELAPSED -lt $TIMEOUT ]; do
-              CURRENT_HASH=$(md5sum "$LOCK_FILE" 2>/dev/null | cut -d' ' -f1)
-              if [ "$CURRENT_HASH" != "$INITIAL_HASH" ]; then
-                echo "Deploy detected after ${ELAPSED}s"
-                break
-              fi
-              sleep 5
-              ELAPSED=$((ELAPSED + 5))
-            done
-
             cd ~/domains/staging.drankbestel.nl/public_html/wp-content
             wp acorn optimize:clear
             wp acorn optimize
