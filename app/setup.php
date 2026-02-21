@@ -195,7 +195,6 @@ add_action('wp_enqueue_scripts', function() {
     wp_dequeue_script('jquery-payment');
     wp_dequeue_script('fancybox');
     wp_dequeue_script('jqueryui');
-    wp_dequeue_script('customize-base');
 }, 99);
 
 // Remove global styles
@@ -223,6 +222,8 @@ add_action('wp_enqueue_scripts', function() {
     wp_dequeue_script('jquery-ui-draggable');
     wp_deregister_script('jquery-ui-slider');
     wp_dequeue_script('jquery-ui-slider');
+    wp_deregister_script('customize-base');
+    wp_dequeue_script('customize-base');
 }, 99);
 
 // Filtereverything plugin
