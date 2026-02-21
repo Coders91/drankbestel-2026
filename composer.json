@@ -77,7 +77,8 @@
     "scripts": {
       "post-install-cmd": [
         "@php /usr/local/bin/wp-cli-2.12.0.phar acorn:optimize clear --path=public",
-        "@php /usr/local/bin/wp-cli-2.12.0.phar acorn:optimize --path=public"
+        "@php /usr/local/bin/wp-cli-2.12.0.phar acorn:optimize --path=public",
+        "@php /usr/local/bin/wp-cli-2.12.0.phar wp litespeed-purge all --path=public"
       ]
     }
   }
