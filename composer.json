@@ -75,7 +75,7 @@
       "Roots\\Acorn\\ComposerScripts::postAutoloadDump"
     ],
     "post-install-cmd": [
-      "wp acorn search:index-all",
+      "wp acorn search:index",
       "wp acorn:optimize clear",
       "wp acorn:optimize"
     ]
