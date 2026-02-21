@@ -48,10 +48,10 @@ class ArchiveProduct extends Composer
             'products' => collect($wp_query->posts)
                 ->map(fn ($post) => Product::find($post->ID))
                 ->filter(),
-            'queryVars' => $wp_query->query_vars ?? [],
-            'maxPages' => $wp_query->max_num_pages ?? 0,
+            'queryVars' => $wp_query->query_vars,
+            'maxPages' => $wp_query->max_num_pages,
             'pagination' => $pagination->links('components.pagination'),
-            'totalProducts' => $wp_query->found_posts ?? 0,
+            'totalProducts' => $wp_query->found_posts,
             'filters' => $service->getFiltersForView(),
             'activeFilterCount' => $service->getActiveFilterCount(),
             'selectedChips' => $service->getSelectedChips(),
