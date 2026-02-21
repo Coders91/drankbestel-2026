@@ -1,11 +1,10 @@
 <div>
   <x-checkout-header />
   <div class="container px-4">
-    <x-page-header class="flex lg:justify-center mt-8 mb-4" title="Afrekenen" />
     <form method="post"
           id="checkout"
           name="checkout"
-          class="grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8"
+          class="pt-10 grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8"
           x-data="checkout()"
           @submit.prevent="submitForm()"
           @pageshow.window="$event.persisted && window.location.reload()"

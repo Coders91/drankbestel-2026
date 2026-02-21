@@ -1,5 +1,5 @@
 <x-layouts.app>
-  @include('partials.page-header')
+  <x-page-header />
 
   @if (! have_posts())
     <x-alert type="warning">

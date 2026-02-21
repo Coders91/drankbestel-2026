@@ -15,6 +15,6 @@ jobs:
     steps:
       - name: Trigger Hostinger deployment
         run: |
-          curl -X POST https://webhooks.hostinger.com/deploy/5a3a5e5612d3379e56211426eea572a9 \
+          curl -X POST https://webhooks.hostinger.com/deploy/5bcfe9433978980bdf3590a539a2bdde \
           -H "Content-Type: application/json" \
           -d '{}'
