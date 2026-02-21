@@ -205,12 +205,20 @@ add_action('wp_enqueue_scripts', function() {
     if (is_admin()) return;
     wp_dequeue_script('jquery');
     wp_deregister_script('jquery');
+    wp_dequeue_script('jquery-migrate');
+    wp_deregister_script('jquery-migrate');
     wp_dequeue_script('jquery-core');
     wp_deregister_script('jquery-core');
     wp_deregister_script('jquery-ui-core');
     wp_dequeue_script('jquery-ui-core');
-    wp_dequeue_script('jquery-migrate');
-    wp_deregister_script('jquery-migrate');
+    wp_deregister_script('jquery-ui-mouse');
+    wp_dequeue_script('jquery-ui-mouse');
+    wp_deregister_script('jquery-ui-menu');
+    wp_dequeue_script('jquery-ui-menu');
+    wp_deregister_script('jquery-ui-button');
+    wp_dequeue_script('jquery-ui-button');
+    wp_deregister_script('jquery-ui-draggable');
+    wp_dequeue_script('jquery-ui-draggable');
 }, 99);
 
 // Filtereverything plugin
