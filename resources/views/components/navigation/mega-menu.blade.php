@@ -13,7 +13,7 @@
         aria-label="{{ wp_get_nav_menu_name($name) }}"
         x-on:mouseleave="megaMenuLeave()"
     >
-        <div class="container mx-auto px-6">
+        <div class="container h-14 mx-auto px-4">
             <ul class="flex items-center gap-8">
                 @foreach ($menu->all() as $item)
                     @php

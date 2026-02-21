@@ -23,12 +23,15 @@
   @endif
 
   <a href="{{ $product->url }}">
-    <div class="bg-gray-50 py-6 rounded-t-xl">
-      <x-image height="160" width="80" :id="$product->imageId" class="w-full max-h-50 object-contain mix-blend-multiply" />
+    <div class="relative bg-gray-50 py-4 rounded-t-xl">
+      @if ($product->isNew)
+        <x-product-label color="cyan" class="absolute top-3 left-3 z-10">{{ __('Nieuw', 'sage') }}</x-product-label>
+      @endif
+      <x-image height="160" width="80" :id="$product->imageId" class="w-full max-h-35 lg:max-h-45 object-contain mix-blend-multiply" />
     </div>
-    <div class="pt-5 px-4 md:px-5">
-      <h3 class="block text-lg stext-gray-900 font-semibold text-balance line-clamp-2">{{ $product->name }}</h3>
-      <div class="text-base font-heading text-gray-600 pt-1">{{ $product->contents }}</div>
+    <div class="pt-2.5 px-3 md:px-4">
+      <h3 class="block text-base stext-gray-900 font-semibold text-balance line-clamp-2">{{ $product->name }}</h3>
+      <div class="text-sm font-heading text-gray-600 pt-1">{{ $product->contents }}</div>
       @if ($product->reviewCount > 0)
         <div class="flex items-center gap-1.5 pt-2 pb-1">
           <x-star-rating :rating="$product->rating" class="gap-1" size="sm" />
@@ -37,19 +40,19 @@
       @endif
     </div>
   </a>
-  <div class="flex items-center justify-between self-end h-fit px-4 md:px-5 pb-4 md:pb-5">
+  <div class="flex max-md:flex-col md:items-center gap-2 justify-between self-end h-fit mt-2 px-3 md:px-4 pb-3 md:pb-4">
     @if ($product->is_on_sale)
       <div class="flex flex-col font-heading">
         <span class="text-gray-700 line-through text-muted">
           {{ $product->price->regular->formatted() }}
         </span>
 
-        <span class="font-semibold text-red-600 text-xl">
+        <span class="font-semibold text-red-600 text-lg lg:text-xl">
           {{ $product->price->sale->formatted() }}
         </span>
       </div>
     @else
-      <span class="text-xl font-semibold font-heading">
+      <span class="text-lg lg:text-xl font-semibold font-heading">
       {{ $product->price->regular->formatted() }}
     </span>
     @endif

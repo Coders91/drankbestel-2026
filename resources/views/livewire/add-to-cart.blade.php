@@ -4,7 +4,7 @@
   x-on:add-to-cart-pack.window="if ($event.detail.productId === {{ $productId }}) { $wire.addPack($event.detail.multiplier || 1) }"
   x-on:add-to-cart-error.window="if ($event.detail.productId === {{ $productId }}) { showError = true; errorMessage = $event.detail.message; setTimeout(function() { showError = false }, 4000) }"
   x-on:product-added-to-cart.window="if ($event.detail.productId === {{ $productId }}) { showError = false }"
-  class="relative"
+  class="relative max-lg:flex-grow {{ is_product() ? 'w-full' : 'lg:w-fit' }} "
 >
   {{-- Error tooltip --}}
   <div
@@ -29,18 +29,19 @@
         wire:click="addPack"
         wire:loading.attr="disabled"
         wire:target="addPack"
-        class="w-full h-full"
+        class="w-full h-full relative"
         :disabled="$this->disabled"
+        :size="is_product() ? 'regular' : ''"
       >
-        <span wire:loading.remove wire:target="addPack">
+        <span wire:loading.class="invisible" wire:target="addPack">
            @if($this->disabled)
             {{ __('Uitverkocht', 'sage') }}
           @else
             {{ __('Bestel', 'sage') }} ({{ $this->packSize }})
           @endif
         </span>
-        <span wire:loading wire:target="addPack" class="flex items-center gap-2">
-          @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+        <span wire:loading wire:target="addPack" class="absolute inset-0 flex items-center justify-center">
+          @svg('resources.images.icons.loader', 'animate-spin size-4')
         </span>
       </x-button>
   @else
@@ -49,19 +50,19 @@
       wire:click="add"
       wire:loading.attr="disabled"
       wire:target="add"
-      class="w-full h-full"
+      class="w-full h-full text-sm relative"
       :size="is_product() ? 'regular' : ''"
       :disabled="$this->disabled"
     >
-      <span wire:loading.remove wire:target="add">
+      <span wire:loading.class="invisible" wire:target="add">
         @if($this->disabled)
           @svg('resources.images.icons.slash-circle-01')
         @else
           {{ __('Bestel', 'sage') }}
         @endif
       </span>
-      <span wire:loading wire:target="add" class="flex items-center gap-2">
-        @svg('resources.images.icons.loader', 'animate-spin h-6 w-6')
+      <span wire:loading wire:target="add" class="absolute inset-0 flex items-center justify-center">
+        @svg('resources.images.icons.loader', 'animate-spin size-4')
       </span>
     </x-button>
   @endif

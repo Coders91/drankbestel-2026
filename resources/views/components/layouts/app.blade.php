@@ -46,7 +46,7 @@
 
     {{-- Breadcrumbs --}}
     @if($breadcrumbs)
-      <div class="container py-6">
+      <div class="container max-sm:hidden py-4 md:py-6">
         <x-breadcrumbs />
       </div>
     @endif

@@ -3,7 +3,7 @@
 ])
 
 <div
-  {{ $attributes->merge(['class' => 'usp-bar leading-0 h-fit']) }}
+  {{ $attributes->merge(['class' => 'usp-bar leading-0 lg:h-8']) }}
   x-data="{ mounted: false }"
   x-init="setTimeout(() => mounted = true, 50)"
   :class="{ 'invisible': !mounted }"

@@ -20,11 +20,7 @@ class Breadcrumbs extends Component
     {
         $crumbs = [
             [
-                'name' => get_svg(
-                    'resources.images.icons.home-03',
-                    'w-5 h-5 stroke-gray-700',
-                    ['aria-hidden' => 'true']
-                ),
+                'name' => 'Home',
                 'url' => home_url('/'),
             ],
         ];

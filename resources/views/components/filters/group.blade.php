@@ -119,7 +119,7 @@
                 @if ($showToggle)
                     <button
                         type="button"
-                        class="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+                        class="text-sm text-red-600 hover:text-red-700 underline"
                         @click="expanded = !expanded"
                         x-show="!searchQuery || searchQuery.length === 0"
                     >

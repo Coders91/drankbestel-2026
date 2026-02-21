@@ -30,6 +30,7 @@ class Product implements Wireable
     public readonly bool $is_in_stock;
     public readonly float $rating;
     public readonly int $reviewCount;
+    public readonly bool $isNew;
     public readonly bool $soldAsPack;
     public readonly int $packSize;
 
@@ -64,6 +65,9 @@ class Product implements Wireable
         $aggregatedRating = self::getAggregatedRating($this->name);
         $this->rating = $aggregatedRating['average_rating'];
         $this->reviewCount = $aggregatedRating['review_count'];
+
+        $dateCreated = $product->get_date_created();
+        $this->isNew = $dateCreated && $dateCreated->getTimestamp() >= strtotime('-30 days');
 
         $this->soldAsPack = (bool) get_field('product_sold_as_pack', $this->id);
         $this->packSize = (int) (get_field('product_pack_size', $this->id) ?: 1);
