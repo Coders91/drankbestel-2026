@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite';
 import laravel from 'laravel-vite-plugin'
@@ -6,14 +7,15 @@ import { wordpressPlugin, wordpressThemeJson } from '@roots/vite-plugin';
 
 const host = 'local.drankbestel.nl';
 const certsPath = '/etc/apache2/ssl';
+const themeDirName = process.env.VITE_THEME_DIR || path.basename(process.cwd());
 
 export default defineConfig(({ command }) => {
 
   const config = {
     base:
       command === 'build'
-      ? '/wp-content/themes/drankbestel-new/public/build/' // Production (server)
-      : '/app/themes/drankbestel-2026/public/build/', // Development (local)
+      ? `/wp-content/themes/${themeDirName}/public/build/`
+      : `/app/themes/${themeDirName}/public/build/`,
     plugins: [
       tailwindcss(),
       laravel({

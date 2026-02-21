@@ -7,11 +7,30 @@ on:
     types:
       - closed
 
+env:
+  VITE_THEME_DIR: drankbestel-2026
+  REMOTE_THEME_PATH: ~/domains/staging.drankbestel.nl/public_html/wp-content/themes/drankbestel-2026
+
 jobs:
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
       - name: Trigger Hostinger deployment
         run: |
           curl -X POST https://webhooks.hostinger.com/deploy/5bcfe9433978980bdf3590a539a2bdde \
@@ -19,7 +38,18 @@ jobs:
           -d '{}'
 
       - name: Wait for deployment to finish
-        run: sleep 5
+        run: sleep 10
+
+      - name: Deploy built assets to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: public/build/
+          target: ${{ env.REMOTE_THEME_PATH }}
+          overwrite: true
 
       - name: Clear cache
         uses: appleboy/ssh-action@v1
