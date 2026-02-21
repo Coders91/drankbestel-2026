@@ -1,4 +1,3 @@
-# .github/workflows/deploy.yml
 name: Deploy master
 
 on:
@@ -19,15 +18,19 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{}'
 
-      - name: Wait for deployment and clear cache
+      - name: Wait for deployment to finish
+        run: sleep 60
+
+      - name: Clear cache
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          command_timeout: 60s
           script: |
-            cd ~/domains/staging.drankbestel.nl/public_html/wp-content
+            cd ~/domains/staging.drankbestel.nl/public_html
             wp acorn optimize:clear
             wp acorn optimize
             wp litespeed-purge all
