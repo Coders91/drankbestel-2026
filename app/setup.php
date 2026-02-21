@@ -207,6 +207,8 @@ add_action('wp_enqueue_scripts', function() {
     wp_deregister_script('jquery');
     wp_dequeue_script('jquery-core');
     wp_deregister_script('jquery-core');
+    wp_deregister_script('jquery-ui-core');
+    wp_dequeue_script('jquery-ui-core');
     wp_dequeue_script('jquery-migrate');
     wp_deregister_script('jquery-migrate');
 }, 99);
