@@ -73,6 +73,11 @@
   "scripts": {
     "post-autoload-dump": [
       "Roots\\Acorn\\ComposerScripts::postAutoloadDump"
+    ],
+    "post-install-cmd": [
+      "wp acorn search:index-all",
+      "wp acorn:optimize clear",
+      "wp acorn:optimize"
     ]
   }
 }

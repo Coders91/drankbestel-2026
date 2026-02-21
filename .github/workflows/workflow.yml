@@ -1,0 +1,20 @@
+# .github/workflows/deploy.yml
+name: Deploy master
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Hostinger deployment
+        run: |
+          curl -X POST https://webhooks.hostinger.com/deploy/5a3a5e5612d3379e56211426eea572a9 \
+          -H "Content-Type: application/json" \
+          -d '{}'
