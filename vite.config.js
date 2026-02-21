@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => {
     base:
       command === 'build'
       ? '/wp-content/themes/drankbestel-new/public/build/' // Production (server)
-      : '/app/themes/drankbestel-new/public/build/', // Development (local)
+      : '/app/themes/drankbestel-2026/public/build/', // Development (local)
     plugins: [
       tailwindcss(),
       laravel({
