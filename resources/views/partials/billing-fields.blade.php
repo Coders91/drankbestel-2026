@@ -1,6 +1,6 @@
 <div class="grid gap-4">
   <h3 class="text-lg font-semibold" x-show="form.is_business_order" x-cloak>Persoonsgegevens</h3>
-  <x-field-group class="flex gap-4">
+  <x-forms.field-group class="flex gap-4">
     {{-- First name --}}
     <div class="flex-1">
       <x-form-field id="billing_first_name"
@@ -29,10 +29,10 @@
       </x-form-field>
     </div>
 
-  </x-field-group>
+  </x-forms.field-group>
 
   {{-- E-mail --}}
-  <x-field-group>
+  <x-forms.field-group>
     <x-form-field id="billing_email"
                   name="billing_email"
                   wire:model.live.blur="form.billing_email"
@@ -43,10 +43,10 @@
     >
       E-mailadres
     </x-form-field>
-  </x-field-group>
+  </x-forms.field-group>
 
   {{-- Phone --}}
-  <x-field-group>
+  <x-forms.field-group>
     <x-form-field id="billing_phone"
                   name="billing_phone"
                   wire:model.live.blur="form.billing_phone"
@@ -58,5 +58,5 @@
     >
       Telefoonnummer
     </x-form-field>
-  </x-field-group>
+  </x-forms.field-group>
 </div>

@@ -10,7 +10,7 @@
 @endphp
 
 <div class="py-1 {{ $isDisabled ? 'opacity-50' : '' }}">
-    <x-checkbox
+    <x-forms.checkbox
         :withErrors="false"
         :id="$inputId"
         :name="$taxonomy"
@@ -20,5 +20,5 @@
         class="text-sm"
     >
       <x-filters.item :count="$term['count']">{{ $term['label'] }}</x-filters.item>
-    </x-checkbox>
+    </x-forms.checkbox>
 </div>

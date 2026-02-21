@@ -33,7 +33,7 @@
             {{-- Buttons to toggle business fields --}}
             <div class="flex gap-2.5 mb-2">
               <div class="px-5 py-2.5 border border-gray-300 rounded-lg bg-white">
-                <x-radio id="consumer"
+                <x-forms.radio id="consumer"
                          name="is_business_order"
                          value="0"
                          class="text-sm text-gray-600"
@@ -42,10 +42,10 @@
                          wire:model.boolean.live="form.is_business_order"
                 >
                   Particulier
-                </x-radio>
+                </x-forms.radio>
               </div>
               <div class="px-5 py-2.5 border border-gray-300 rounded-lg bg-white">
-                <x-radio id="business"
+                <x-forms.radio id="business"
                          name="is_business_order"
                          value="1"
                          class="text-sm text-gray-600"
@@ -54,7 +54,7 @@
                          wire:model.boolean.live="form.is_business_order"
                 >
                   Zakelijk
-                </x-radio>
+                </x-forms.radio>
               </div>
             </div>
           </x-slot:header>

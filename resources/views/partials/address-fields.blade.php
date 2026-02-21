@@ -1,4 +1,4 @@
-<x-field-group class="flex gap-4">
+<x-forms.field-group class="flex gap-4">
   <div class="flex-1">
     <x-form-field id="{{ $type }}_postcode"
                   name="{{ $type }}_postcode"
@@ -36,14 +36,14 @@
       Toev.
     </x-form-field>
   </div>
-</x-field-group>
+</x-forms.field-group>
 <div x-show="{{ $type }}_loading" x-cloak class="text-sm mt-2">
   <span>Laden...</span>
 </div>
 @if(!empty($messages[$type . '_address']))
   <p class="text-sm text-red-600" wire:key="message-{{ $type }}">{{ $messages[$type . '_address'] }}</p>
 @endif
-<x-field-group class="flex gap-4">
+<x-forms.field-group class="flex gap-4">
   <div class="flex-1">
     <x-form-field readonly
                   :readonly="$this->isAddressReadOnly($type)"
@@ -72,4 +72,4 @@
       Plaats
     </x-form-field>
   </div>
-</x-field-group>
+</x-forms.field-group>

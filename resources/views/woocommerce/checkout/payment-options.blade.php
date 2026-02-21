@@ -6,7 +6,7 @@
         class="block w-full border rounded-lg p-4 cursor-pointer border-gray-200 has-checked:border-red-600 has-checked:border-2 has-checked:p-[14px]"
         data-payment-gateway="{{ $gateway->id }}"
       >
-        <x-radio
+        <x-forms.radio
           id="payment_{{ $gateway->id }}"
           name="payment_method"
           value="{{ $gateway->id }}"
@@ -15,7 +15,7 @@
         >
           <span>{{ $gateway->title }}</span>
           <span class="ml-auto">{!! $gateway->icon !!}</span>
-        </x-radio>
+        </x-forms.radio>
 
         @if($gateway->has_fields)
           <div x-show="$wire.get('form.payment_method') === '{{ $gateway->id }}'" x-cloak x-transition.opacity.200ms class="mt-4 text-left" @click.stop>

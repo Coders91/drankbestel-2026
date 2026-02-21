@@ -75,7 +75,7 @@
   <div class="space-y-4 pt-4 mt-6 border-t border-gray-200">
     {{-- Age Check --}}
     <div>
-      <x-checkbox
+      <x-forms.checkbox
         id="age_check"
         name="age_check"
         x-model="form.age_check"
@@ -83,19 +83,19 @@
         @change="markTouched('age_check'); validateField($el)"
       >
         <span class="text-gray-700">Ik bevestig dat ik 18 jaar of ouder ben</span> <span class="text-red-600">*</span>
-      </x-checkbox>
+      </x-forms.checkbox>
     </div>
 
     {{-- Newsletter --}}
     <div>
-      <x-checkbox
+      <x-forms.checkbox
         id="newsletter"
         name="newsletter"
         x-model="form.newsletter"
         wire:model="form.newsletter"
       >
         <span class="text-gray-700">Ja, ik wil graag meer drankaanbiedingen ontvangen.</span>
-      </x-checkbox>
+      </x-forms.checkbox>
     </div>
 
     <x-button

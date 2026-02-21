@@ -1,5 +1,5 @@
 <div class="grid gap-4" x-show="form.is_business_order" x-cloak>
-  <x-field-group class="flex gap-4">
+  <x-forms.field-group class="flex gap-4">
     <div class="flex-1">
       <x-form-field
                     id="billing_company"
@@ -22,7 +22,7 @@
           BTW-nummer
         </x-form-field>
     </div>
-  </x-field-group>
+  </x-forms.field-group>
   <div>
     <x-form-field id="customer_reference"
                   name="customer_reference"
