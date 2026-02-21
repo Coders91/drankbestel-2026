@@ -4,12 +4,12 @@
     "src": "editor.deps.json"
   },
   "resources/css/app.css": {
-    "file": "assets/app-IuOOKATc.css",
+    "file": "assets/app-Czx-ecyX.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/css/editor.css": {
-    "file": "assets/editor-BEIG0jSU.css",
+    "file": "assets/editor-C7TTGwfD.css",
     "src": "resources/css/editor.css",
     "isEntry": true
   },
@@ -4246,7 +4246,7 @@
     "src": "resources/images/logos/whatsapp.svg"
   },
   "resources/js/app.js": {
-    "file": "assets/app-C4qRykIy.js",
+    "file": "assets/app-d5_yYELi.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
