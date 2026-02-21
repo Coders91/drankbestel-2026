@@ -188,6 +188,7 @@ add_action('wp_enqueue_scripts', function() {
     wp_dequeue_script('wc-add-to-cart-variation');
     wp_dequeue_script('wc-single-product');
     wp_dequeue_script('wc-cart');
+    wp_dequeue_script('wc-price-slider');
     wp_dequeue_script('wc-chosen');
     wp_dequeue_script('jquery-blockui');
     wp_dequeue_script('jquery-placeholder');
