@@ -7,29 +7,31 @@ use WC_Order;
 
 class WebhookHandler
 {
-    protected const STATUS_MAP = [
-        1 => 'Concept',
-        2 => 'Geregistreerd',
-        3 => 'Aangemeld bij bezorger',
-        4 => 'Sortering',
-        5 => 'Bezorging',
-        6 => 'Bezorgd',
-        7 => 'Niet bezorgd',
-        8 => 'Klaar om op te halen',
-        9 => 'Opgehaald',
-        10 => 'Afgehandeld',
-        11 => 'Creditering',
-        12 => 'Inactief',
-        30 => 'Niet bij PostNL',
-        31 => 'Retour bij PostNL',
-        32 => 'Retour geleverd',
-        33 => 'Brief',
-        34 => 'Geannuleerd',
-        35 => 'Geweigerd',
-        36 => 'Uitgesteld',
-        37 => 'Klantgegevens niet compleet',
-        38 => 'Onbekend',
-    ];
+    /**
+     * Shipment statuses from the MyParcel SDK.
+     *
+     * 1  = pending - concept
+     * 2  = pending - registered (label printed)
+     * 3  = enroute - handed to carrier
+     * 4  = enroute - sorting
+     * 5  = enroute - distribution
+     * 6  = enroute - customs
+     * 7  = delivered - at recipient
+     * 8  = delivered - ready for pickup
+     * 9  = delivered - package picked up
+     * 10 = delivered - return shipment ready for pickup
+     * 11 = delivered - return shipment package picked up
+     * 12 = printed - letter
+     * 13 = credit
+     * 14 = printed - digital stamp
+     * 30–38 = inactive variants
+     * 99 = unknown
+     */
+    protected const PRINTED_STATUSES = [2, 12, 14];
+
+    protected const HANDED_TO_CARRIER = 3;
+
+    protected const DELIVERED_STATUSES = [7, 8, 9];
 
     public function handle(array $data): void
     {
@@ -62,28 +64,36 @@ class WebhookHandler
             return;
         }
 
-        $statusName = self::STATUS_MAP[$status] ?? "Onbekend ({$status})";
+        if ($status) {
+            $order->update_meta_data('_myparcel_shipment_status', $status);
+        }
 
-        if ($barcode) {
+        // Update barcode when the label has been printed
+        if ($barcode && in_array($status, self::PRINTED_STATUSES, true)) {
             $order->update_meta_data('_myparcel_barcode', $barcode);
+            $order->add_order_note(
+                sprintf(__('MyParcel label geprint — Track & trace: %s', 'sage'), $barcode)
+            );
         }
 
-        $order->update_meta_data('_myparcel_shipment_status', $statusName);
-
-        $note = sprintf(__('MyParcel status: %s', 'sage'), $statusName);
-        if ($barcode) {
-            $note .= sprintf(' (Track & trace: %s)', $barcode);
+        // Carrier has scanned/collected the package
+        if ($status === self::HANDED_TO_CARRIER) {
+            $order->add_order_note(__('Zending is opgehaald door de bezorger', 'sage'));
         }
-        $order->add_order_note($note);
+
+        // Package delivered
+        if (in_array($status, self::DELIVERED_STATUSES, true)) {
+            $order->add_order_note(__('Zending is bezorgd', 'sage'));
+        }
 
         $order->save();
 
-        do_action('myparcel_shipment_status_changed', $order, $statusName, $barcode);
+        do_action('myparcel_shipment_status_changed', $order, $status, $barcode);
 
         Log::info('MyParcel webhook processed', [
             'order_id' => $order->get_id(),
             'shipment_id' => $shipmentId,
-            'status' => $statusName,
+            'status' => $status,
             'barcode' => $barcode,
         ]);
     }
