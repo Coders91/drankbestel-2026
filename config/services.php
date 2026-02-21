@@ -63,4 +63,9 @@ return [
     'google' => [
         'merchant_center_id' => 737478831,
     ],
+
+    'myparcel' => [
+        'api_key' => env('MYPARCEL_API_KEY'),
+    ],
+
 ];

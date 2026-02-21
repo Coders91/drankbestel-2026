@@ -49,6 +49,7 @@
     "log1x/pagi": "^1.1",
     "log1x/sage-svg": "^2.0",
     "mollie/mollie-api-php": "^3.6",
+    "myparcelnl/sdk": "^7.20",
     "roots/acorn": "^5.0",
     "roots/acorn-mail": "^1.0",
     "roots/acorn-post-types": "^1.0",

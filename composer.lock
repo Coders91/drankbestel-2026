@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "23d35e598df14010200fd187f99f85a1",
+    "content-hash": "1a598cb762e81ed519e4e9801e6101d9",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -4355,6 +4355,70 @@
                 }
             ],
             "time": "2026-01-02T08:56:05+00:00"
+        },
+        {
+            "name": "myparcelnl/sdk",
+            "version": "7.25.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/myparcelnl/sdk.git",
+                "reference": "058bdc8f566bfb1d7733d0a7cc981579802a7c84"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/058bdc8f566bfb1d7733d0a7cc981579802a7c84",
+                "reference": "058bdc8f566bfb1d7733d0a7cc981579802a7c84",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "fakerphp/faker": "^v1.16.0",
+                "phpunit/phpunit": "^7.5.20",
+                "psr/container": "~1.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MyParcelNL\\Sdk\\": "src",
+                    "MyParcelNL\\Sdk\\src\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Edie Lemoine",
+                    "email": "support@myparcel.nl"
+                },
+                {
+                    "name": "Joeri van Veen",
+                    "email": "support@myparcel.nl"
+                },
+                {
+                    "name": "Mark Ernst",
+                    "email": "support@myparcel.nl"
+                },
+                {
+                    "name": "Richard Perdaan",
+                    "email": "support@myparcel.nl"
+                }
+            ],
+            "description": "This package is designed to send and receive data from MyParcel by means of an API.",
+            "homepage": "https://myparcelnl.github.io/sdk",
+            "keywords": [
+                "Flespakket",
+                "myparcel",
+                "postnl"
+            ],
+            "support": {
+                "issues": "https://github.com/myparcelnl/sdk/issues",
+                "source": "https://github.com/myparcelnl/sdk/tree/v7.25.3"
+            },
+            "time": "2025-11-06T15:07:29+00:00"
         },
         {
             "name": "nesbot/carbon",
