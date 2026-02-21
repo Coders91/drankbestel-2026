@@ -33,4 +33,3 @@ jobs:
             cd ~/domains/staging.drankbestel.nl/public_html
             wp acorn optimize:clear
             wp acorn optimize
-            wp litespeed-purge all
