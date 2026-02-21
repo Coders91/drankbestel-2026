@@ -19,7 +19,7 @@ jobs:
           -d '{}'
 
       - name: Wait for deployment to finish
-        run: sleep 10
+        run: sleep 5
 
       - name: Clear cache
         uses: appleboy/ssh-action@v1
