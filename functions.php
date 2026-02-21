@@ -38,6 +38,7 @@ Application::configure()
         App\Providers\MollieServiceProvider::class,
         App\Providers\LightspeedServiceProvider::class,
         App\Providers\InvoiceServiceProvider::class,
+        App\Providers\MyParcelServiceProvider::class,
         App\Providers\TNTSearchProvider::class,
         App\Providers\StructuredDataServiceProvider::class,
     ])
