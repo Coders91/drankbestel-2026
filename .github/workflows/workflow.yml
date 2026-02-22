@@ -60,7 +60,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 60s
           script: |
-            cd ~/domains/staging.drankbestel.nl/public_html
+            cd ${{ env.REMOTE_THEME_PATH }}
             wp acorn optimize:clear
             wp acorn optimize
             wp cache flush
