@@ -461,7 +461,7 @@ class Checkout extends Component
                 amount: $order->get_total(),
                 description: sprintf('Bestelling #%s', $order->get_order_number()),
                 redirect_url: $redirectUrl,
-                webhook_url: config('mollie.webhook_url', home_url()),
+                webhook_url: config('services.mollie.webhook_url'),
                 metadata: [
                     'order_id' => $order->get_id(),
                     'order_key' => $order->get_order_key(),
