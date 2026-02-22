@@ -13,8 +13,9 @@ final readonly class ShippingZoneService
      */
     public static function freeShippingMinimum(): float
     {
-        $shipping_zones = WC_Shipping_Zones::get_zones();
-        return Cache::remember('free_shipping_amount', 43200 , function () use ($shipping_zones) {
+        return Cache::remember('free_shipping_amount', 43200, function () {
+            $shipping_zones = WC_Shipping_Zones::get_zones();
+
             foreach ($shipping_zones as $zone) {
                 foreach ($zone['shipping_methods'] as $method) {
                     if ($method->id === 'free_shipping' && $method->enabled === 'yes') {
@@ -25,15 +26,16 @@ final readonly class ShippingZoneService
                     }
                 }
             }
-            $themeOption = get_option('free_shipping_minimum', 100);
-            return (float) $themeOption;
+
+            return (float) get_option('free_shipping_minimum', 100);
         });
     }
 
     public static function flatRateCost(): float
     {
-        $shipping_zones = WC_Shipping_Zones::get_zones();
-        return Cache::remember('flat_rate_cost', 43200 , function () use ($shipping_zones) {
+        return Cache::remember('flat_rate_cost', 43200, function () {
+            $shipping_zones = WC_Shipping_Zones::get_zones();
+
             foreach ($shipping_zones as $zone) {
                 foreach ($zone['shipping_methods'] as $method) {
                     if ($method->id === 'flat_rate' && $method->enabled === 'yes') {
@@ -44,9 +46,8 @@ final readonly class ShippingZoneService
                     }
                 }
             }
-            $themeOption = get_option('flat_rate_costs', 7.95);
-            return (float) $themeOption;
+
+            return (float) get_option('flat_rate_costs', 7.95);
         });
     }
 }
-

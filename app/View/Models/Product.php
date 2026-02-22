@@ -130,6 +130,111 @@ class Product implements Wireable
         return self::$ratingCache[$productName];
     }
 
+    /**
+     * Prime WordPress object caches for a batch of product IDs.
+     * Call this before looping Product::find() to avoid N+1 queries.
+     */
+    public static function primeCache(array $ids): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        // Prime post and post meta caches in bulk
+        _prime_post_caches($ids, true, true);
+
+        // Prime term caches for all products at once
+        wp_cache_get_multiple(array_map(fn ($id) => "product_cat_relationships_{$id}", $ids), 'terms');
+        update_object_term_cache($ids, 'product');
+
+        // Prime aggregated ratings in batch
+        self::primeRatingCache($ids);
+    }
+
+    /**
+     * Batch-load aggregated ratings for multiple products.
+     */
+    protected static function primeRatingCache(array $ids): void
+    {
+        global $wpdb;
+
+        if (empty($ids)) {
+            return;
+        }
+
+        // Get names for the given IDs that aren't already cached
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+        $names = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT post_title FROM $wpdb->posts WHERE ID IN ($placeholders) AND post_type = 'product' AND post_status = 'publish'",
+            ...$ids
+        ));
+
+        $uncachedNames = array_filter($names, fn ($name) => !isset(self::$ratingCache[$name]));
+
+        if (empty($uncachedNames)) {
+            return;
+        }
+
+        // Find all product IDs matching these names
+        $namePlaceholders = implode(',', array_fill(0, count($uncachedNames), '%s'));
+        $allProductIds = $wpdb->get_results($wpdb->prepare(
+            "SELECT ID, post_title FROM $wpdb->posts WHERE post_title IN ($namePlaceholders) AND post_type = 'product' AND post_status = 'publish'",
+            ...$uncachedNames
+        ));
+
+        $idsByName = [];
+        foreach ($allProductIds as $row) {
+            $idsByName[$row->post_title][] = (int) $row->ID;
+        }
+
+        // Batch-fetch all reviews for these product IDs
+        $allIds = array_merge(...array_values($idsByName));
+
+        if (empty($allIds)) {
+            foreach ($uncachedNames as $name) {
+                self::$ratingCache[$name] = ['average_rating' => 0.0, 'review_count' => 0];
+            }
+            return;
+        }
+
+        $reviews = get_comments([
+            'post__in' => $allIds,
+            'status' => 'approve',
+            'type' => 'review',
+        ]);
+
+        // Group reviews by product name
+        $reviewsByName = [];
+        $postIdToName = [];
+        foreach ($allProductIds as $row) {
+            $postIdToName[(int) $row->ID] = $row->post_title;
+        }
+
+        foreach ($reviews as $review) {
+            $name = $postIdToName[(int) $review->comment_post_ID] ?? null;
+            if ($name) {
+                $reviewsByName[$name][] = $review;
+            }
+        }
+
+        // Calculate ratings per name
+        foreach ($uncachedNames as $name) {
+            $nameReviews = $reviewsByName[$name] ?? [];
+            $count = count($nameReviews);
+            $avg = 0.0;
+
+            if ($count > 0) {
+                $total = 0;
+                foreach ($nameReviews as $review) {
+                    $total += (int) get_comment_meta($review->comment_ID, 'rating', true);
+                }
+                $avg = $total / $count;
+            }
+
+            self::$ratingCache[$name] = ['average_rating' => $avg, 'review_count' => $count];
+        }
+    }
+
     public static function find(int|WC_Product $product): ?self
     {
         if ($product instanceof self) {

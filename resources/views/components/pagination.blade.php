@@ -8,7 +8,7 @@
         <span class="max-lg:hidden">Vorige</span>
       </span>
     @else
-      <a class="group flex items-center gap-2 p-2" href="{{ $pagi->previousPageUrl() }}" wire:navigate>
+      <a class="group flex items-center gap-2 p-2" href="{{ $pagi->previousPageUrl() }}">
         <span class="max-lg:hidden group-hover:text-gray-700">Vorige</span>
       </a>
     @endif
@@ -32,7 +32,7 @@
                 {{ $page }}
               </span>
             @else
-              <a href="{{ $url }}" wire:navigate class="text-base flex items-center justify-center size-10 p-3 hover:text-gray-700">
+              <a href="{{ $url }}" class="text-base flex items-center justify-center size-10 p-3 hover:text-gray-700">
                 {{ $page }}
               </a>
             @endif

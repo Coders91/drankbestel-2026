@@ -12,7 +12,7 @@ class MegaMenuService
     /**
      * Cache TTL in seconds (1 hour).
      */
-    private const CACHE_TTL = 1;
+    private const CACHE_TTL = 3600;
 
     /**
      * Get top-level product categories for the mega menu.
@@ -69,6 +69,7 @@ class MegaMenuService
     {
         $cacheKey = "mega_menu_panel_{$parentSlug}";
 
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($parentSlug) {
             $parentId = 0;
 
             if ($parentSlug) {
@@ -82,7 +83,7 @@ class MegaMenuService
                 'taxonomy' => 'product_cat',
                 'parent' => $parentId,
                 'hide_empty' => true,
-                'exclude' => get_option( 'default_product_cat' ),
+                'exclude' => get_option('default_product_cat'),
                 'childless' => false,
                 'orderby' => 'menu_order',
                 'order' => 'ASC',
@@ -98,6 +99,7 @@ class MegaMenuService
 
                 return $formatted;
             });
+        });
     }
 
     /**

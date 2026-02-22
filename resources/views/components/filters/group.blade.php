@@ -94,7 +94,9 @@
                 {{-- List-based filters (checkbox, radio, rating) --}}
                 <ul class="space-y-1 max-h-[400px] overflow-y-auto">
                     @foreach ($terms as $index => $term)
-                        <li x-show="isVisible({{ $index }})">
+                        <li x-show="isVisible({{ $index }})"
+                            {{ $showToggle && $index >= $moreLessCount ? 'x-cloak' : '' }}
+                        >
                             @switch($view)
                                 @case('checkboxes')
                                     <x-filters.types.checkbox :term="$term" :taxonomy="$taxonomy" />

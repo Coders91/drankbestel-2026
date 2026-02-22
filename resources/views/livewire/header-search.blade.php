@@ -11,12 +11,12 @@
     </button>
 
   {{-- Desktop search form --}}
-  <form wire:submit.prevent="goToSearch" class="relative hidden sm:flex lg:min-w-[640px]">
+  <form wire:submit.prevent="goToSearch" class="relative hidden sm:flex">
     <input
       type="search"
       id="header-search"
       name="header-search"
-      class="w-full py-3 px-6 rounded-full h-10  lg:rounded-xl bg-gray-50 placeholder:text-gray-700 outline-0"
+      class="w-full py-3 px-6 rounded-full h-10 lg:h-14 lg:rounded-xl bg-gray-50 placeholder:text-gray-700 outline-0"
       placeholder="{{ __('Zoeken...', 'sage') }}"
       wire:model.live.debounce.300ms="query"
       @focus="focused = true; $wire.focusInput(); setTimeout(() => { backdrop = true }, 100);"

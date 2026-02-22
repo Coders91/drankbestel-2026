@@ -75,6 +75,8 @@ class ProductLoadMore extends Component
             return [];
         }
 
+        Product::primeCache($this->additionalProductIds);
+
         return collect($this->additionalProductIds)
             ->map(fn (int $id) => Product::find($id))
             ->filter()

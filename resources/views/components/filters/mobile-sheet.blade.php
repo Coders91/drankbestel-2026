@@ -99,25 +99,16 @@
         </div>
     </div>
 
-    {{-- FILTER CONTENT (single instance, moves between containers based on viewport) --}}
-    <div
-        id="filters-sidebar"
-        x-effect="
-            const desktopTarget = document.querySelector('#desktop-filters-target');
-            const mobileTarget = document.querySelector('#mobile-filters-container');
-            if (isDesktop && desktopTarget) {
-                desktopTarget.appendChild($el);
-            } else if (!isDesktop && mobileTarget) {
-                mobileTarget.appendChild($el);
-            }
-        "
-    >
-        <x-filters.sidebar
-            :filters="$filters"
-            :active-count="$activeCount"
-            :selected-chips="$selectedChips"
-            :reset-url="$resetUrl"
-            :more-less-count="$moreLessCount"
-        />
-    </div>
+    {{-- On mobile, move the filters from the desktop sidebar into the mobile sheet --}}
+    <template x-effect="
+        const sidebar = document.querySelector('#filters-sidebar');
+        const mobileTarget = document.querySelector('#mobile-filters-container');
+        const desktopTarget = document.querySelector('#desktop-filters-target');
+        if (!sidebar) return;
+        if (!isDesktop && mobileTarget) {
+            mobileTarget.appendChild(sidebar);
+        } else if (isDesktop && desktopTarget && !desktopTarget.contains(sidebar)) {
+            desktopTarget.appendChild(sidebar);
+        }
+    "></template>
 </div>

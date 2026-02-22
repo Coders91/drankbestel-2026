@@ -26,9 +26,16 @@ the readme will list any important changes.
         @popstate.window="handlePopstate()"
         @filter-apply.window="applyFilter($event.detail.url)"
       >
-        {{-- Desktop filters target (receives content via DOM move from mobile-sheet) --}}
         <aside id="desktop-filters-target" class="w-full lg:w-68 shrink-0 max-lg:hidden">
-          {{-- Filter content moves here on desktop --}}
+          <div id="filters-sidebar">
+            <x-filters.sidebar
+              :filters="$filters"
+              :active-count="$activeFilterCount"
+              :selected-chips="$selectedChips"
+              :reset-url="$resetUrl"
+              :more-less-count="$moreLessCount"
+            />
+          </div>
         </aside>
 
         {{-- Products grid --}}
@@ -92,15 +99,25 @@ the readme will list any important changes.
           @endphp
 
           <div class="lg:hidden">
-            <livewire:product-load-more
-              :query-vars="$queryVars"
-              :max-pages="$maxPages"
-              :initial-count="$products->count()"
-              :total-products="$totalProducts"
-            />
+            @if($maxPages > 1 && $currentPage < $maxPages)
+              <div class="flex justify-end items-center gap-4 mt-8" id="mobile-load-more">
+                <p class="text-sm text-gray-700">
+                  Pagina {{ $currentPage }} van {{ $maxPages }}
+                </p>
+                <x-button
+                  type="button"
+                  class="max-sm:w-full"
+                  variant="secondary"
+                  @click="applyFilter('{{ $nextPageUrl }}')"
+                >
+                  {{ __('Meer tonen', 'sage') }}
+                </x-button>
+              </div>
+            @endif
           </div>
 
-          <div id="pagination" class="max-lg:hidden mt-8">
+          <div id="pagination" class="max-lg:hidden mt-8"
+               @click="if ($event.target.closest('a')) { $event.preventDefault(); applyFilter($event.target.closest('a').href) }">
             {!! $pagination !!}
           </div>
         </div>
@@ -109,6 +126,7 @@ the readme will list any important changes.
         <div
           x-show="loading"
           x-transition.opacity
+          x-cloak
           class="fixed inset-0 bg-white/50 z-50 flex items-center justify-center"
         >
           @svg('resources.images.icons.loader', 'w-8 h-8 animate-spin')
@@ -136,7 +154,11 @@ the readme will list any important changes.
         async applyFilter(url) {
           if (this.loading) return;
 
-          this.loading = true;
+          // Scroll first so it happens during the fetch
+          this.scrollToProducts();
+
+          // Only show overlay if fetch takes longer than 150ms
+          const loaderTimeout = setTimeout(() => { this.loading = true; }, 150);
 
           try {
             const html = await this.fetchPage(url);
@@ -145,28 +167,26 @@ the readme will list any important changes.
 
             // Dispatch event to close mobile sheet
             window.dispatchEvent(new CustomEvent('filter-applied'));
-
-            // Scroll to top of products area
-            this.scrollToProducts();
           } catch (err) {
             console.error('Filter failed:', err);
           } finally {
+            clearTimeout(loaderTimeout);
             this.loading = false;
           }
         },
 
         async handlePopstate() {
-          this.loading = true;
+          this.scrollToProducts();
+
+          const loaderTimeout = setTimeout(() => { this.loading = true; }, 150);
 
           try {
             const html = await this.fetchPage(location.href);
             this.updateContent(html);
-
-            // Scroll to top of products area
-            this.scrollToProducts();
           } catch (err) {
             console.error('Popstate failed:', err);
           } finally {
+            clearTimeout(loaderTimeout);
             this.loading = false;
           }
         },
@@ -198,6 +218,7 @@ the readme will list any important changes.
           this.replaceElement('#products-grid', doc);
           this.replaceElement('#result-count', doc);
           this.replaceElement('#pagination', doc);
+          this.replaceElement('#mobile-load-more', doc);
           this.replaceElement('#proposed-filters', doc);
 
           document.title = doc.title;

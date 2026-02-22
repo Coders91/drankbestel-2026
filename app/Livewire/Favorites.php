@@ -45,6 +45,8 @@ class Favorites extends Component
             return [];
         }
 
+        Product::primeCache($this->favoriteIds);
+
         $products = [];
 
         foreach ($this->favoriteIds as $productId) {
