@@ -41,10 +41,6 @@ return [
         'secret_key' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
-    'filtereverything' => [
-        'sorting_widget_id' => env('FILTEREVERYTHING_SORTING_WIDGET_ID'),
-    ],
-
     'lightspeed' => [
         'ideal_payment_id' => env('LIGHTSPEED_IDEAL_PAYMENT_ID', 13),
         'delivery_costs_item_id' => env('LIGHTSPEED_DELIVERY_COSTS_ITEM_ID'),
@@ -58,10 +54,7 @@ return [
         'profile_id' => env('MOLLIE_PROFILE_ID'),
         'test_mode' => env('MOLLIE_TEST_MODE'),
         'api_key' => env('MOLLIE_API_KEY'),
-    ],
-
-    'google' => [
-        'merchant_center_id' => 737478831,
+        'webhook_url' => env('MOLLIE_WEBHOOK_URL'),
     ],
 
     'myparcel' => [

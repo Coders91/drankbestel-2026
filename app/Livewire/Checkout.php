@@ -454,9 +454,6 @@ class Checkout extends Component
                 'key' => $order->get_order_key(),
             ]);
 
-            // Change later
-            $webhookUrl = 'https://dev.drankbestel.nl/mollie/v1/webhook';
-
             $cardToken = $cardToken ? ['cardToken' => $cardToken] : [];
 
             $payment = $this->mollieService->createPayment(
@@ -464,7 +461,7 @@ class Checkout extends Component
                 amount: $order->get_total(),
                 description: sprintf('Bestelling #%s', $order->get_order_number()),
                 redirect_url: $redirectUrl,
-                webhook_url: $webhookUrl,
+                webhook_url: config('mollie.webhook_url', home_url()),
                 metadata: [
                     'order_id' => $order->get_id(),
                     'order_key' => $order->get_order_key(),

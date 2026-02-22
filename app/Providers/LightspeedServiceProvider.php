@@ -49,6 +49,9 @@ class LightspeedServiceProvider extends ServiceProvider
 
         // Hook into WooCommerce order processing to sync to Lightspeed
         add_action('woocommerce_order_status_processing', function (int $orderId) {
+
+            if(env('APP_ENV') !== 'production') return;
+
             $orderSyncService = $this->app->make(LightspeedOrderSyncService::class);
             $orderSyncService->syncOrderToLightspeed($orderId);
         });
