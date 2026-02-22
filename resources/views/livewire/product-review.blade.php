@@ -1,18 +1,16 @@
 <div x-data="reviewForm()">
     @if ($submitted)
-        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+        <x-alert type="success">
             <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                @svg('resources.images.icons.check-circle', 'w-5 h-5 text-green-500 shrink-0')
                 <p class="text-green-700 font-medium">
                     {{ __('Bedankt voor je review! Deze wordt na goedkeuring geplaatst.', 'sage') }}
                 </p>
             </div>
-        </div>
+        </x-alert>
     @else
         <form class="space-y-6" @submit.prevent="if(validateAll('reviewForm')) $wire.submit()" id="reviewForm">
-            <h4 class="text-lg font-semibold text-gray-900">
+            <h2 class="text-xl font-semibold font-heading text-gray-900">
                 {{ __('Schrijf een review', 'sage') }}
             </h4>
 
@@ -45,7 +43,7 @@
                             wire:model="form.author"
                             placeholder="{{ __('Je naam', 'sage') }}"
                             class="mt-1"
-                            x-bind:class="{'border-red-600': errors.author}"
+                            x-bind:class="{'border-red-600 focus:ring-red-600': errors.author}"
                             @input="markTouched('author')"
                             @blur="validateField($el)"
                         />
@@ -65,7 +63,7 @@
                             wire:model="form.email"
                             placeholder="{{ __('je@email.nl', 'sage') }}"
                             class="mt-1"
-                            x-bind:class="{'border-red-600': errors.email}"
+                            x-bind:class="{'border-red-600 focus:ring-red-600': errors.email}"
                             @input="markTouched('email')"
                             @blur="validateField($el)"
                         />
@@ -89,7 +87,7 @@
                     rows="4"
                     placeholder="{{ __('Wat vind je van dit product?', 'sage') }}"
                     class="mt-1"
-                    x-bind:class="{'border-red-600': errors.content}"
+                    x-bind:class="{'border-red-600 focus:ring-red-600': errors.content}"
                     @input="markTouched('content')"
                     @blur="validateField($el)"
                 />
@@ -103,7 +101,7 @@
 
             <x-button type="submit" wire:loading.attr="disabled" wire:target="submit">
                 <span wire:loading.remove wire:target="submit">{{ __('Review plaatsen', 'sage') }}</span>
-                <span wire:loading wire:target="submit" class="flex items-center gap-2">
+                <span wire:loading.flex wire:target="submit" class="items-center gap-2">
                     @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
                     {{ __('Bezig...', 'sage') }}
                 </span>

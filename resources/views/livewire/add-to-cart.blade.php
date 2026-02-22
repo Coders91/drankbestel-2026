@@ -4,7 +4,7 @@
   x-on:add-to-cart-pack.window="if ($event.detail.productId === {{ $productId }}) { $wire.addPack($event.detail.multiplier || 1) }"
   x-on:add-to-cart-error.window="if ($event.detail.productId === {{ $productId }}) { showError = true; errorMessage = $event.detail.message; setTimeout(function() { showError = false }, 4000) }"
   x-on:product-added-to-cart.window="if ($event.detail.productId === {{ $productId }}) { showError = false }"
-  class="relative max-lg:flex-grow {{ is_product() ? 'w-full' : 'lg:w-fit' }} "
+  class="relative max-lg:flex-grow {{ !$this->isCard ? 'w-full' : 'lg:w-fit' }} "
 >
   {{-- Error tooltip --}}
   <div
@@ -31,7 +31,7 @@
         wire:target="addPack"
         class="w-full h-full relative"
         :disabled="$this->disabled"
-        :size="is_product() ? 'regular' : ''"
+        :size="!$this->isCard ? 'regular' : ''"
       >
         <span wire:loading.class="invisible" wire:target="addPack">
            @if($this->disabled)
@@ -40,7 +40,7 @@
             {{ __('Bestel', 'sage') }} ({{ $this->packSize }})
           @endif
         </span>
-        <span wire:loading wire:target="addPack" class="absolute inset-0 flex items-center justify-center">
+        <span wire:loading.flex wire:target="addPack" class="absolute inset-0 items-center justify-center">
           @svg('resources.images.icons.loader', 'animate-spin size-4')
         </span>
       </x-button>
@@ -51,7 +51,7 @@
       wire:loading.attr="disabled"
       wire:target="add"
       class="w-full h-full text-sm relative"
-      :size="is_product() ? 'regular' : ''"
+      :size="!$this->isCard ? 'regular' : ''"
       :disabled="$this->disabled"
     >
       <span wire:loading.class="invisible" wire:target="add">
@@ -61,7 +61,7 @@
           {{ __('Bestel', 'sage') }}
         @endif
       </span>
-      <span wire:loading wire:target="add" class="absolute inset-0 flex items-center justify-center">
+      <span wire:loading.flex wire:target="add" class="absolute inset-0 items-center justify-center">
         @svg('resources.images.icons.loader', 'animate-spin size-4')
       </span>
     </x-button>

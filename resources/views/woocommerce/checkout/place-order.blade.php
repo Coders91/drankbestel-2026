@@ -6,7 +6,7 @@
   wire:target="save"
 >
   <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
-  <span wire:loading wire:target="save" class="flex items-center gap-2">
+  <span wire:loading.flex wire:target="save" class="items-center gap-2">
           @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
           Bestelling plaatsen..
         </span>

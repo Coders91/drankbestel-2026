@@ -80,7 +80,7 @@
                     type="text"
                     x-model="searchQuery"
                     placeholder="{{ __('Zoeken...', 'sage') }}"
-                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-red-500 focus:border-red-500"
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-sm focus:ring-1 focus:ring-red-600 focus:border-red-600"
                 />
             </div>
         @endif

@@ -36,12 +36,12 @@
                 @if ($footerMenu->isNotEmpty())
                     @foreach ($footerMenu->all() as $menuItem)
                         <div>
-                            <h4 class="text-white font-heading font-semibold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                            <h4 class="text-white font-heading font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
                                 <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
                                 {{ $menuItem->label }}
                             </h4>
                             @if ($menuItem->children)
-                                <ul class="space-y-3">
+                                <ul class="space-y-4">
                                     @foreach ($menuItem->children as $child)
                                         <li>
                                             <a
@@ -61,7 +61,7 @@
 
                 {{-- Contact Column --}}
                 <div>
-                    <h4 class="text-white font-heading font-semibold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                    <h4 class="text-white font-heading font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
                         <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
                         {{ __('Contact', 'sage') }}
                     </h4>

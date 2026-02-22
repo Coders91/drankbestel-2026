@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container py-12">
     @if($query && strlen($query) >= 2)
         <header class="woocommerce-products-header mb-6">
             <h1 class="woocommerce-products-header__title page-title text-2xl font-heading font-bold">

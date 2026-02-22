@@ -14,9 +14,9 @@
 })
 
 @php($class .= ' ' .  match ($size) {
-  'small' => 'px-4 py-2.5',
-  'regular' => 'px-5 py-3.5',
-  default => 'px-4.5 py-3',
+  'small' => 'px-4 py-2',
+  'regular' => 'px-6 py-4',
+  default => 'px-4 py-3',
 })
 
 @if ($attributes->has('href'))

@@ -4,14 +4,14 @@
   @click.outside="if (!focused) open = false; dropdown = false"
 >
 
-    <button type="button" class="flex items-center gap-2 md:hidden w-full p-2 pb-3 text-gray-600 hover:text-red-600 transition-colors"
+    <button type="button" class="flex items-center gap-2 sm:hidden w-full bg-gray-50 pl-6 p-2 pb-3 text-gray-600 hover:text-red-600 transition-colors"
       wire:click="openMobileSearch" aria-label="{{ __('Zoeken', 'sage') }}">
       @svg('resources.images.icons.search-sm', 'size-6')
       Zoeken...
     </button>
 
   {{-- Desktop search form --}}
-  <form wire:submit.prevent="goToSearch" class="relative hidden md:flex lg:min-w-[640px]">
+  <form wire:submit.prevent="goToSearch" class="relative hidden sm:flex lg:min-w-[640px]">
     <input
       type="search"
       id="header-search"
@@ -47,7 +47,7 @@
     {{-- Loading state with spinner --}}
     <div wire:loading wire:target="query" class="p-6">
       <div class="flex items-center justify-center gap-3">
-        @svg('resources.images.icons.loader', 'animate-spin size-5 text-blue-600')
+        @svg('resources.images.icons.loader', 'animate-spin size-5 text-red-600')
         <span class="text-sm text-gray-500">{{ __('Zoeken...', 'sage') }}</span>
       </div>
     </div>
@@ -142,7 +142,7 @@
           @if($searchResults->totalCount() >= 5)
             <a
               href="{{ route('search', ['q' => $query]) }}"
-              class="col-span-full block p-3 text-center text-sm text-blue-600 transition-colors hover:bg-gray-50 border-t border-gray-100"
+              class="col-span-full block p-3 text-center text-sm text-red-600 transition-colors hover:bg-gray-50 border-t border-gray-100"
             >
               {{ __('Bekijk alle resultaten voor', 'sage') }} "{{ $query }}"
             </a>
@@ -182,9 +182,7 @@
           class="shrink-0 p-2 -m-2 text-gray-600"
           aria-label="{{ __('Sluiten', 'sage') }}"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
+          @svg('resources.images.icons.arrow-left', 'size-6')
         </button>
 
         {{-- Search input --}}
@@ -207,9 +205,7 @@
               wire:click="$set('query', '')"
               class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              @svg('resources.images.icons.x', 'size-5')
             </button>
           @endif
         </div>
@@ -226,7 +222,7 @@
       {{-- Loading state with spinner --}}
       <div wire:loading wire:target="query" class="p-8">
         <div class="flex flex-col items-center justify-center gap-3">
-          @svg('resources.images.icons.loader', 'animate-spin size-8 text-blue-600')
+          @svg('resources.images.icons.loader', 'animate-spin size-8 text-red-600')
           <span class="text-sm text-gray-500">{{ __('Zoeken...', 'sage') }}</span>
         </div>
       </div>
@@ -294,7 +290,7 @@
             @if($searchResults->totalCount() >= 5)
               <a
                 href="{{ route('search', ['q' => $query]) }}"
-                class="block py-4 text-center text-blue-600 font-medium border-t border-gray-200"
+                class="block py-4 text-center text-red-600 font-medium border-t border-gray-200"
               >
                 {{ __('Bekijk alle resultaten', 'sage') }}
               </a>
@@ -304,9 +300,7 @@
         @elseif($query && strlen($query) >= 2)
           {{-- Empty state --}}
           <div class="py-12 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto size-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            @svg('resources.images.icons.search-lg', 'mx-auto size-12 text-gray-300')
             <p class="mt-4 text-gray-500">
               {{ __('Geen resultaten gevonden voor', 'sage') }} "{{ $query }}"
             </p>
@@ -335,9 +329,7 @@
         @else
           {{-- Initial state - prompt to search --}}
           <div class="py-12 text-center text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto size-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            @svg('resources.images.icons.search-lg', 'mx-auto size-12 text-gray-300')
             <p class="mt-4">
               {{ __('Zoek naar producten, merken of categorieën', 'sage') }}
             </p>

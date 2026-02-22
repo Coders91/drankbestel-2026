@@ -7,7 +7,7 @@
   <article {{ $attributes->merge(['class' => 'article-card group']) }}>
     @if($variant === 'featured')
       {{-- Featured Variant: Horizontal card --}}
-      <a href="{{ $article['url'] }}" class="flex flex-col sm:flex-row gap-4 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <a href="{{ $article['url'] }}" class="flex flex-col sm:flex-row gap-4 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
         {{-- Image --}}
         <div class="sm:w-1/3 aspect-video sm:aspect-square overflow-hidden flex-shrink-0">
           @if($article['imageId'])
@@ -39,7 +39,7 @@
 
     @elseif($variant === 'list')
       {{-- List Variant: Emphasized list badge --}}
-      <a href="{{ $article['url'] }}" class="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <a href="{{ $article['url'] }}" class="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
         {{-- Image with Badge --}}
         <div class="relative aspect-video overflow-hidden">
           @if($article['imageId'])
@@ -96,7 +96,7 @@
 
     @else
       {{-- Default Variant: Simple card --}}
-      <a href="{{ $article['url'] }}" class="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <a href="{{ $article['url'] }}" class="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
         {{-- Image --}}
         <div class="aspect-video overflow-hidden">
           @if($article['imageId'])

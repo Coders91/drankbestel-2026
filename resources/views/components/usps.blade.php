@@ -35,7 +35,7 @@
     {{-- Boxed Variant: Gray background with rounded container --}}
     @elseif ($variant === 'boxed')
         <div {{ $attributes->merge(['class' => "rounded-xl p-6"]) }}>
-            <div class="container grid {{ $gridCols }} gap-4">
+            <div class="container p-0 grid {{ $gridCols }} gap-4">
                 @foreach ($usps as $usp)
                     <div class="flex flex-col items-center gap-3 p-4">
                         @if (isset($usp['icon']))

@@ -25,16 +25,16 @@
 
     {{-- Desktop: Pills (≤3 variations) --}}
     @unless ($showSelect)
-      <div class="hidden md:flex flex-wrap gap-2.5">
+      <div class="hidden md:flex flex-wrap gap-2">
         @foreach ($variations as $variation)
           @if ($variation['is_current'])
-            <span class="inline-flex items-center gap-2 rounded-lg px-[15px] py-2 border border-red-600 text-red-600 font-semibold">
+            <span class="inline-flex items-center gap-2 rounded-lg px-4 py-2 border border-red-600 text-red-600 font-semibold">
               <span class="text-sm">{{ $variation['contents'] ?: __('Standaard', 'sage') }}</span>
             </span>
           @elseif($variation['is_in_stock'])
             <a
               href="{{ $variation['url'] }}"
-              class="inline-flex items-center gap-2 px-[15px] py-2 rounded-lg border border-gray-300 bg-white hover:border-red-600 hover:bg-red-50 transition-colors"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:border-red-600 hover:bg-red-50 transition-colors"
             >
               <span class="text-sm">{{ $variation['contents'] ?: __('Standaard', 'sage') }}</span>
             </a>

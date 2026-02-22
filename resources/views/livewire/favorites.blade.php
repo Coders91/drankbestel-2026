@@ -1,5 +1,5 @@
 <div
-  class="container mx-auto px-4 py-12"
+  class="container py-12"
   x-data="{ loaded: false }"
   x-init="
     $wire.loadFavorites(favorites);
@@ -30,12 +30,9 @@
         </svg>
         <h2 class="text-2xl font-bold font-heading mb-4">{{ __('Je hebt nog geen favorieten', 'sage') }}</h2>
         <p class="text-gray-600 mb-8">{{ __('Voeg producten toe aan je favorieten door op het hartje te klikken.', 'sage') }}</p>
-        <a
-          href="{{ wc_get_page_permalink('shop') }}"
-          class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold font-heading py-4 px-8 rounded-lg uppercase transition duration-200"
-        >
+        <x-button href="{{ wc_get_page_permalink('shop') }}">
           {{ __('Bekijk Producten', 'sage') }}
-        </a>
+        </x-button>
       </div>
     @else
       <p class="text-gray-600 mb-8">

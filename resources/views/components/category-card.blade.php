@@ -44,7 +44,7 @@
 <a
     href="{{ $url }}"
     {{ $attributes->merge([
-        'class' => 'group block bg-white rounded-lg border border-gray-200 p-3 transition-all duration-300 hover:border-red-200 hover:shadow-md hover:shadow-red-500/5 hover:-translate-y-0.5'
+        'class' => 'group block bg-white rounded-xl border border-gray-200 p-3 transition-all duration-300 hover:border-red-200 hover:shadow-md hover:shadow-red-500/5 hover:-translate-y-0.5'
     ]) }}
     title="{{ $name }}"
 >

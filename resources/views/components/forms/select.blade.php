@@ -12,7 +12,7 @@
     <select
       id="{{ $name }}"
       name="{{ $name }}"
-      {{ $attributes->merge(['class' => 'w-full min-h-12 appearance-none rounded-lg border border-gray-300 bg-white pl-4 pr-12 py-2 cursor-pointer col-start-1 row-start-1 order-1 truncate']) }}
+      {{ $attributes->merge(['class' => 'w-full min-h-12 appearance-none rounded-sm border border-gray-300 bg-white pl-4 pr-12 py-2 cursor-pointer col-start-1 row-start-1 order-1 truncate']) }}
     >
       @if(!empty($options))
         @foreach ($options as $value => $label)

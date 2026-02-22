@@ -1,6 +1,6 @@
 <div>
   <x-checkout-header />
-  <div class="container px-4">
+  <div class="container">
     <form method="post"
           id="checkout"
           name="checkout"
@@ -13,14 +13,12 @@
       <div class="grid gap-y-8 lg:gap-y-12 min-w-0">
         {{-- Order Error Message --}}
         @error('order')
-          <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <x-alert type="warning">
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-              </svg>
+              @svg('resources.images.icons.alert-circle', 'w-5 h-5 text-red-500 shrink-0')
               <p class="text-red-700 font-medium">{{ $message }}</p>
             </div>
-          </div>
+          </x-alert>
         @enderror
 
         <x-checkout-section
@@ -30,8 +28,8 @@
         >
           <x-slot:header>
             {{-- Buttons to toggle business fields --}}
-            <div class="flex gap-2.5 mb-2">
-              <div class="px-5 py-2.5 border border-gray-300 rounded-lg bg-white">
+            <div class="flex gap-2 mb-2">
+              <div class="px-4 py-2 border border-gray-300 rounded-lg bg-white">
                 <x-forms.radio id="consumer"
                          name="is_business_order"
                          value="0"
@@ -43,7 +41,7 @@
                   Particulier
                 </x-forms.radio>
               </div>
-              <div class="px-5 py-2.5 border border-gray-300 rounded-lg bg-white">
+              <div class="px-4 py-2 border border-gray-300 rounded-lg bg-white">
                 <x-forms.radio id="business"
                          name="is_business_order"
                          value="1"
@@ -90,7 +88,7 @@
           wire:target="save"
         >
           <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
-          <span wire:loading wire:target="save" class="flex items-center gap-2">
+          <span wire:loading.flex wire:target="save" class="items-center gap-2">
             @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
             Bestelling plaatsen..
           </span>
