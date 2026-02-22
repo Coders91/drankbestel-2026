@@ -6,6 +6,7 @@ use Roots\Acorn\View\Composer;
 
 use App\View\Models\Product;
 use App\Services\FilterEverythingService;
+use Illuminate\Support\Facades\Cache;
 use Log1x\Pagi\PagiFacade as Pagi;
 
 class ArchiveProduct extends Composer
@@ -35,6 +36,8 @@ class ArchiveProduct extends Composer
                 'currentSort' => '',
                 'queryVars' => [],
                 'maxPages' => 0,
+                'currentPage' => 1,
+                'nextPageUrl' => '',
             ];
         }
 
@@ -53,12 +56,17 @@ class ArchiveProduct extends Composer
             }
         }
 
+        $productIds = wp_list_pluck($wp_query->posts, 'ID');
+        Product::primeCache($productIds);
+
         return [
             'products' => collect($wp_query->posts)
                 ->map(fn ($post) => Product::find($post->ID))
                 ->filter(),
             'queryVars' => $wp_query->query_vars,
             'maxPages' => $wp_query->max_num_pages,
+            'currentPage' => max(1, get_query_var('paged', 1)),
+            'nextPageUrl' => $pagination->nextPageUrl(),
             'pagination' => $pagination->links('components.pagination'),
             'totalProducts' => $wp_query->found_posts,
             'filters' => $service->getFiltersForView(),
@@ -97,54 +105,53 @@ class ArchiveProduct extends Composer
             return []; // No children, don't show selector
         }
 
-        // Get pa_soort terms only from products in the current category
-        global $wpdb;
+        return Cache::remember("soort_categories_{$currentTerm->term_id}", 3600, function () use ($currentTerm) {
+            global $wpdb;
 
-        $soortTerms = $wpdb->get_results($wpdb->prepare("
-            SELECT t.term_id, t.name, t.slug, COUNT(DISTINCT tr.object_id) as count
-            FROM {$wpdb->terms} t
-            INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-            INNER JOIN {$wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
-            INNER JOIN {$wpdb->term_relationships} tr_cat ON tr.object_id = tr_cat.object_id
-            INNER JOIN {$wpdb->term_taxonomy} tt_cat ON tr_cat.term_taxonomy_id = tt_cat.term_taxonomy_id
-            WHERE tt.taxonomy = 'pa_soort'
-            AND tt_cat.taxonomy = 'product_cat'
-            AND tt_cat.term_id IN (
-                SELECT term_id FROM {$wpdb->term_taxonomy}
-                WHERE taxonomy = 'product_cat'
-                AND (term_id = %d OR parent = %d)
-            )
-            GROUP BY t.term_id
-            ORDER BY count DESC
-        ", $currentTerm->term_id, $currentTerm->term_id));
+            $soortTerms = $wpdb->get_results($wpdb->prepare("
+                SELECT t.term_id, t.name, t.slug, COUNT(DISTINCT tr.object_id) as count
+                FROM {$wpdb->terms} t
+                INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+                INNER JOIN {$wpdb->term_relationships} tr ON tt.term_taxonomy_id = tr.term_taxonomy_id
+                INNER JOIN {$wpdb->term_relationships} tr_cat ON tr.object_id = tr_cat.object_id
+                INNER JOIN {$wpdb->term_taxonomy} tt_cat ON tr_cat.term_taxonomy_id = tt_cat.term_taxonomy_id
+                WHERE tt.taxonomy = 'pa_soort'
+                AND tt_cat.taxonomy = 'product_cat'
+                AND tt_cat.term_id IN (
+                    SELECT term_id FROM {$wpdb->term_taxonomy}
+                    WHERE taxonomy = 'product_cat'
+                    AND (term_id = %d OR parent = %d)
+                )
+                GROUP BY t.term_id
+                ORDER BY count DESC
+            ", $currentTerm->term_id, $currentTerm->term_id));
 
-        if (empty($soortTerms)) {
-            return [];
-        }
-
-        $categories = [];
-
-        foreach ($soortTerms as $soortTerm) {
-            // Find matching product_cat with same name
-            $matchingCat = get_term_by('name', $soortTerm->name, 'product_cat');
-
-            if (!$matchingCat) {
-                continue; // Skip if no matching category
+            if (empty($soortTerms)) {
+                return [];
             }
 
-            // Get category image
-            $thumbnailId = get_term_meta($matchingCat->term_id, 'thumbnail_id', true);
-            $imageUrl = $thumbnailId ? wp_get_attachment_image_url($thumbnailId, 'medium') : null;
+            $categories = [];
 
-            $categories[] = [
-                'name' => $soortTerm->name,
-                'slug' => $matchingCat->slug,
-                'url' => get_term_link($matchingCat),
-                'image_url' => $imageUrl,
-                'count' => (int) $soortTerm->count,
-            ];
-        }
+            foreach ($soortTerms as $soortTerm) {
+                $matchingCat = get_term_by('name', $soortTerm->name, 'product_cat');
 
-        return $categories;
+                if (!$matchingCat) {
+                    continue;
+                }
+
+                $thumbnailId = get_term_meta($matchingCat->term_id, 'thumbnail_id', true);
+                $imageUrl = $thumbnailId ? wp_get_attachment_image_url($thumbnailId, 'medium') : null;
+
+                $categories[] = [
+                    'name' => $soortTerm->name,
+                    'slug' => $matchingCat->slug,
+                    'url' => get_term_link($matchingCat),
+                    'image_url' => $imageUrl,
+                    'count' => (int) $soortTerm->count,
+                ];
+            }
+
+            return $categories;
+        });
     }
 }

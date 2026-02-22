@@ -27,6 +27,9 @@ export default defineConfig(({ command }) => {
           // JS
           'resources/js/app.js',
           'resources/js/editor.js',
+
+          // External
+          'resources/js/instant.page.js'
         ],
         refresh: true,
       }),

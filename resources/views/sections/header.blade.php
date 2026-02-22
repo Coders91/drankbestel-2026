@@ -7,8 +7,7 @@
     <div class="border-b border-gray-100">
       <div class="container max-lg:px-0 flex align-content-center min-h-14 lg:min-h-20 pt-2 lg:py-3 mx-auto">
           <div
-              class="grid grid-flow-col items-center gap-2 justify-between w-full">
-
+              class="max-sm:grid max-sm:grid-flow-col flex items-center gap-2 justify-between w-full">
 
             <div class="flex items-center gap-2">
 
@@ -20,8 +19,7 @@
               @click="openMobileMenu()"
               aria-label="{{ __('Open menu', 'sage') }}"
             >
-              <svg aria-hidden="true" class="w-6 h-6
-            max-lg:group-data-[header-style=transparent]:stroke-white" width="20" height="14" viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+              <svg aria-hidden="true" class="w-6 h-6" width="20" height="14" viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 7H15M1 1H19M1 13H19"></path>
               </svg>
             </button>
@@ -38,7 +36,7 @@
 
               {{-- Search Bar --}}
               <div
-                  class="max-sm:row-start-2 max-sm:col-span-2 w-full md:max-w-2xl"
+                  class="max-sm:row-start-2 max-sm:col-span-2 w-full lg:max-w-[640px]"
               >
                   <livewire:header-search class="-ml-2 -mr-1" />
               </div>

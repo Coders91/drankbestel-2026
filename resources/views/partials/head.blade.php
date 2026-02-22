@@ -8,4 +8,5 @@
   @isset($structuredData)
     {!! $structuredData !!}
   @endisset
+  <script defer src="{{ Vite::asset('resources/js/instant.page.js') }}"></script>
 </head>

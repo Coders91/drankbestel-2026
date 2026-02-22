@@ -235,11 +235,14 @@ add_action('wp_enqueue_scripts', function() {
 
 // Filtereverything plugin
 add_action( 'wp_print_styles', function () {
-    wp_dequeue_style( 'wpc-filter-everything' );
     wp_deregister_style( 'wpc-filter-everything' );
+    wp_dequeue_style( 'wpc-filter-everything' );
 
-    wp_dequeue_style( 'wpc-widgets' );
+    wp_deregister_style( 'wpc-filter-everything-custom' );
+    wp_dequeue_style( 'wpc-filter-everythomg-custom' );
+
     wp_deregister_style( 'wpc-widgets' );
+    wp_dequeue_style( 'wpc-widgets' );
 }, 999 );
 
 add_action('wp_print_scripts', function () {

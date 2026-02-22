@@ -6,6 +6,7 @@ use App\Services\MegaMenuService;
 use App\Services\MetaIndexService;
 use App\Services\Search\SearchAnalyticsService;
 use App\Services\Woocommerce\AggregatedRatingService;
+use Illuminate\Support\Facades\Cache;
 use Roots\Acorn\Sage\SageServiceProvider;
 
 class ThemeServiceProvider extends SageServiceProvider
@@ -52,6 +53,62 @@ class ThemeServiceProvider extends SageServiceProvider
 
         // Update meta indexes on ACF save
         add_action('acf/save_post', [$this, 'updateMetaIndexes'], 20);
+
+        // Invalidate caches when product categories change
+        add_action('created_product_cat', [$this, 'invalidateCategoryCaches']);
+        add_action('edited_product_cat', [$this, 'invalidateCategoryCaches']);
+        add_action('delete_product_cat', [$this, 'invalidateCategoryCaches']);
+
+        // Invalidate caches when product brands change
+        add_action('created_product_brand', fn () => app(MegaMenuService::class)->clearCache());
+        add_action('edited_product_brand', fn () => app(MegaMenuService::class)->clearCache());
+        add_action('delete_product_brand', fn () => app(MegaMenuService::class)->clearCache());
+
+        // Invalidate soort categories cache when pa_soort terms or product relationships change
+        add_action('edited_pa_soort', [$this, 'invalidateSoortCaches']);
+        add_action('created_pa_soort', [$this, 'invalidateSoortCaches']);
+        add_action('delete_pa_soort', [$this, 'invalidateSoortCaches']);
+        add_action('woocommerce_update_product', [$this, 'invalidateSoortCaches']);
+
+        // Invalidate shipping caches when WooCommerce shipping zones change
+        add_action('woocommerce_after_shipping_zone_object_save', [$this, 'invalidateShippingCaches']);
+    }
+
+    /**
+     * Invalidate mega menu and soort category caches when product categories change.
+     */
+    public function invalidateCategoryCaches(): void
+    {
+        app(MegaMenuService::class)->clearCache();
+        $this->invalidateSoortCaches();
+    }
+
+    /**
+     * Invalidate all soort_categories_* cache keys.
+     */
+    public function invalidateSoortCaches(): void
+    {
+        $topLevelTerms = get_terms([
+            'taxonomy' => 'product_cat',
+            'parent' => 0,
+            'hide_empty' => false,
+            'fields' => 'ids',
+        ]);
+
+        if (!is_wp_error($topLevelTerms)) {
+            foreach ($topLevelTerms as $termId) {
+                Cache::forget("soort_categories_{$termId}");
+            }
+        }
+    }
+
+    /**
+     * Invalidate shipping-related caches.
+     */
+    public function invalidateShippingCaches(): void
+    {
+        Cache::forget('free_shipping_amount');
+        Cache::forget('flat_rate_cost');
     }
 
     /**

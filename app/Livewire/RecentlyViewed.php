@@ -51,6 +51,8 @@ class RecentlyViewed extends Component
             return [];
         }
 
+        Product::primeCache($this->productIds);
+
         $products = [];
 
         foreach ($this->productIds as $productId) {
