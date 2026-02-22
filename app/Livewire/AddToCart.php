@@ -20,15 +20,15 @@ class AddToCart extends Component
 
     public bool $disabled = false;
 
-    public bool $isCard = false;
+    public bool $isSingleProduct = false;
 
     public ?string $errorMessage = null;
 
-    public function mount(int $productId, int $quantity = 1, bool $isCard = false): void
+    public function mount(int $productId, int $quantity = 1, bool $isSingleProduct = false): void
     {
         $this->productId = $productId;
         $this->quantity  = max(1, $quantity);
-        $this->isCard = $isCard;
+        $this->isSingleProduct = $isSingleProduct;
 
         $this->initializePackSettings();
     }

@@ -87,6 +87,12 @@
         init() {
           this.checkWidth();
           window.addEventListener("resize", () => this.checkWidth());
+          window.addEventListener("accordion-open", (e) => {
+            if (e.detail?.id === this.accordionId) {
+              this.activeAccordion = this.accordionId;
+              this.$nextTick(() => this.$el.scrollIntoView({ behavior: "smooth", block: "start" }));
+            }
+          });
         },
         checkWidth() {
           const v = bps[destroyBreakpoint];

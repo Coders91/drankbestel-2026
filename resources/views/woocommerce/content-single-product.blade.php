@@ -41,7 +41,10 @@ x-data="{
           @if ($product->hasReviews())
             <div class="flex items-center gap-2 mt-2 mb-2">
               <x-star-rating :rating="$product->rating" size="md" />
-              <a href="#reviews" class="text-sm text-gray-500 hover:text-red-600 transition-colors">
+              <a href="#reviews"
+                 class="text-sm text-gray-500 hover:text-red-600 transition-colors"
+                 @click.prevent="$dispatch('accordion-open', { id: 'reviews' })"
+              >
                 {{ $product->reviewCount }} {{ $product->reviewCount === 1 ? __('review', 'sage') : __('reviews', 'sage') }}
               </a>
             </div>
@@ -94,7 +97,7 @@ x-data="{
         {{-- Add to Cart Form --}}
         <div class="md:col-start-2">
           @if($product->is_in_stock)
-            <livewire:add-to-cart :productId="$product->id" />
+            <livewire:add-to-cart :productId="$product->id" :isSingleProduct="true" />
           @else
             <h3 class="display-6">Uitverkocht</h3>
           @endif
