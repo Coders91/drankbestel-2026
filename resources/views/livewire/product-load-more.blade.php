@@ -1,4 +1,16 @@
-<div>
+<div
+    x-data
+    x-init="
+        const match = location.hash.match(/^#page-(\d+)$/);
+        if (match && parseInt(match[1]) > 1) {
+            $wire.loadUpToPage(parseInt(match[1]));
+        }
+
+        Livewire.on('page-updated', ({ page }) => {
+            history.replaceState(null, '', '#page-' + page);
+        });
+    "
+>
     @if (count($additionalProducts) > 0)
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mt-4 lg:mt-6">
             @foreach ($additionalProducts as $product)

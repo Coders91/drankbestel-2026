@@ -5,12 +5,26 @@
     class="z-20 bg-white transition-transform duration-300">
     {{-- Main Header Bar --}}
     <div class="border-b border-gray-100">
-      <div class="container flex align-content-center min-h-14 lg:min-h-20 pl-4 pr-3 pt-2 lg:py-3 mx-auto">
+      <div class="container max-lg:px-0 flex align-content-center min-h-14 lg:min-h-20 pt-2 lg:py-3 mx-auto">
           <div
-              class="grid grid-flow-col items-center justify-between w-full">
+              class="grid grid-flow-col items-center gap-2 justify-between w-full">
 
-            <div class="flex items-center gap-6 md:gap-5 lg:gap-10">
 
+            <div class="flex items-center gap-2">
+
+            {{-- Hamburger Menu Button (mobile only) --}}
+            <button
+              type="button"
+              class="lg:hidden pl-4 p-2 text-gray-700 hover:text-red-600 transition-colors"
+              title="{{ __('Menu', 'sage') }}"
+              @click="openMobileMenu()"
+              aria-label="{{ __('Open menu', 'sage') }}"
+            >
+              <svg aria-hidden="true" class="w-6 h-6
+            max-lg:group-data-[header-style=transparent]:stroke-white" width="20" height="14" viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 7H15M1 1H19M1 13H19"></path>
+              </svg>
+            </button>
               {{-- Logo --}}
               <a
                   class="brand flex-shrink-0 text-xl font-bold font-heading text-gray-900 hover:text-red-600 transition-all duration-300"
@@ -24,13 +38,13 @@
 
               {{-- Search Bar --}}
               <div
-                  class="max-sm:row-start-2 max-sm:col-span-2 w-full lg:max-w-2xl"
+                  class="max-sm:row-start-2 max-sm:col-span-2 w-full md:max-w-2xl"
               >
                   <livewire:header-search class="-ml-2 -mr-1" />
               </div>
 
               {{-- Right Side: Icons & Hamburger --}}
-              <div class="flex items-center lg:gap-2.5">
+              <div class="flex items-center md:gap-2 pr-4">
 
                   {{-- Favorites Icon --}}
                   <a
@@ -47,18 +61,6 @@
 
                   {{-- Cart Icon --}}
                   <livewire:header-cart />
-
-                {{-- Hamburger Menu Button (mobile only) --}}
-                <button
-                  type="button"
-                  class="lg:hidden p-2 text-gray-700 hover:text-red-600 transition-colors"
-                  title="{{ __('Menu', 'sage') }}"
-                  @click="openMobileMenu()"
-                  aria-label="{{ __('Open menu', 'sage') }}"
-                >
-                  @svg('resources.images.icons.menu', 'size-6')
-                </button>
-
               </div>
           </div>
       </div>

@@ -9,7 +9,7 @@
   {{-- Order Items --}}
   <div class="space-y-4">
     @foreach ($items as $item)
-      <div class="flex gap-3 pb-4 border-b border-gray-200 last:border-b-0">
+      <div class="flex gap-4 pb-4 border-b border-gray-200 last:border-b-0">
         <div class="shrink-0 w-26 h-26 bg-white rounded-lg border border-gray-100 flex items-center justify-center">
           <x-image
             class="w-full h-full object-contain p-1 rounded-lg"
@@ -32,7 +32,7 @@
   </div>
 
   {{-- Totals --}}
-  <div class="space-y-3 pt-4 border-t border-gray-200">
+  <div class="space-y-4 pt-4 border-t border-gray-200">
     {{-- Subtotal before discounts (only show if there are discounts) --}}
     @if ($totals->discount->amount->amount > 0)
       <div class="flex justify-between text-gray-900">

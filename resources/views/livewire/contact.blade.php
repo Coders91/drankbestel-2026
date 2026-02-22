@@ -1,4 +1,4 @@
-<div class="container mx-auto px-4 py-12" x-data="contactForm()">
+<div class="container py-12" x-data="contactForm()">
     <x-page-header class="mb-4" title="{{ __('Contact', 'sage') }}" />
 
     <p class="text-gray-600 mb-8 max-w-2xl">
@@ -11,7 +11,7 @@
             {{-- Phone --}}
             @if(config('store.contact.phone'))
             <a href="tel:{{ preg_replace('/[^0-9+]/', '', config('store.contact.phone')) }}"
-               class="group block bg-white rounded-lg p-5 border border-gray-200 shadow-sm hover:border-red-200 hover:shadow-md transition-all duration-200">
+               class="group block bg-white rounded-lg p-6 border border-gray-200 shadow-sm hover:border-red-200 hover:shadow-md transition-all duration-200">
                 <div class="flex items-start gap-4">
                     <div class="flex items-center justify-center w-10 h-10 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
                         @svg('resources.images.icons.phone', 'w-5 h-5 text-red-600')
@@ -29,7 +29,7 @@
             {{-- Email --}}
             @if(config('store.contact.email'))
             <a href="mailto:{{ config('store.contact.email') }}"
-               class="group block bg-white rounded-lg p-5 border border-gray-200 shadow-sm hover:border-red-200 hover:shadow-md transition-all duration-200">
+               class="group block bg-white rounded-lg p-6 border border-gray-200 shadow-sm hover:border-red-200 hover:shadow-md transition-all duration-200">
                 <div class="flex items-start gap-4">
                     <div class="flex items-center justify-center w-10 h-10 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
                         @svg('resources.images.icons.mail', 'w-5 h-5 text-red-600')
@@ -49,7 +49,7 @@
             <a href="{{ config('store.contact.whatsapp') }}"
                target="_blank"
                rel="noopener noreferrer"
-               class="group block bg-white rounded-lg p-5 border border-gray-200 shadow-sm hover:border-green-200 hover:shadow-md transition-all duration-200">
+               class="group block bg-white rounded-lg p-6 border border-gray-200 shadow-sm hover:border-green-200 hover:shadow-md transition-all duration-200">
                 <div class="flex items-start gap-4">
                     <div class="flex items-center justify-center w-10 h-10 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
                         @svg('resources.images.logos.whatsapp', 'w-5 h-5 text-green-600')
@@ -66,7 +66,7 @@
 
             {{-- Business Hours --}}
             @if(config('store.hours'))
-            <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
+            <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
                 <div class="flex items-start gap-4">
                     <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg">
                         @svg('resources.images.icons.clock', 'w-5 h-5 text-gray-600')
@@ -88,7 +88,7 @@
 
             {{-- Address --}}
             @if(config('store.address'))
-                <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
+                <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
                     <div class="flex items-start gap-4">
                         <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg">
                             @svg('resources.images.icons.map-pin', 'w-5 h-5 text-gray-600')
@@ -117,12 +117,10 @@
 
                 @if ($submitted)
                     {{-- Success State --}}
-                    <div class="p-6 bg-green-50 border border-green-200 rounded-lg">
+                    <x-alert type="success" class="p-6">
                         <div class="flex items-start gap-4">
                             <div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full shrink-0">
-                                <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
+                                @svg('resources.images.icons.check', 'w-5 h-5 text-green-600')
                             </div>
                             <div>
                                 <h3 class="font-semibold text-green-800 mb-1">
@@ -133,7 +131,7 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
+                    </x-alert>
                 @else
                     <form class="space-y-5" @submit.prevent="if(validateAll('contactForm')) $wire.submit()" id="contactForm">
                         {{-- Name Field --}}
@@ -211,7 +209,7 @@
                                     {{ __('Verstuur bericht', 'sage') }}
                                     @svg('resources.images.icons.arrow-right', 'w-4 h-4')
                                 </span>
-                                <span wire:loading wire:target="submit" class="flex items-center gap-2">
+                                <span wire:loading.flex wire:target="submit" class="items-center gap-2">
                                     @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
                                     {{ __('Bezig...', 'sage') }}
                                 </span>
@@ -220,14 +218,12 @@
 
                         {{-- General Form Error --}}
                         @error('form')
-                            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <x-alert type="warning">
                                 <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                    </svg>
+                                    @svg('resources.images.icons.alert-circle', 'w-5 h-5 text-red-500 shrink-0')
                                     <p class="text-red-600 text-sm">{{ $message }}</p>
                                 </div>
-                            </div>
+                            </x-alert>
                         @enderror
                     </form>
                 @endif

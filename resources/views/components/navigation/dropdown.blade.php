@@ -15,7 +15,7 @@
     x-cloak
     class="absolute left-0 top-full z-50 min-w-[220px]"
 >
-    <div class="bg-white rounded-b-lg shadow-lg border border-t-0 border-gray-100 py-2">
+    <div class="bg-white rounded-b-lg shadow-xl border border-t-0 border-gray-100 py-2">
         <ul>
             @foreach ($children as $child)
                 @php

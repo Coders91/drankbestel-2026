@@ -13,14 +13,14 @@
         aria-label="{{ wp_get_nav_menu_name($name) }}"
         x-on:mouseleave="megaMenuLeave()"
     >
-        <div class="container h-14 mx-auto px-4">
+        <div class="container mx-auto px-4">
             <ul class="flex items-center gap-8">
                 @foreach ($menu->all() as $item)
                     @php
                         $hasChildren = $item->children && count($item->children) > 0;
                         $isMegaPanel = strtolower($item->label) === 'gedestilleerd';
                         $showDropdown = $hasChildren;
-                        $itemClasses = 'group relative flex items-center gap-6 py-4 text-sm font-medium transition-colors';
+                        $itemClasses = 'group relative flex items-center gap-6 py-4.5 text-sm font-medium transition-colors';
                         $itemClasses .= $item->active ? ' text-red-600' : ' text-gray-700 hover:text-red-600';
                         $indicatorClasses = 'absolute bottom-0 left-0 right-0 h-0.5 bg-red-600 transition-transform origin-left';
                     @endphp

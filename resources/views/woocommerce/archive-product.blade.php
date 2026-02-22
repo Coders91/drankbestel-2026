@@ -17,11 +17,6 @@ the readme will list any important changes.
 <x-layouts.app>
     <x-page-header class="container pt-6 mb-4" title="{!! woocommerce_page_title(false) !!}" description="{{ get_the_archive_description() }}"/>
 
-    {{-- Category Selector (only shows on leaf categories) --}}
-    @if(!empty($soortCategories))
-      <x-category-selector :categories="$soortCategories" />
-    @endif
-
     {{-- Main content with sidebar layout --}}
 
   <div class="container">

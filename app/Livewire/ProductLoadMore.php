@@ -33,11 +33,28 @@ class ProductLoadMore extends Component
 
         $this->page++;
 
+        $this->loadPage($this->page);
+
+        $this->dispatch('page-updated', page: $this->page);
+    }
+
+    public function loadUpToPage(int $targetPage): void
+    {
+        $targetPage = min($targetPage, $this->maxPages);
+
+        while ($this->page < $targetPage) {
+            $this->page++;
+            $this->loadPage($this->page);
+        }
+    }
+
+    private function loadPage(int $page): void
+    {
         $args = array_merge($this->queryVars, [
             'post_type' => 'product',
             'post_status' => 'publish',
             'posts_per_page' => $this->perPage,
-            'paged' => $this->page,
+            'paged' => $page,
             'fields' => 'ids',
         ]);
 

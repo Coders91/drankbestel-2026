@@ -147,7 +147,7 @@
           <div class="flex flex-col sm:flex-row gap-4">
             <x-button type="submit" wire:loading.attr="disabled" wire:target="submit" class="flex-1 sm:flex-none">
               <span wire:loading.remove wire:target="submit">{{ __('Review plaatsen', 'sage') }}</span>
-              <span wire:loading wire:target="submit" class="flex items-center justify-center gap-2">
+              <span wire:loading.flex wire:target="submit" class="items-center justify-center gap-2">
                 @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
                 {{ __('Bezig...', 'sage') }}
               </span>

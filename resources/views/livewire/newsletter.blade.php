@@ -1,13 +1,13 @@
 <div x-data="newsletterForm()">
     @if ($submitted)
-        <div class="flex items-center gap-3 p-4 bg-green-900/30 border border-green-700/50 rounded-lg">
-            <svg class="w-5 h-5 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-            <p class="text-green-300 text-sm">
-                {{ __('Bedankt voor je aanmelding!', 'sage') }}
-            </p>
-        </div>
+        <x-alert type="success">
+            <div class="flex items-center gap-3">
+                @svg('resources.images.icons.check', 'w-5 h-5 text-green-600 shrink-0')
+                <p class="text-green-700 text-sm">
+                    {{ __('Bedankt voor je aanmelding!', 'sage') }}
+                </p>
+            </div>
+        </x-alert>
     @else
         <form
             class="flex gap-2"
@@ -27,19 +27,18 @@
                     @blur="validateField($el)"
                 >
             </div>
-            <button
+            <x-button
                 type="submit"
-                class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-heading font-semibold text-sm uppercase tracking-wide rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 wire:loading.attr="disabled"
                 wire:target="submit"
             >
                 <span wire:loading.remove wire:target="submit">
                     {{ __('Aanmelden', 'sage') }}
                 </span>
-                <span wire:loading wire:target="submit">
+                <span wire:loading.flex wire:target="submit" class="items-center justify-center">
                     @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
                 </span>
-            </button>
+            </x-button>
         </form>
 
         {{-- Error messages --}}

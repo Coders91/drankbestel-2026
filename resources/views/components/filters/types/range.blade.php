@@ -78,7 +78,7 @@
                     :min="min"
                     :max="maxValue"
                     :step="step"
-                    class="w-full py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-red-500 focus:border-red-500 {{ $prefix ? 'pl-7 pr-3' : 'px-3' }}"
+                    class="w-full py-2 text-sm border border-gray-300 rounded-sm focus:ring-1 focus:ring-red-600 focus:border-red-600 {{ $prefix ? 'pl-7 pr-3' : 'px-3' }}"
                     placeholder="{{ __('Min', 'sage') }}"
                 />
             </div>
@@ -99,7 +99,7 @@
                     :min="minValue"
                     :max="max"
                     :step="step"
-                    class="w-full py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-red-500 focus:border-red-500 {{ $prefix ? 'pl-7 pr-3' : 'px-3' }}"
+                    class="w-full py-2 text-sm border border-gray-300 rounded-sm focus:ring-1 focus:ring-red-600 focus:border-red-600 {{ $prefix ? 'pl-7 pr-3' : 'px-3' }}"
                     placeholder="{{ __('Max', 'sage') }}"
                 />
             </div>
@@ -107,11 +107,13 @@
     </div>
 
     {{-- Apply button --}}
-    <button
+    <x-button
         type="button"
+        variant="secondary"
+        size="small"
         @click="applyRange()"
-        class="w-full px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        class="w-full text-sm"
     >
         {{ __('Toepassen', 'sage') }}
-    </button>
+    </x-button>
 </div>

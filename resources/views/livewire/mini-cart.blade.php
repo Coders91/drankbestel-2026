@@ -16,9 +16,7 @@
       {{-- Header --}}
       <div class="bg-green-50 px-4 py-3 flex items-center justify-between border-b border-green-100">
         <div class="flex items-center gap-2 text-green-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
+          @svg('resources.images.icons.check', 'w-5 h-5')
           <span class="font-semibold text-sm">{{ __('Toegevoegd aan winkelwagen', 'sage') }}</span>
         </div>
         <button
@@ -26,9 +24,7 @@
           x-on:click="show = false; $wire.hideToast()"
           class="text-gray-400 hover:text-gray-600 transition"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          @svg('resources.images.icons.x', 'w-5 h-5')
         </button>
       </div>
 
@@ -58,20 +54,12 @@
 
         {{-- Action Buttons --}}
         <div class="flex gap-2">
-          <button
-            type="button"
-            wire:click="goToCart"
-            class="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-          >
+          <x-button variant="outline" size="small" wire:click="goToCart" class="flex-1 text-sm">
             {{ __('Winkelwagen', 'sage') }}
-          </button>
-          <button
-            type="button"
-            wire:click="goToCheckout"
-            class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
-          >
+          </x-button>
+          <x-button size="small" wire:click="goToCheckout" class="flex-1 text-sm">
             {{ __('Afrekenen', 'sage') }}
-          </button>
+          </x-button>
         </div>
       </div>
     </div>

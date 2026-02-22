@@ -1,6 +1,6 @@
 @php use App\View\Models\Product; @endphp
 
-<div class="container mx-auto px-4 py-12">
+<div class="container py-12">
   <x-page-header class="mb-4" title="Winkelwagen" />
   @if ($this->isEmpty)
     {{-- Empty Cart State --}}
@@ -17,7 +17,7 @@
       {{ sprintf(_n('Je hebt %d product in je winkelwagen', 'Je hebt %d producten in je winkelwagen', $this->totals->itemCount, 'sage'), $this->totals->itemCount) }}
     </p>
 
-    <div class="grid lg:grid-cols-[768px_1fr] gap-8">
+    <div class="grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8">
       {{-- Cart Items --}}
       <div>
         @foreach ($this->items as $item)
@@ -137,18 +137,13 @@
             <div class="border-t border-gray-200 pt-4">
               <h3 class="text-gray-900 text-lg font-heading mb-4 font-semibold">{{ __('Kortingscode', 'sage') }}</h3>
               <form wire:submit="applyCoupon" class="flex gap-2">
-                <input
+                <x-forms.input-text
                   type="text"
                   wire:model="couponCode"
                   placeholder="{{ __('Voer code in', 'sage') }}"
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:border-transparent"
-                >
-                <button
-                  type="submit"
-                  class="bg-gray-900 hover:bg-gray-800 text-white font-bold font-heading px-6 py-2 rounded-lg uppercase transition duration-200"
-                >
-                  OK
-                </button>
+                  class="flex-1"
+                />
+                <x-button type="submit" variant="secondary" size="small">OK</x-button>
               </form>
 
               @if (isset($messages['coupon_error']))
