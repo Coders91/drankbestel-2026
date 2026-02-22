@@ -56,6 +56,6 @@
       {{ $product->price->regular->formatted() }}
     </span>
     @endif
-    <livewire:add-to-cart :disabled="!$product->is_in_stock" :productId="$product->id" :isCard="true" />
+    <livewire:add-to-cart :disabled="!$product->is_in_stock" :productId="$product->id" :isSingleProduct="false" />
   </div>
 </article>

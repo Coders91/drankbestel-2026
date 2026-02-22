@@ -4,7 +4,7 @@
   x-on:add-to-cart-pack.window="if ($event.detail.productId === {{ $productId }}) { $wire.addPack($event.detail.multiplier || 1) }"
   x-on:add-to-cart-error.window="if ($event.detail.productId === {{ $productId }}) { showError = true; errorMessage = $event.detail.message; setTimeout(function() { showError = false }, 4000) }"
   x-on:product-added-to-cart.window="if ($event.detail.productId === {{ $productId }}) { showError = false }"
-  class="relative max-lg:flex-grow {{ !$this->isCard ? 'w-full' : 'lg:w-fit' }} "
+  class="relative max-lg:flex-grow"
 >
   {{-- Error tooltip --}}
   <div
@@ -31,7 +31,7 @@
         wire:target="addPack"
         class="w-full h-full relative"
         :disabled="$this->disabled"
-        :size="!$this->isCard ? 'regular' : ''"
+        :size="!$this->isSingleProduct ? 'small' : ''"
       >
         <span wire:loading.class="invisible" wire:target="addPack">
            @if($this->disabled)
@@ -50,8 +50,8 @@
       wire:click="add"
       wire:loading.attr="disabled"
       wire:target="add"
-      class="w-full h-full text-sm relative"
-      :size="!$this->isCard ? 'regular' : ''"
+      class="w-full h-full relative"
+      :size="!$this->isSingleProduct ? 'small' : ''"
       :disabled="$this->disabled"
     >
       <span wire:loading.class="invisible" wire:target="add">

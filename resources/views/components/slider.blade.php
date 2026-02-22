@@ -33,11 +33,18 @@
     @endif
 
     @if ($hasNavigation && !$hasCustomNavEl)
-      <button type="button" class="group absolute z-10 right-auto left-0 -translate-y-1/2 top-1/2 size-14 rounded-full bg-white flex justify-center items-center shadow-md border border-gray-200" x-ref="prev">
+      <button type="button"
+              class="group absolute z-10 right-auto left-0 -translate-y-1/2 top-1/2 size-14 rounded-full bg-white flex justify-center items-center shadow-md border border-gray-200"
+              disabled
+              x-ref="prev"
+      >
         @svg('resources.images.icons.chevron-left', 'size-7 group-hover:stroke-red-600')
         <span class="sr-only">{{ __('Vorige', 'sage') }}</span>
       </button>
-      <button type="button" class="group absolute z-10 left-auto right-0 -translate-y-1/2 top-1/2 size-14 rounded-full bg-white flex justify-center items-center shadow-md border border-gray-200" x-ref="next">
+      <button type="button"
+              class="group absolute z-10 left-auto right-0 -translate-y-1/2 top-1/2 size-14 rounded-full bg-white flex justify-center items-center shadow-md border border-gray-200"
+              x-ref="next"
+      >
         @svg('resources.images.icons.chevron-right', 'size-7 group-hover:stroke-red-600')
         <span class="sr-only">{{ __('Volgende', 'sage') }}</span>
       </button>
@@ -50,110 +57,112 @@
     </div>
   @endisset
 
-  <script>
-    function Slider(options = {}) {
-      return {
-        swiper: null,
-        options,
-        init() {
-          this.initSwiper();
-        },
-        waitForSlidesAndInit() {
-          const wrapper = this.$refs.swiper?.querySelector('.swiper-wrapper');
-          const slides = wrapper?.querySelectorAll('.swiper-slide');
-
-          if (slides && slides.length > 0) {
+  @pushonce('scripts')
+    <script>
+      function Slider(options = {}) {
+        return {
+          swiper: null,
+          options,
+          init() {
             this.initSwiper();
-            return;
-          }
+          },
+          waitForSlidesAndInit() {
+            const wrapper = this.$refs.swiper?.querySelector('.swiper-wrapper');
+            const slides = wrapper?.querySelectorAll('.swiper-slide');
 
-          let attempts = 0;
-          const checkInterval = setInterval(() => {
-            attempts++;
-            const newSlides = wrapper?.querySelectorAll('.swiper-slide');
-
-            if ((newSlides && newSlides.length > 0) || attempts >= 10) {
-              clearInterval(checkInterval);
-              if (newSlides && newSlides.length > 0) {
-                this.initSwiper();
-              }
+            if (slides && slides.length > 0) {
+              this.initSwiper();
+              return;
             }
-          }, 50);
-        },
-        initSwiper() {
-          console.log(this.options);
-          const config = { ...this.options };
 
-          // Bind navigation to refs if set to true
-          if (config.navigation === true) {
-            config.navigation = {
-              nextEl: this.$refs.next,
-              prevEl: this.$refs.prev,
-            };
-          }
+            let attempts = 0;
+            const checkInterval = setInterval(() => {
+              attempts++;
+              const newSlides = wrapper?.querySelectorAll('.swiper-slide');
 
-          // Bind pagination to ref and handle custom bullet rendering
-          if (config.pagination) {
-            const bulletSvg = config.pagination.bulletSvg;
-            config.pagination = {
-              ...config.pagination,
-              el: this.$refs.pagination,
-            };
-            delete config.pagination.bulletSvg;
+              if ((newSlides && newSlides.length > 0) || attempts >= 10) {
+                clearInterval(checkInterval);
+                if (newSlides && newSlides.length > 0) {
+                  this.initSwiper();
+                }
+              }
+            }, 50);
+          },
+          initSwiper() {
+            console.log(this.options);
+            const config = { ...this.options };
 
-            if (bulletSvg) {
-              config.pagination.renderBullet = (index, className) => {
-                return `<span class="${className}">${bulletSvg}</span>`;
+            // Bind navigation to refs if set to true
+            if (config.navigation === true) {
+              config.navigation = {
+                nextEl: this.$refs.next,
+                prevEl: this.$refs.prev,
               };
             }
-          }
 
-          // Bind scrollbar to ref
-          if (config.scrollbar && this.$refs.scrollbar) {
-            config.scrollbar = {
-              ...config.scrollbar,
-              el: this.$refs.scrollbar,
+            // Bind pagination to ref and handle custom bullet rendering
+            if (config.pagination) {
+              const bulletSvg = config.pagination.bulletSvg;
+              config.pagination = {
+                ...config.pagination,
+                el: this.$refs.pagination,
+              };
+              delete config.pagination.bulletSvg;
+
+              if (bulletSvg) {
+                config.pagination.renderBullet = (index, className) => {
+                  return `<span class="${className}">${bulletSvg}</span>`;
+                };
+              }
+            }
+
+            // Bind scrollbar to ref
+            if (config.scrollbar && this.$refs.scrollbar) {
+              config.scrollbar = {
+                ...config.scrollbar,
+                el: this.$refs.scrollbar,
+              };
+            }
+
+            // Handle thumbs slider reference
+            if (config.thumbsSlider) {
+              config.thumbs = {
+                swiper: window[config.thumbsSlider] || config.thumbsSlider,
+              };
+              delete config.thumbsSlider;
+            }
+
+            // Add slide change event
+            config.on = {
+              ...config.on,
+              slideChangeTransitionStart: (swiper) => {
+                this.$dispatch('slide-change', { index: swiper.realIndex });
+              },
             };
-          }
 
-          // Handle thumbs slider reference
-          if (config.thumbsSlider) {
-            config.thumbs = {
-              swiper: window[config.thumbsSlider] || config.thumbsSlider,
-            };
-            delete config.thumbsSlider;
+            this.swiper = new Swiper(this.$refs.swiper, config);
+          },
+          refresh() {
+            if (this.swiper) {
+              this.swiper.destroy(true, true);
+              this.swiper = null;
+            }
+            this.$nextTick(() => this.waitForSlidesAndInit());
+          },
+          slideNext() {
+            this.swiper?.slideNext();
+          },
+          slidePrev() {
+            this.swiper?.slidePrev();
+          },
+          slideTo(index) {
+            this.swiper?.slideTo(index);
+          },
+          getRealIndex() {
+            return this.swiper?.realIndex ?? 0;
           }
-
-          // Add slide change event
-          config.on = {
-            ...config.on,
-            slideChangeTransitionStart: (swiper) => {
-              this.$dispatch('slide-change', { index: swiper.realIndex });
-            },
-          };
-
-          this.swiper = new Swiper(this.$refs.swiper, config);
-        },
-        refresh() {
-          if (this.swiper) {
-            this.swiper.destroy(true, true);
-            this.swiper = null;
-          }
-          this.$nextTick(() => this.waitForSlidesAndInit());
-        },
-        slideNext() {
-          this.swiper?.slideNext();
-        },
-        slidePrev() {
-          this.swiper?.slidePrev();
-        },
-        slideTo(index) {
-          this.swiper?.slideTo(index);
-        },
-        getRealIndex() {
-          return this.swiper?.realIndex ?? 0;
         }
       }
-    }
-  </script>
+    </script>
+  @endpushonce
 </div>

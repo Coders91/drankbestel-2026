@@ -8,8 +8,14 @@
         <button
           type="button"
           @click="activeSlide = {{ $index }}; window.dispatchEvent(new CustomEvent('product-gallery-slide-to', { detail: { index: {{ $index }} } }))"
-          class="shrink-0 w-20 h-20 lg:w-full lg:h-24 p-2 rounded-lg overflow-hidden border-2 transition-colors"
-          :class="activeSlide === {{ $index }} ? 'border-red-600' : 'border-gray-200 hover:border-gray-400'"
+          @class([
+            'shrink-0 w-20 h-20 lg:w-full lg:h-24 p-2 rounded-lg overflow-hidden border-2',
+            'border-red-600' => $loop->first,
+            'border-gray-200 hover:border-gray-400' => !$loop->first,
+          ])
+          :class="{'border-red-600': activeSlide === {{ $index }},
+            'border-gray-200 hover:border-gray-400': activeSlide !== {{ $index }}
+          }"
         >
           <x-image
             :id="$image_id"
