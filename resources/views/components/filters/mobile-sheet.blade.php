@@ -24,7 +24,7 @@
         x-show="!isDesktop"
         type="button"
         @click="open = true"
-        class="fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 px-6 py-3.5 bg-gray-900 text-white font-semibold rounded-full shadow-lg hover:bg-gray-800 transition-colors"
+        class="fixed bottom-4 left-4 right-4 z-40 flex items-center justify-center gap-2 px-6 py-3.5 border border-white bg-gray-900 text-white font-semibold rounded-full shadow-lg hover:bg-gray-800 transition-colors"
         x-cloak
     >
         @svg('resources.images.icons.filter-lines', 'w-5 h-5')

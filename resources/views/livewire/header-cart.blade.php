@@ -5,10 +5,16 @@
     title="{{ __('Winkelwagen', 'sage') }}"
   >
     @svg('resources.images.icons.shopping-cart', 'h-6')
+
+    <x-counter-badge
+      x-show="favorites.length > 0"
+      x-text="favorites.length > 99 ? '99+' : favorites.length"
+      x-cloak
+    ></x-counter-badge>
     @if ($this->itemCount > 0)
-      <span class="absolute -top-0.25 -right-1 bg-red-600 text-white text-xs font-bold rounded-full size-5 flex items-center justify-center px-1">
+      <x-counter-badge>
         {{ $this->itemCount > 99 ? '99+' : $this->itemCount }}
-      </span>
+      </x-counter-badge>
     @endif
   </a>
 </div>
