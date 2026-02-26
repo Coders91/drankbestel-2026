@@ -4,41 +4,38 @@
 <header
     class="z-20 bg-white transition-transform duration-300">
     {{-- Main Header Bar --}}
-    <div class="border-b border-gray-100">
-      <div class="container max-lg:px-0 flex align-content-center min-h-14 lg:min-h-20 pt-2 lg:py-3 mx-auto">
+    <div class="sm:border-b sm:border-gray-100">
+      <div class="container max-lg:px-0 flex align-content-center lg:min-h-20 pt-2 sm:py-3 mx-auto">
           <div
-              class="max-sm:grid max-sm:grid-flow-col flex items-center gap-2 justify-between w-full">
+              class="max-sm:grid max-sm:grid-flow-col flex items-center gap-1 justify-between w-full">
 
-            <div class="flex items-center gap-2">
-
-            {{-- Hamburger Menu Button (mobile only) --}}
-            <button
-              type="button"
-              class="lg:hidden pl-4 p-2 text-gray-700 hover:text-red-600 transition-colors"
-              title="{{ __('Menu', 'sage') }}"
-              @click="openMobileMenu()"
-              aria-label="{{ __('Open menu', 'sage') }}"
-            >
-              <svg aria-hidden="true" class="w-6 h-6" width="20" height="14" viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 7H15M1 1H19M1 13H19"></path>
-              </svg>
-            </button>
-              {{-- Logo --}}
-              <a
-                  class="brand flex-shrink-0 text-xl font-bold font-heading text-gray-900 hover:text-red-600 transition-all duration-300"
-                  href="{{ home_url('/') }}"
+            <div class="flex items-center gap-2 pl-2">
+              {{-- Hamburger Menu Button (mobile only) --}}
+              <button
+                type="button"
+                class="flex justify-center items-center lg:hidden p-2 text-gray-700 hover:text-red-600 transition-colors"
+                title="{{ __('Menu', 'sage') }}"
+                @click="openMobileMenu()"
+                aria-label="{{ __('Open menu', 'sage') }}"
               >
-                  <span class="block lg:h-7.5">
-                      @svg('resources.images.logos.drankbestel', 'h-5.5 lg:h-full w-auto lg:pr-4')
-                  </span>
-              </a>
+                @svg('resources.images.icons.menu', 'size-6')
+              </button>
+                {{-- Logo --}}
+                <a
+                    class="pr-2 flex-shrink-0 text-xl font-bold font-heading text-gray-900 hover:text-red-600 transition-all duration-300"
+                    href="{{ home_url('/') }}"
+                >
+                    <span class="block lg:h-7.5">
+                        @svg('resources.images.logos.drankbestel', 'h-5 lg:h-7 w-auto')
+                    </span>
+                </a>
             </div>
 
               {{-- Search Bar --}}
               <div
                   class="max-sm:row-start-2 max-sm:col-span-2 w-full lg:max-w-[640px]"
               >
-                  <livewire:header-search class="-ml-2 -mr-1" />
+                  <livewire:header-search />
               </div>
 
               {{-- Right Side: Icons & Hamburger --}}
