@@ -95,7 +95,7 @@
        x-transition:leave="transition-opacity ease-in duration-100"
        x-transition:leave-start="opacity-100"
        x-transition:leave-end="opacity-0"
-       x-on:click="backdrop = false"
+       x-on:click="backdrop = false; searchActive = false"
        x-cloak
        class="fixed z-[1] inset-0 bg-gray-900/30"
   ></div>
@@ -309,6 +309,7 @@
   function App() {
     return {
       backdrop: false,
+      searchActive: false,
       productId: @js(is_product() ? get_the_ID() : ''),
       favorites: [],
       recentlyViewed: [],

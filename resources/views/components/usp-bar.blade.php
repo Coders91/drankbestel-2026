@@ -5,6 +5,7 @@
 <div
   {{ $attributes->merge(['class' => 'usp-bar leading-0 lg:h-8']) }}
   x-data="{ mounted: false }"
+  x-ref="usp-bar"
   x-init="setTimeout(() => mounted = true, 50)"
   :class="{ 'invisible': !mounted }"
   style="transition: opacity 0.3s ease-in-out;"

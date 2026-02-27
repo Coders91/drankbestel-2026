@@ -17,7 +17,7 @@
   {{ $attributes->merge(['class' => 'slider-component']) }}
   x-data="Slider(@js($options))"
 >
-  <div class="swiper" x-ref="swiper" id="{{ $sliderId }}">
+  <div class="swiper relative" x-ref="swiper" id="{{ $sliderId }}">
     <div class="swiper-wrapper">
       {{ $slot }}
     </div>

@@ -173,6 +173,8 @@ the readme will list any important changes.
 
             if (!this.isMobile()) {
               window.dispatchEvent(new CustomEvent('filter-applied'));
+            } else {
+              this.scrollToProducts();
             }
           } catch (err) {
             console.error('Filter failed:', err);
@@ -214,9 +216,7 @@ the readme will list any important changes.
         },
 
         async handlePopstate() {
-          if (!this.isMobile()) {
-            this.scrollToProducts();
-          }
+          this.scrollToProducts();
 
           const loaderTimeout = setTimeout(() => { this.loading = true; }, 150);
 
@@ -271,6 +271,8 @@ the readme will list any important changes.
 
           if (current && incoming) {
             current.innerHTML = incoming.innerHTML;
+          } else if (current && !incoming) {
+            current.innerHTML = '';
           }
         },
 
@@ -295,7 +297,7 @@ the readme will list any important changes.
 
           const productArea = document.querySelector('#product-area');
           if (productArea) {
-            productArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            productArea.scrollIntoView({ behavior: this.isMobile() ? 'instant' : 'smooth', block: 'start' });
           }
         },
       }));

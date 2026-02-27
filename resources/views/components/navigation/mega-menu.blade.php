@@ -9,10 +9,21 @@
 
 @if ($menu->isNotEmpty())
     <nav
-        class="mega-menu hidden lg:block bg-white"
+        class="mega-menu relative hidden lg:block bg-white"
         aria-label="{{ wp_get_nav_menu_name($name) }}"
         x-on:mouseleave="megaMenuLeave()"
     >
+        {{-- Search active overlay --}}
+        <div
+            x-show="searchActive"
+            x-transition:enter="transition-opacity ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="absolute inset-0 z-10 bg-gray-900/30 pointer-events-none"
+        ></div>
         <div class="container mx-auto px-4">
             <ul class="flex items-center gap-8">
                 @foreach ($menu->all() as $item)

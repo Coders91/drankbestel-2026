@@ -28,11 +28,11 @@
           @foreach ($element as $page => $url)
             @if ($page == $pagi->currentPage())
               <span
-                class="text-base flex items-center justify-center size-10 p-3 rounded-full bg-gray-50 text-primary-600">
+                class="text-base flex items-center justify-center size-10 p-3 rounded-full bg-red-50 font-semibold text-red-600">
                 {{ $page }}
               </span>
             @else
-              <a href="{{ $url }}" class="text-base flex items-center justify-center size-10 p-3 hover:text-gray-700">
+              <a href="{{ $url }}" class="text-base flex items-center justify-center size-10 p-3 text-gray-700 hover:text-gray-800">
                 {{ $page }}
               </a>
             @endif

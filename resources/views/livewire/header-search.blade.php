@@ -1,7 +1,7 @@
 <div
   {{ $attributes->merge(['class' => 'header-search relative']) }}
   x-data="{ open: @entangle('showDropdown'), focused: false }"
-  @click.outside="if (!focused) open = false; dropdown = false"
+  @click.outside="if (!focused) open = false"
 >
 
   {{-- Mobile search --}}
@@ -9,8 +9,8 @@
     <button type="button"
             class="flex items-center gap-3 w-full pl-4 p-1.5 bg-white rounded-full text-gray-600 hover:text-red-600 transition-colors"
             aria-label="{{ __('Zoeken', 'sage') }}"
-            wire:click="openMobileSearch" aria-label="{{ __('Zoeken', 'sage') }}">
-      <span class="text-sm">Zoeken...</span>
+            @click="$dispatch('open-mobile-search')" aria-label="{{ __('Zoeken', 'sage') }}">
+      <span>Zoeken...</span>
       @svg('resources.images.icons.search-sm', 'ml-auto size-6 mr-2.5 stroke-gray-700')
     </button>
   </div>
@@ -24,8 +24,8 @@
       class="w-full py-3 px-6 rounded-full h-10 lg:h-12 lg:rounded-full bg-gray-50 placeholder:text-gray-700 outline-0"
       placeholder="{{ __('Zoeken...', 'sage') }}"
       wire:model.live.debounce.300ms="query"
-      @focus="focused = true; $wire.focusInput(); setTimeout(() => { backdrop = true }, 100);"
-      @blur="focused = false; setTimeout(() => { if (!focused) open = false; backdrop = false }, 200);"
+      @focus="focused = true; searchActive = true; $wire.focusInput(); setTimeout(() => { backdrop = true }, 100);"
+      @blur="focused = false; setTimeout(() => { if (!focused) { open = false; backdrop = false; searchActive = false } }, 200);"
     />
 
     {{-- Clear button --}}
@@ -58,7 +58,7 @@
     </div>
 
     {{-- Content --}}
-    <div wire:loading.remove wire:target="query">
+    <div wire:loading.remove wire:target="query" x-cloak>
       {{-- Popular searches (shown when no query) --}}
       @if(!empty($popularSearches) && strlen($query) < 2)
         <div class="p-4">
@@ -174,29 +174,24 @@
     x-transition:leave="transition ease-in duration-150"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    class="fixed inset-0 z-[100] bg-white md:hidden"
     @keydown.escape.window="$wire.closeMobileSearch()"
+    @open-mobile-search.window="show = true"
+    x-cloak
+    class="fixed inset-0 z-[100] bg-white md:hidden"
   >
     {{-- Header with search input --}}
     <div class="sticky top-0 bg-white border-b border-gray-200 p-4 safe-area-inset-top">
       <form wire:submit.prevent="goToSearch" class="flex items-center gap-3">
-        {{-- Back/close button --}}
-        <button
-          type="button"
-          wire:click="closeMobileSearch"
-          class="shrink-0 p-2 -m-2 text-gray-600"
-          aria-label="{{ __('Sluiten', 'sage') }}"
-        >
-          @svg('resources.images.icons.arrow-left', 'size-6')
-        </button>
-
-        {{-- Search input --}}
+        {{-- Search input with icon --}}
         <div class="flex-1 relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+            @svg('resources.images.icons.search-sm', 'size-5')
+          </span>
           <input
             type="search"
             x-ref="mobileSearchInput"
             x-init="$watch('show', value => { if (value) setTimeout(() => $refs.mobileSearchInput.focus(), 100) })"
-            class="w-full py-3 px-4 rounded-xl bg-gray-100 placeholder:text-gray-500 outline-0 text-base"
+            class="w-full py-3 pl-10 pr-4 rounded-xl bg-gray-100 placeholder:text-gray-500 outline-0 text-base"
             placeholder="{{ __('Zoeken...', 'sage') }}"
             wire:model.live.debounce.300ms="query"
             autocomplete="off"
@@ -215,9 +210,14 @@
           @endif
         </div>
 
-        {{-- Search button --}}
-        <button type="submit" class="shrink-0 p-2 -m-2 text-gray-600">
-          @svg('resources.images.icons.search-sm', 'size-6')
+        {{-- Close button --}}
+        <button
+          type="button"
+          wire:click="closeMobileSearch"
+          class="shrink-0 p-2 -m-2 text-gray-600"
+          aria-label="{{ __('Sluiten', 'sage') }}"
+        >
+          @svg('resources.images.icons.x', 'size-6')
         </button>
       </form>
     </div>
@@ -295,7 +295,7 @@
             @if($searchResults->totalCount() >= 5)
               <a
                 href="{{ route('search', ['q' => $query]) }}"
-                class="block py-4 text-center text-red-600 font-medium border-t border-gray-200"
+                class="block pt-4 text-center text-red-600 font-medium border-t border-gray-200"
               >
                 {{ __('Bekijk alle resultaten', 'sage') }}
               </a>
