@@ -41,7 +41,6 @@ the readme will list any important changes.
         {{-- Products grid --}}
         <div id="product-area" class="flex-1" :class="{ 'opacity-50 pointer-events-none': loading }">
 
-
           {{-- Proposed filters --}}
           @if(!empty($proposedFilters))
             <div class="mb-6">
@@ -100,18 +99,19 @@ the readme will list any important changes.
 
           <div class="lg:hidden">
             @if($maxPages > 1 && $currentPage < $maxPages)
-              <div class="flex justify-end items-center gap-4 mt-8" id="mobile-load-more">
-                <p class="text-sm text-gray-700">
-                  Pagina {{ $currentPage }} van {{ $maxPages }}
-                </p>
+              <div class="flex flex-col justify-end items-center gap-4 mt-8" id="mobile-load-more">
                 <x-button
                   type="button"
                   class="max-sm:w-full"
                   variant="secondary"
-                  @click="applyFilter('{{ $nextPageUrl }}')"
+                  @click="loadMore('{{ $nextPageUrl }}')"
                 >
-                  {{ __('Meer tonen', 'sage') }}
+                  {{ __('Toon meer', 'sage') }}
+                  @svg('resources.images.icons.arrow-down')
                 </x-button>
+                <p class="text-sm text-gray-700">
+                  {{ min($currentPage * $productsPerPage, $totalProducts) }} van {{ $totalProducts }} producten gezien
+                </p>
               </div>
             @endif
           </div>
@@ -148,25 +148,32 @@ the readme will list any important changes.
     document.addEventListener('alpine:init', () => {
       Alpine.data('productFilters', () => ({
         loading: false,
+        desktopMq: window.matchMedia('(min-width: 1024px)'),
 
         init() {},
+
+        isMobile() {
+          return !this.desktopMq.matches;
+        },
 
         async applyFilter(url) {
           if (this.loading) return;
 
-          // Scroll first so it happens during the fetch
-          this.scrollToProducts();
+          if (!this.isMobile()) {
+            this.scrollToProducts();
+          }
 
-          // Only show overlay if fetch takes longer than 150ms
           const loaderTimeout = setTimeout(() => { this.loading = true; }, 150);
 
           try {
             const html = await this.fetchPage(url);
             this.updateContent(html);
+            this.dispatchCounts();
             history.pushState({ filterUrl: url }, '', url);
 
-            // Dispatch event to close mobile sheet
-            window.dispatchEvent(new CustomEvent('filter-applied'));
+            if (!this.isMobile()) {
+              window.dispatchEvent(new CustomEvent('filter-applied'));
+            }
           } catch (err) {
             console.error('Filter failed:', err);
           } finally {
@@ -175,14 +182,48 @@ the readme will list any important changes.
           }
         },
 
+        async loadMore(url) {
+          if (this.loading) return;
+
+          const loaderTimeout = setTimeout(() => { this.loading = true; }, 150);
+
+          try {
+            const html = await this.fetchPage(url);
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+
+            // Append new products instead of replacing
+            const incomingGrid = doc.querySelector('#products-grid');
+            const currentGrid = document.querySelector('#products-grid');
+            if (currentGrid && incomingGrid) {
+              currentGrid.insertAdjacentHTML('beforeend', incomingGrid.innerHTML);
+            }
+
+            // Replace supporting elements
+            this.replaceElement('#mobile-load-more', doc);
+            this.replaceElement('#filters-sidebar', doc);
+            this.replaceElement('#result-count', doc);
+            this.replaceElement('#proposed-filters', doc);
+
+            history.pushState({ filterUrl: url }, '', url);
+          } catch (err) {
+            console.error('Load more failed:', err);
+          } finally {
+            clearTimeout(loaderTimeout);
+            this.loading = false;
+          }
+        },
+
         async handlePopstate() {
-          this.scrollToProducts();
+          if (!this.isMobile()) {
+            this.scrollToProducts();
+          }
 
           const loaderTimeout = setTimeout(() => { this.loading = true; }, 150);
 
           try {
             const html = await this.fetchPage(location.href);
             this.updateContent(html);
+            this.dispatchCounts();
           } catch (err) {
             console.error('Popstate failed:', err);
           } finally {
@@ -233,8 +274,23 @@ the readme will list any important changes.
           }
         },
 
+        dispatchCounts() {
+          const sidebar = document.querySelector('#filters-sidebar [data-active-count]');
+          const activeCount = sidebar ? parseInt(sidebar.getAttribute('data-active-count'), 10) : 0;
+
+          const resultCountEl = document.querySelector('#result-count p');
+          let totalResults = 0;
+          if (resultCountEl) {
+            const match = resultCountEl.textContent.match(/(\d+)/);
+            if (match) totalResults = parseInt(match[1], 10);
+          }
+
+          window.dispatchEvent(new CustomEvent('filter-counts-updated', {
+            detail: { activeCount, totalResults }
+          }));
+        },
+
         scrollToProducts() {
-          // Only scroll if user has scrolled down the page
           if (window.scrollY <= 1) return;
 
           const productArea = document.querySelector('#product-area');

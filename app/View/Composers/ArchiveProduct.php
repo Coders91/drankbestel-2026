@@ -69,6 +69,7 @@ class ArchiveProduct extends Composer
             'nextPageUrl' => $pagination->nextPageUrl(),
             'pagination' => $pagination->links('components.pagination'),
             'totalProducts' => $wp_query->found_posts,
+            'productsPerPage' => $wp_query->query_vars['posts_per_page'] ?? get_option('posts_per_page'),
             'filters' => $service->getFiltersForView(),
             'activeFilterCount' => $service->getActiveFilterCount(),
             'selectedChips' => $service->getSelectedChips(),
