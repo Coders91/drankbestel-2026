@@ -29,12 +29,6 @@ class HeaderSearch extends Component
         $this->showDropdown = false;
     }
 
-    public function openMobileSearch(): void
-    {
-        $this->showMobileOverlay = true;
-        $this->dispatch('mobile-search-opened');
-    }
-
     public function closeMobileSearch(): void
     {
         $this->showMobileOverlay = false;
@@ -103,7 +97,7 @@ class HeaderSearch extends Component
             'searchResults' => $isOpen && $hasQuery
                 ? $this->getSearchResults($this->getSearchOptions())
                 : null,
-            'popularSearches' => $isOpen && !$hasQuery
+            'popularSearches' => !$hasQuery
                 ? $this->getPopularSearches()
                 : [],
         ]);
