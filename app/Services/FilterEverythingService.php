@@ -638,4 +638,9 @@ class FilterEverythingService
 
         return $tax->labels->singular_name ?? ucfirst(str_replace('_', ' ', $taxonomy));
     }
+
+    public function isFilteredPage(): bool {
+        return function_exists('flrt_is_filter_request') && flrt_is_filter_request();
+    }
+
 }

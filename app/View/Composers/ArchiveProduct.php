@@ -72,6 +72,7 @@ class ArchiveProduct extends Composer
             'productsPerPage' => $wp_query->query_vars['posts_per_page'] ?? get_option('posts_per_page'),
             'filters' => $service->getFiltersForView(),
             'activeFilterCount' => $service->getActiveFilterCount(),
+            'isFilteredPage' => $service->isFilteredPage(),
             'selectedChips' => $service->getSelectedChips(),
             'resetUrl' => $service->getResetUrl(),
             'moreLessCount' => $service->getMoreLessCount(),

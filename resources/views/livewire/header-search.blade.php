@@ -10,7 +10,7 @@
             class="flex items-center gap-3 w-full pl-4 p-1.5 bg-white rounded-full text-gray-600 hover:text-red-600 transition-colors"
             aria-label="{{ __('Zoeken', 'sage') }}"
             wire:click="openMobileSearch" aria-label="{{ __('Zoeken', 'sage') }}">
-      <span class="text-sm">Zoeken...</span>
+      <span>Zoeken...</span>
       @svg('resources.images.icons.search-sm', 'ml-auto size-6 mr-2.5 stroke-gray-700')
     </button>
   </div>
