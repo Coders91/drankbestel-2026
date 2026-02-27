@@ -10,7 +10,9 @@
 <div
     x-data="{
         open: false,
-        isDesktop: window.matchMedia('(min-width: 1024px)').matches
+        isDesktop: window.matchMedia('(min-width: 1024px)').matches,
+        activeCount: {{ $activeCount }},
+        totalResults: {{ $totalResults }}
     }"
     x-init="
         const mq = window.matchMedia('(min-width: 1024px)');
@@ -18,6 +20,7 @@
     "
     @keydown.escape.window="open = false"
     @filter-applied.window="open = false"
+    @filter-counts-updated.window="activeCount = $event.detail.activeCount; totalResults = $event.detail.totalResults"
 >
     {{-- Mobile trigger button (hidden on desktop) --}}
     <button
@@ -29,11 +32,11 @@
     >
         @svg('resources.images.icons.filter-lines', 'w-5 h-5')
         <span>{{ __('Filters', 'sage') }}</span>
-        @if ($activeCount > 0)
-            <span class="flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 text-xs font-bold bg-red-600 rounded-full">
-                {{ $activeCount }}
-            </span>
-        @endif
+        <span
+            x-show="activeCount > 0"
+            x-text="activeCount"
+            class="flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 text-xs font-bold bg-red-600 rounded-full"
+        ></span>
     </button>
 
     {{-- Mobile backdrop --}}
@@ -71,9 +74,7 @@
         <div class="flex items-center justify-between px-4 pb-3 border-b border-gray-200">
             <h2 class="text-lg font-bold">
                 {{ __('Filters', 'sage') }}
-                @if ($activeCount > 0)
-                    <span class="text-sm font-normal text-gray-500">({{ $activeCount }})</span>
-                @endif
+                <span x-show="activeCount > 0" class="text-sm font-normal text-gray-500">(<span x-text="activeCount"></span>)</span>
             </h2>
             <button
                 type="button"
@@ -94,7 +95,7 @@
                 @click="open = false"
                 class="w-full px-6 py-3.5 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors"
             >
-                {{ sprintf(__('Toon %d producten', 'sage'), $totalResults) }}
+                <span x-text="'Toon ' + totalResults + ' producten'"></span>
             </button>
         </div>
     </div>

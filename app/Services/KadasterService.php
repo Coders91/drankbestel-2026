@@ -50,7 +50,7 @@ class KadasterService
 
         $response = Http::timeout($this->timeout)
             ->withHeaders([
-                'X-Api-Key' => env('BAG_KADASTER_API_KEY')
+                'X-Api-Key' => config('services.kadaster.api_key'),
             ])
             ->get($this->baseUrl . '/adressen', $params);
 

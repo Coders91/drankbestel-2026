@@ -5,14 +5,14 @@
     'resetUrl' => '',
     'moreLessCount' => 5,
 ])
-<div class="space-y-4">
+<div class="space-y-4" data-active-count="{{ $activeCount }}">
   {{-- Active filter count and reset --}}
     @if ($activeCount > 0)
         <div class="flex items-center justify-between pb-4 border-b border-gray-200">
             <a
                 href="{{ $resetUrl }}"
                 class="text-sm text-red-600 hover:text-red-700 underline"
-                @click.prevent="applyFilter('{{ $resetUrl }}')"
+                @click.prevent="$dispatch('filter-apply', { url: '{{ $resetUrl }}' })"
             >
                 {{ __('Wis filters', 'sage') }}
             </a>
@@ -24,7 +24,7 @@
                 @foreach ($selectedChips as $chip)
                     <a
                         href="{{ $chip['link'] }}"
-                        @click.prevent="applyFilter('{{ $chip['link'] }}')"
+                        @click.prevent="$dispatch('filter-apply', { url: '{{ $chip['link'] }}' })"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
                     >
                         @if (isset($chip['rating']))

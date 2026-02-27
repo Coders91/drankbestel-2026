@@ -61,4 +61,8 @@ return [
         'api_key' => env('MYPARCEL_API_KEY'),
     ],
 
+    'kadaster' => [
+        'api_key' => env('BAG_KADASTER_API_KEY'),
+    ]
+
 ];
