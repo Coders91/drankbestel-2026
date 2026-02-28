@@ -174,7 +174,7 @@
     x-transition:leave="transition ease-in duration-150"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    @keydown.escape.window="$wire.closeMobileSearch()"
+    @keydown.escape.window="show = false"
     @open-mobile-search.window="show = true"
     x-cloak
     class="fixed inset-0 z-[100] bg-white md:hidden"
@@ -213,7 +213,7 @@
         {{-- Close button --}}
         <button
           type="button"
-          wire:click="closeMobileSearch"
+          @click="show = false"
           class="shrink-0 p-2 -m-2 text-gray-600"
           aria-label="{{ __('Sluiten', 'sage') }}"
         >

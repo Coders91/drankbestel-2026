@@ -29,13 +29,6 @@ class HeaderSearch extends Component
         $this->showDropdown = false;
     }
 
-    public function closeMobileSearch(): void
-    {
-        $this->showMobileOverlay = false;
-        $this->query = '';
-        $this->dispatch('mobile-search-closed');
-    }
-
     public function selectSuggestion(string $suggestion): void
     {
         $this->query = $suggestion;
