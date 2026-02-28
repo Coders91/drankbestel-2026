@@ -1,4 +1,6 @@
 <x-layouts.app>
+  <p>Hallo World</p>
+
   <x-page-header />
 
   @if (! have_posts())
