@@ -46,7 +46,7 @@ export function formValidator(config = {}) {
         const checked = document.querySelector(`[name="${fieldName}"]:checked`);
         value = checked ? checked.value : '';
       } else {
-        value = element ? element.value : this.form[fieldName];
+        value = element ? element.value.trim() : this.form[fieldName];
       }
       let hasError = false;
 
