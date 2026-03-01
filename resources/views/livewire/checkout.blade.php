@@ -27,16 +27,16 @@
           x-text="form.is_business_order ? 'Zakelijke gegevens' : 'Persoonlijke gegevens'"
         >
           <x-slot:header>
-            {{-- Buttons to toggle business fields --}}
+            {{-- Buttons to toggle business fields (client-side only to avoid server roundtrip lag) --}}
             <div class="flex gap-2 mb-2">
               <div class="px-4 py-2 border border-gray-300 rounded-lg bg-white">
                 <x-forms.radio id="consumer"
                          name="is_business_order"
                          value="0"
                          class="text-sm text-gray-600"
+                         :checked="!$form->is_business_order"
+                         x-bind:checked="!form.is_business_order"
                          @change="form.is_business_order = false"
-                         x-model="form.is_business_order"
-                         wire:model.boolean.live="form.is_business_order"
                 >
                   Particulier
                 </x-forms.radio>
@@ -46,9 +46,9 @@
                          name="is_business_order"
                          value="1"
                          class="text-sm text-gray-600"
+                         :checked="$form->is_business_order"
+                         x-bind:checked="form.is_business_order"
                          @change="form.is_business_order = true"
-                         x-model="form.is_business_order"
-                         wire:model.boolean.live="form.is_business_order"
                 >
                   Zakelijk
                 </x-forms.radio>
@@ -135,7 +135,7 @@
                 return false;
               }
             }
-            this.$wire.save(token);
+            this.$wire.save(token, this.form.is_business_order);
           }
         },
 
