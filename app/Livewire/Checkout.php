@@ -118,6 +118,11 @@ class Checkout extends Component
             WC()->session->set_customer_session_cookie(true);
         }
 
+        if (in_array($propertyName, ['form.billing_postcode', 'form.shipping_postcode'])) {
+            $field = $propertyName === 'form.billing_postcode' ? 'billing_postcode' : 'shipping_postcode';
+            $this->form->$field = trim($this->form->$field);
+        }
+
         if ($propertyName === 'form.ship_to_different_address') {
             $shippingFields = [
                 'shipping_first_name',
