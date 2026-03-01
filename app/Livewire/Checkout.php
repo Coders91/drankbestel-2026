@@ -423,8 +423,10 @@ class Checkout extends Component
         return $order;
     }
 
-    public function save($cardToken = '')
+    public function save($cardToken = '', $isBusinessOrder = false)
     {
+        $this->form->is_business_order = (bool) $isBusinessOrder;
+
         $this->validate();
 
         $this->isProcessing = true;
