@@ -133,7 +133,7 @@
           const checkedRadio = document.querySelector(`[name="${fieldName}"]:checked`);
           value = checkedRadio ? checkedRadio.value : '';
         } else {
-          value = element ? element.value : this.form[fieldName];
+          value = element ? element.value.trim() : this.form[fieldName];
         }
 
         let hasError = false;
