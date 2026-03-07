@@ -118,14 +118,9 @@
         // Checkout-specific state
         billing_loading: false,
         shipping_loading: false,
-        applePayAvailable: false,
         selectedPaymentMethod: @json($form->payment_method ?? ''),
 
         init() {
-          window.addEventListener('apple-pay-availability', (e) => {
-            this.applePayAvailable = e.detail.available;
-          });
-
           this.$wire.$watch('form.payment_method', (value) => {
             this.selectedPaymentMethod = value;
           });

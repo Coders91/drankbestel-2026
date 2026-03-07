@@ -98,9 +98,7 @@
       </x-forms.checkbox>
     </div>
 
-    {{-- Regular place order button — hidden when Apple Pay is selected and available --}}
     <x-button
-      x-show="!(['applepay', 'mollie_applepay'].includes(selectedPaymentMethod) && applePayAvailable)"
       type="submit"
       class="mt-10 flex items-center w-full text-lg"
       wire:loading.attr="disabled"
@@ -113,19 +111,6 @@
         @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
         Bestelling plaatsen..
       </span>
-    </x-button>
-
-    {{-- Apple Pay button — shown when Apple Pay is selected and available --}}
-    <x-button
-      x-show="['applepay', 'mollie_applepay'].includes(selectedPaymentMethod) && applePayAvailable"
-      x-cloak
-      type="button"
-      class="mt-10 w-full text-lg gap-3"
-      size="regular"
-      @click="validateAll('checkout') && window.dispatchEvent(new CustomEvent('trigger-apple-pay'))"
-    >
-      @svg('resources.images.logos.apple-pay', 'h-5 w-auto')
-      Apple Pay
     </x-button>
   </div>
 </div>
