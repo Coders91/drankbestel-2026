@@ -110,10 +110,10 @@ class MollieService
      * @throws ApiException
      * @throws RequestException
      */
-    public function requestApplePaySession(string $validationUrl): object
+    public function requestApplePaySession(string $validationUrl): array
     {
         $domain = parse_url(home_url(), PHP_URL_HOST);
 
-        return $this->mollie->wallets->requestApplePayPaymentSession($domain, $validationUrl);
+        return $this->mollie->wallets->requestApplePayPaymentSession($domain, $validationUrl)->toArray();
     }
 }
