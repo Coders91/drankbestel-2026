@@ -119,10 +119,15 @@
         billing_loading: false,
         shipping_loading: false,
         applePayAvailable: false,
+        selectedPaymentMethod: @json($form->payment_method ?? ''),
 
         init() {
           window.addEventListener('apple-pay-availability', (e) => {
             this.applePayAvailable = e.detail.available;
+          });
+
+          this.$wire.$watch('form.payment_method', (value) => {
+            this.selectedPaymentMethod = value;
           });
         },
 
@@ -130,13 +135,13 @@
         async submitForm() {
           if (this.validateAll('checkout')) {
             // When Apple Pay is selected, hand off to the Apple Pay flow
-            if (this.$wire.get('form.payment_method') === 'mollie_applepay') {
+            if (this.selectedPaymentMethod === 'mollie_applepay') {
               window.dispatchEvent(new CustomEvent('trigger-apple-pay'));
               return;
             }
 
             let token = '';
-            if (this.$wire.get('form.payment_method') === 'mollie_creditcard') {
+            if (this.selectedPaymentMethod === 'mollie_creditcard') {
               const result = await mollieInstance.createToken();
 
               if (result.token) {
