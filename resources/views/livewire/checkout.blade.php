@@ -130,13 +130,13 @@
         async submitForm() {
           if (this.validateAll('checkout')) {
             // When Apple Pay is selected, hand off to the Apple Pay flow
-            if (this.form.payment_method === 'mollie_applepay') {
+            if (this.$wire.get('form.payment_method') === 'mollie_applepay') {
               window.dispatchEvent(new CustomEvent('trigger-apple-pay'));
               return;
             }
 
             let token = '';
-            if (this.form.payment_method === 'mollie_creditcard') {
+            if (this.$wire.get('form.payment_method') === 'mollie_creditcard') {
               const result = await mollieInstance.createToken();
 
               if (result.token) {
