@@ -81,7 +81,9 @@ class MollieService
     ): ?Payment
     {
 
-        if (! $this->getPaymentMethod($method)) {
+        // Skip the enabled-methods check for Apple Pay — availability is already
+        // verified client-side via canMakePayments() and merchant validation.
+        if ($method !== 'applepay' && ! $this->getPaymentMethod($method)) {
             Log::error('payment method not enabled');
             return null;
         }
