@@ -139,7 +139,7 @@
         async submitForm() {
           if (this.validateAll('checkout')) {
             // When Apple Pay is selected, hand off to the Apple Pay flow
-            if (this.selectedPaymentMethod === 'mollie_applepay') {
+            if (['applepay', 'mollie_applepay'].includes(this.selectedPaymentMethod)) {
               window.dispatchEvent(new CustomEvent('trigger-apple-pay'));
               return;
             }
