@@ -100,7 +100,7 @@
 
     {{-- Regular place order button — hidden when Apple Pay is selected and available --}}
     <x-button
-      x-show="!($wire.get('form.payment_method') === 'mollie_applepay' && applePayAvailable)"
+      x-show="!(selectedPaymentMethod === 'mollie_applepay' && applePayAvailable)"
       type="submit"
       class="mt-10 flex items-center w-full text-lg"
       wire:loading.attr="disabled"
@@ -117,7 +117,7 @@
 
     {{-- Apple Pay button — shown when Apple Pay is selected and available --}}
     <button
-      x-show="$wire.get('form.payment_method') === 'mollie_applepay' && applePayAvailable"
+      x-show="selectedPaymentMethod === 'mollie_applepay' && applePayAvailable"
       x-cloak
       type="button"
       class="apple-pay-button apple-pay-button-black mt-10 w-full"
