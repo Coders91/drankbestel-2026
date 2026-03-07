@@ -12,7 +12,8 @@
 </div>
 
 <style>
-  body:not(.has-applepay) [data-payment-gateway="mollie_applepay"] {
+  body:not(.has-applepay) [data-payment-gateway="mollie_applepay"],
+  body:not(.has-applepay) [data-payment-gateway="applepay"] {
     display: none !important;
   }
 
