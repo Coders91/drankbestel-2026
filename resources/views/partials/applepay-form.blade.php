@@ -1,39 +1,9 @@
-<div
-  id="applepay-form"
-  x-data="applePayForm()"
-  x-init="init()"
->
-  {{-- Informational text when Apple Pay is available (button is in the order review sidebar) --}}
-  <div x-show="available" x-cloak>
-    <p class="text-sm text-gray-600">
-      Gebruik de Apple Pay knop om uw bestelling te plaatsen.
-    </p>
-  </div>
-</div>
+<div id="applepay-form" x-data="applePayForm()" x-init="init()" class="hidden"></div>
 
 <style>
   body:not(.has-applepay) [data-payment-gateway="mollie_applepay"],
   body:not(.has-applepay) [data-payment-gateway="applepay"] {
     display: none !important;
-  }
-
-  .apple-pay-button {
-    -webkit-appearance: -apple-pay-button;
-    -apple-pay-button-type: buy;
-    display: inline-block;
-    width: 100%;
-    min-height: 44px;
-    border: none;
-    background-color: black;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  .apple-pay-button-black {
-    -apple-pay-button-style: black;
-  }
-  .apple-pay-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 </style>
 

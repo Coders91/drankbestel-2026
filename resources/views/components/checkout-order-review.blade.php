@@ -116,12 +116,16 @@
     </x-button>
 
     {{-- Apple Pay button — shown when Apple Pay is selected and available --}}
-    <button
+    <x-button
       x-show="['applepay', 'mollie_applepay'].includes(selectedPaymentMethod) && applePayAvailable"
       x-cloak
       type="button"
-      class="apple-pay-button apple-pay-button-black mt-10 w-full"
+      class="mt-10 w-full text-lg gap-3"
+      size="regular"
       @click="validateAll('checkout') && window.dispatchEvent(new CustomEvent('trigger-apple-pay'))"
-    ></button>
+    >
+      @svg('resources.images.logos.apple-pay', 'h-5 w-auto')
+      Apple Pay
+    </x-button>
   </div>
 </div>
