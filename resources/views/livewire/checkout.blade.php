@@ -118,10 +118,23 @@
         // Checkout-specific state
         billing_loading: false,
         shipping_loading: false,
+        applePayAvailable: false,
+
+        init() {
+          window.addEventListener('apple-pay-availability', (e) => {
+            this.applePayAvailable = e.detail.available;
+          });
+        },
 
         // Checkout-specific methods
         async submitForm() {
           if (this.validateAll('checkout')) {
+            // When Apple Pay is selected, hand off to the Apple Pay flow
+            if (this.form.payment_method === 'mollie_applepay') {
+              window.dispatchEvent(new CustomEvent('trigger-apple-pay'));
+              return;
+            }
+
             let token = '';
             if (this.form.payment_method === 'mollie_creditcard') {
               const result = await mollieInstance.createToken();
