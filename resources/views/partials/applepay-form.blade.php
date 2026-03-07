@@ -46,10 +46,7 @@
       processing: false,
 
       init() {
-        console.log('[applePayForm] init called');
-
         const notifyAvailability = (available) => {
-          console.log('[applePayForm] notifyAvailability:', available);
           this.available = available;
           this.checked = true;
           if (available) document.body.classList.add('has-applepay');
@@ -81,10 +78,14 @@
         if (this.processing) return;
         this.processing = true;
 
+        console.log('[ApplePay] 1. startPayment() called');
+
         try {
           // Get order total from the page
           const totalElement = document.querySelector('[data-checkout-total]');
           const total = totalElement ? totalElement.dataset.checkoutTotal : '0.00';
+
+          console.log('[ApplePay] 2. Creating session with total:', total);
 
           const request = {
             countryCode: 'NL',
@@ -102,6 +103,7 @@
 
           // Merchant validation - get session from our endpoint
           session.onvalidatemerchant = async (event) => {
+            console.log('[ApplePay] 3. onvalidatemerchant fired, validationURL:', event.validationURL);
             try {
               const response = await fetch('/wp-json/mollie/v1/applepay/session', {
                 method: 'POST',
@@ -111,14 +113,17 @@
                 body: JSON.stringify({ validationUrl: event.validationURL })
               });
 
+              console.log('[ApplePay] 4. Merchant session response status:', response.status);
+
               if (!response.ok) {
-                throw new Error('Failed to validate merchant');
+                throw new Error(`Merchant session endpoint returned ${response.status}`);
               }
 
               const merchantSession = await response.json();
+              console.log('[ApplePay] 5. completeMerchantValidation called, session keys:', Object.keys(merchantSession));
               session.completeMerchantValidation(merchantSession);
             } catch (error) {
-              console.error('Merchant validation failed:', error);
+              console.error('[ApplePay] Merchant validation failed:', error);
               session.abort();
               this.processing = false;
             }
@@ -126,29 +131,36 @@
 
           // Payment authorized - get the token and submit to Livewire
           session.onpaymentauthorized = (event) => {
-            const token = JSON.stringify(event.payment.token);
+            console.log('[ApplePay] 6. onpaymentauthorized fired');
+            console.log('[ApplePay] 6a. event.payment:', JSON.stringify(event.payment, null, 2));
 
-            // Call Livewire to process the payment
+            const token = JSON.stringify(event.payment.token);
+            console.log('[ApplePay] 7. token stringified, length:', token.length);
+
+            console.log('[ApplePay] 8. Calling $wire.saveApplePayPayment...');
             this.$wire.saveApplePayPayment(token)
               .then((result) => {
+                console.log('[ApplePay] 9. saveApplePayPayment resolved, result:', result);
                 session.completePayment(ApplePaySession.STATUS_SUCCESS);
               })
               .catch((error) => {
-                console.error('Payment failed:', error);
+                console.error('[ApplePay] 9. saveApplePayPayment rejected:', error);
                 session.completePayment(ApplePaySession.STATUS_FAILURE);
                 this.processing = false;
               });
           };
 
           // Payment cancelled
-          session.oncancel = () => {
+          session.oncancel = (event) => {
+            console.log('[ApplePay] Session cancelled by user');
             this.processing = false;
           };
 
+          console.log('[ApplePay] 2b. session.begin()');
           session.begin();
 
         } catch (error) {
-          console.error('Apple Pay error:', error);
+          console.error('[ApplePay] Uncaught error in startPayment:', error);
           this.processing = false;
         }
       }

@@ -3,9 +3,7 @@
   /** @var App\View\Models\CartTotals $totals */
 @endphp
 
-<div {{ $attributes->merge(['class' => 'grid content-center m-auto']) }}
-  x-init="console.log('[OrderReview] init scope check', { selectedPaymentMethod: typeof selectedPaymentMethod !== 'undefined' ? selectedPaymentMethod : 'UNDEFINED', applePayAvailable: typeof applePayAvailable !== 'undefined' ? applePayAvailable : 'UNDEFINED' })"
->
+<div {{ $attributes->merge(['class' => 'grid content-center m-auto']) }}>
   <h2 class="text-gray-900 text-xl mb-4 font-semibold">Overzicht</h2>
 
   {{-- Order Items --}}
