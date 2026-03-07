@@ -3,17 +3,11 @@
   x-data="applePayForm()"
   x-init="init()"
 >
-  {{-- Show when Apple Pay is available --}}
+  {{-- Informational text when Apple Pay is available (button is in the order review sidebar) --}}
   <div x-show="available" x-cloak>
-    <p class="text-sm text-gray-600 mb-3">
-      Klik op de betaalknop om te betalen met Apple Pay.
+    <p class="text-sm text-gray-600">
+      Gebruik de Apple Pay knop om uw bestelling te plaatsen.
     </p>
-    <button
-      type="button"
-      @click="startPayment()"
-      class="apple-pay-button apple-pay-button-black"
-      :disabled="processing"
-    ></button>
   </div>
 </div>
 
@@ -52,36 +46,31 @@
       processing: false,
 
       init() {
+        const notifyAvailability = (available) => {
+          this.available = available;
+          this.checked = true;
+          if (available) document.body.classList.add('has-applepay');
+          window.dispatchEvent(new CustomEvent('apple-pay-availability', { detail: { available } }));
+        };
+
         // Check if Apple Pay is available
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
           // Check if we can make payments with specific networks
           ApplePaySession.canMakePaymentsWithActiveCard('merchant.nl.drankbestel')
             .then((canMake) => {
-              this.available = canMake || ApplePaySession.canMakePayments();
-              this.checked = true;
-              if (this.available) document.body.classList.add('has-applepay');
+              notifyAvailability(canMake || ApplePaySession.canMakePayments());
             })
             .catch(() => {
               // Fallback: just check basic capability
-              this.available = ApplePaySession.canMakePayments();
-              this.checked = true;
-              if (this.available) document.body.classList.add('has-applepay');
+              notifyAvailability(ApplePaySession.canMakePayments());
             });
         } else {
-          this.available = false;
-          this.checked = true;
+          notifyAvailability(false);
         }
 
-        // Listen for checkout submit when Apple Pay is selected
-        window.addEventListener('place-order', (event) => {
-          const paymentMethod = this.$wire?.get('form.payment_method') ||
-                               document.querySelector('input[name="payment_method"]:checked')?.value;
-
-          if ((paymentMethod === 'mollie_applepay' || paymentMethod === 'applepay') && this.available) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            this.startPayment();
-          }
+        // Listen for trigger from the sidebar Apple Pay button
+        window.addEventListener('trigger-apple-pay', () => {
+          if (this.available) this.startPayment();
         });
       },
 
