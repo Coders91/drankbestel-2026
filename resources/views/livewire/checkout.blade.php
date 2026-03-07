@@ -122,11 +122,15 @@
         selectedPaymentMethod: @json($form->payment_method ?? ''),
 
         init() {
+          console.log('[checkout] init — selectedPaymentMethod:', this.selectedPaymentMethod, '| applePayAvailable:', this.applePayAvailable);
+
           window.addEventListener('apple-pay-availability', (e) => {
+            console.log('[checkout] apple-pay-availability received:', e.detail.available);
             this.applePayAvailable = e.detail.available;
           });
 
           this.$wire.$watch('form.payment_method', (value) => {
+            console.log('[checkout] payment_method changed to:', value);
             this.selectedPaymentMethod = value;
           });
         },

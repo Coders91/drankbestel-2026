@@ -46,7 +46,10 @@
       processing: false,
 
       init() {
+        console.log('[applePayForm] init called');
+
         const notifyAvailability = (available) => {
+          console.log('[applePayForm] notifyAvailability:', available);
           this.available = available;
           this.checked = true;
           if (available) document.body.classList.add('has-applepay');
