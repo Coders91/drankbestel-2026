@@ -25,58 +25,60 @@
             </x-alert>
           @enderror
 
-          <x-checkout-section
-            title="Persoonlijke gegevens"
-            titleClass="mb-3"
-            x-text="form.is_business_order ? 'Zakelijke gegevens' : 'Persoonlijke gegevens'"
-          >
-            <x-slot:header>
-              <div class="flex gap-4 mb-3 md:mb-4">
-                <div class="w-full md:w-fit px-4 py-2.5 border border-gray-300 rounded-lg bg-white">
-                  <x-forms.radio id="consumer"
-                           name="is_business_order"
-                           value="0"
-                           class="text-sm text-gray-600"
-                           :checked="!$form->is_business_order"
-                           x-bind:checked="!form.is_business_order"
-                           @change="form.is_business_order = false"
-                  >
-                    Particulier
-                  </x-forms.radio>
+          @island
+            <x-checkout-section
+              title="Persoonlijke gegevens"
+              titleClass="mb-3"
+              x-text="form.is_business_order ? 'Zakelijke gegevens' : 'Persoonlijke gegevens'"
+            >
+              <x-slot:header>
+                <div class="flex gap-4 mb-3 md:mb-4">
+                  <div class="w-full md:w-fit px-4 py-2.5 border border-gray-300 rounded-lg bg-white">
+                    <x-forms.radio id="consumer"
+                             name="is_business_order"
+                             value="0"
+                             class="text-sm text-gray-600"
+                             :checked="!$form->is_business_order"
+                             @change="form.is_business_order = false"
+                    >
+                      Particulier
+                    </x-forms.radio>
+                  </div>
+                  <div class="w-full md:w-fit px-4 py-2.5 border border-gray-300 rounded-lg bg-white">
+                    <x-forms.radio id="business"
+                             name="is_business_order"
+                             value="1"
+                             class="text-sm text-gray-600"
+                             :checked="$form->is_business_order"
+                             @change="form.is_business_order = true"
+                    >
+                      Zakelijk
+                    </x-forms.radio>
+                  </div>
                 </div>
-                <div class="w-full md:w-fit px-4 py-2.5 border border-gray-300 rounded-lg bg-white">
-                  <x-forms.radio id="business"
-                           name="is_business_order"
-                           value="1"
-                           class="text-sm text-gray-600"
-                           :checked="$form->is_business_order"
-                           x-bind:checked="form.is_business_order"
-                           @change="form.is_business_order = true"
-                  >
-                    Zakelijk
-                  </x-forms.radio>
-                </div>
-              </div>
-            </x-slot:header>
+              </x-slot:header>
 
-            <div class="grid gap-4">
-              @include('partials.business-fields')
-              @include('partials.billing-fields')
-            </div>
-          </x-checkout-section>
+              <div class="grid gap-4">
+                @include('partials.business-fields')
+                @include('partials.billing-fields')
+              </div>
+            </x-checkout-section>
+          @endisland
 
           <x-checkout-section title="Verzendadres">
             @include('partials.shipping-fields')
           </x-checkout-section>
 
-          <x-checkout-section title="Bezorgmoment">
-            <livewire:delivery-options
-              :postalCode="$form->billing_postcode"
-              :houseNumber="$form->billing_house_number"
-              :houseNumberSuffix="$form->billing_house_number_suffix"
-              wire:model="deliverySelection"
-            />
-          </x-checkout-section>
+          @island
+            <x-checkout-section title="Bezorgmoment">
+              <livewire:delivery-options
+                :postalCode="$form->billing_postcode"
+                :houseNumber="$form->billing_house_number"
+                :houseNumberSuffix="$form->billing_house_number_suffix"
+                wire:model="deliverySelection"
+              />
+            </x-checkout-section>
+          @endisland
 
           <x-checkout-section title="Betaalmethoden">
             @include('woocommerce.checkout.payment-options')
@@ -112,6 +114,7 @@
   <script>
     function checkout() {
       return {
+        // Client side validation
         ...formValidator({
           form: @json($form),
           rules: @json($form->rules()),
@@ -122,11 +125,18 @@
         billing_loading: false,
         shipping_loading: false,
         selectedPaymentMethod: @json($form->payment_method ?? ''),
+        isBusinessOrder: @json($form->is_business_order),
 
         init() {
+          // Sync Alpine selected payment method from Livewire
           this.$wire.$watch('form.payment_method', (value) => {
             this.selectedPaymentMethod = value;
           });
+          // Sync Livewire business order state with Alpine
+          this.$watch('form.is_business_order', (value) => {
+            console.log('form.is_business_order', value);
+            this.$wire.set('form.is_business_order', value);
+          })
         },
 
         async submitForm() {
@@ -186,14 +196,13 @@
               this.form[`${type}_street_name`] = '';
               this.form[`${type}_city`] = '';
 
-              // clear any previous errors (important)
+              // clear any previous errors
               this.errors[`${type}_street_name`] = '';
               this.errors[`${type}_city`] = '';
 
               return;
             }
 
-            // Address found
             this.form[`${type}_address_found`] = true;
 
             // Clear errors for autofilled fields

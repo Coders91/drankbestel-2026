@@ -42,7 +42,17 @@
       {{-- Subtotal (no discounts) --}}
       <div class="flex justify-between text-gray-900">
         <span>{{ __('Totaal producten', 'sage') }} ({{ $totals->itemCount }})</span>
-        <span>{{ $totals->subtotal->amount->formatted() }}</span>
+        @if($this->form->is_business_order)
+          <span>{{ $totals->subtotalExclTax }}</span>
+        @else
+          <span>{{ $totals->subtotal->amount->formatted() }}</span>
+        @endif
+      </div>
+      <div class="flex justify-between text-gray-900">
+        @if($this->form->is_business_order)
+          <span>Btw</span>
+          <span>{{ $totals->tax->formatted() }}</span>
+        @endif
       </div>
     @endif
 
@@ -61,7 +71,12 @@
     {{-- Total --}}
     <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200" data-checkout-total="{{ number_format($totals->total->amount->decimal(), 2, '.', '') }}">
       <span class="text-lg font-semibold font-heading text-gray-900">{{ __('Totaal', 'sage') }}</span>
-      <span class="text-lg font-semibold font-heading text-gray-900">{{ $totals->total->amount->formatted() }}</span>
+      <span>
+        <span class="text-lg font-semibold font-heading text-gray-900">{{ $totals->total->amount->formatted() }}</span>
+        @if($this->form->is_business_order)
+          <span class="block text-xs text-gray-600">inclusief btw </span>
+        @endif
+      </span>
     </div>
   {{-- Checkboxes --}}
   <div class="space-y-4 pt-4 mt-4 border-t border-gray-200">

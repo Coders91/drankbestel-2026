@@ -12,7 +12,7 @@
     <div class="w-full">
       <h3 class="font-medium text-gray-900 line-clamp-2">{!! $item->product->name !!}</h3>
       @if ($item->product->contents)
-        <p class="text-sm leading-6 text-gray-500">{{ $item->product->contents }}</p>
+        <p class="text-sm leading-6 text-gray-600">{{ $item->product->contents }}</p>
       @endif
     </div>
   </div>
