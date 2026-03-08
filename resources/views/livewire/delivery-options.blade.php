@@ -11,7 +11,7 @@
   @fetch-delivery-options.window="fetchOptions()"
 >
   <div x-show="options.length > 0">
-    <div class="flex flex-wrap items-center gap-4 w-full justify-between mt-4 md:mt-0 mb-4">
+    <div class="flex max-sm:hidden flex-wrap items-center gap-4 w-full justify-between mb-4">
       <span class="font-semibold text-sm" x-text="selectedLabel"></span>
       <div class="max-sm:hidden flex items-center gap-2">
         <button
@@ -125,7 +125,12 @@ function deliveryOptions(config) {
 
       wrapper.querySelectorAll('.swiper-slide').forEach(slide => {
         slide.addEventListener('click', () => {
-          this.selectByIndex(parseInt(slide.dataset.index, 10));
+          const index = parseInt(slide.dataset.index, 10);
+          this.selectByIndex(index);
+
+          if (window.innerWidth < 575 && this.swiper) {
+            this.swiper.slideTo(index);
+          }
         });
       });
     },
@@ -155,7 +160,12 @@ function deliveryOptions(config) {
       this.swiper = new Swiper(container, {
         slidesPerView: 1.5,
         spaceBetween: 16,
-        freeMode: true,
+        freeMode: {
+          enabled: true,
+          sticky: true,
+          momentumRatio: 0.10,
+          momentumVelocityRatio: 0.5,
+        },
         navigation: {
           nextEl: '.swiper-button-next-custom',
           prevEl: '.swiper-button-prev-custom',
