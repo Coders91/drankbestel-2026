@@ -18,10 +18,10 @@ class IdealGateway extends WC_Payment_Gateway {
 
         $mollieService = app(MollieService::class);
         $method = $mollieService->getPaymentMethod(PaymentMethod::IDEAL);
+        $this->icon = get_svg('resources.images.logos.ideal-wero', 'size-[30px]');
 
         if($method) {
             $this->id = 'mollie_ideal';
-            $this->icon = get_svg('resources.images.logos.ideal');
         } else {
             $this->id = 'ideal';
             $this->enabled = 'no';
@@ -57,7 +57,7 @@ class IdealGateway extends WC_Payment_Gateway {
                 'title'       => 'Title',
                 'type'        => 'text',
                 'description' => 'This controls the title which the user sees during checkout.',
-                'default'     => 'iDEAL',
+                'default'     => 'iDEAL | Wero',
                 'desc_tip'    => true,
             ],
             'description' => [

@@ -3,7 +3,7 @@
     @if($gateway->enabled === 'yes')
       <label
         for="payment_{{ $gateway->id }}"
-        class="block w-full border rounded-lg p-4 cursor-pointer border-gray-200 has-checked:border-red-600 has-checked:border-2 has-checked:p-[14px]"
+        class="block w-full border rounded-lg p-4 cursor-pointer border-gray-200 has-checked:border-red-600 has-checked:border-2 has-checked:p-[15px]"
         data-payment-gateway="{{ $gateway->id }}"
       >
         <x-forms.radio
@@ -13,12 +13,12 @@
           wire:model="form.payment_method"
           class="border-gray-300"
         >
-          <span>{{ $gateway->title }}</span>
+          <span class="leading-[30px]">{{ $gateway->title }}</span>
           <span class="ml-auto">{!! $gateway->icon !!}</span>
         </x-forms.radio>
 
         @if($gateway->has_fields)
-          <div x-show="$wire.get('form.payment_method') === '{{ $gateway->id }}'" x-cloak x-transition.opacity.200ms class="mt-4 text-left" @click.stop>
+          <div x-show="$wire.get('form.payment_method') === '{{ $gateway->id }}'" x-cloak x-transition.opacity.200ms class="text-left" @click.stop>
             {!! $gateway->payment_fields() !!}
           </div>
         @endif

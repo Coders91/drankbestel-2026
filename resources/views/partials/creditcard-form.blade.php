@@ -4,7 +4,7 @@
 
 <div
   id="creditcard-form"
-  class="flex flex-col gap-4"
+  class="flex flex-col gap-4 mt-4"
   x-data="creditcardForm()"
   wire:ignore
 >

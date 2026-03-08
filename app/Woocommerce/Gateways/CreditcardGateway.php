@@ -23,7 +23,7 @@ class CreditcardGateway extends WC_Payment_Gateway {
 
         if ($method) {
             $this->id = 'mollie_creditcard';
-            $this->icon = get_svg('resources.images.icons.credit-card');
+            $this->icon = get_svg('resources.images.logos.visa-mastercard', 'size-[30px]');
         } else {
             $this->id = 'creditcard';
             $this->enabled = 'no';
