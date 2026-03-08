@@ -19,7 +19,7 @@ class ApplePayGateway extends WC_Payment_Gateway
         $mollieService = app(MollieService::class);
         $method = $mollieService->getPaymentMethod(PaymentMethod::APPLEPAY);
 
-        $this->icon = get_svg('resources.images.logos.apple-pay', 'h-6');
+        $this->icon = get_svg('resources.images.logos.apple-pay', 'h-6 w-9');
 
         if ($method) {
             $this->id = 'mollie_applepay';
