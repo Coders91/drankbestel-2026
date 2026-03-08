@@ -9,7 +9,7 @@
     {{ $header }}
   @endisset
 
-  <div class="grid *:min-w-0 p-4 md:p-6 border border-gray-300 rounded-xl bg-white">
+  <div class="grid *:min-w-0 md:p-4 md:p-6 md:border md:border-gray-300 md:rounded-xl bg-white">
     {{ $slot }}
   </div>
 </div>

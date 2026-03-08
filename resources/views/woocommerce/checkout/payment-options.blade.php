@@ -3,7 +3,7 @@
     @if($gateway->enabled === 'yes')
       <label
         for="payment_{{ $gateway->id }}"
-        class="block w-full border rounded-lg p-4 cursor-pointer border-gray-200 has-checked:border-red-600 has-checked:border-2 has-checked:p-[15px]"
+        class="block w-full border rounded-lg p-3 md:p-4 cursor-pointer border-gray-200 has-checked:border-red-600 has-checked:border-2 has-checked:p-[11px] md:has-checked:p-[15px]"
         data-payment-gateway="{{ $gateway->id }}"
       >
         <x-forms.radio

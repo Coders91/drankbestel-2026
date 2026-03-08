@@ -1,103 +1,107 @@
 <div>
   <x-checkout-header />
   <div class="container">
+    <div class="mt-6">
+      <x-icon-link class="col-span-full w-fit" :href="route('cart')">Winkelwagen</x-icon-link>
+    </div>
     <form method="post"
           id="checkout"
           name="checkout"
-          class="pt-10 grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8"
+          class="pt-6 lg:pt-10 grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8"
           x-data="checkout()"
           @submit.prevent="submitForm()"
           @pageshow.window="$event.persisted && window.location.reload()"
     >
-      {{-- Left side: Form sections --}}
-      <div class="grid gap-y-8 lg:gap-y-12 min-w-0">
-        {{-- Order Error Message --}}
-        @error('order')
-          <x-alert type="warning">
-            <div class="flex items-center gap-3">
-              @svg('resources.images.icons.alert-circle', 'w-5 h-5 text-red-500 shrink-0')
-              <p class="text-red-700 font-medium">{{ $message }}</p>
-            </div>
-          </x-alert>
-        @enderror
-
-        <x-checkout-section
-          title="Persoonlijke gegevens"
-          titleClass="mb-2"
-          x-text="form.is_business_order ? 'Zakelijke gegevens' : 'Persoonlijke gegevens'"
-        >
-          <x-slot:header>
-            {{-- Buttons to toggle business fields (client-side only to avoid server roundtrip lag) --}}
-            <div class="flex gap-2 mb-2">
-              <div class="px-4 py-2 border border-gray-300 rounded-lg bg-white">
-                <x-forms.radio id="consumer"
-                         name="is_business_order"
-                         value="0"
-                         class="text-sm text-gray-600"
-                         :checked="!$form->is_business_order"
-                         x-bind:checked="!form.is_business_order"
-                         @change="form.is_business_order = false"
-                >
-                  Particulier
-                </x-forms.radio>
+      <div>
+        {{-- Left side: Form sections --}}
+        <div class="grid gap-y-8 lg:gap-y-10 min-w-0">
+          {{-- Order Error Message --}}
+          @error('order')
+            <x-alert type="warning">
+              <div class="flex items-center gap-3">
+                @svg('resources.images.icons.alert-circle', 'w-5 h-5 text-red-500 shrink-0')
+                <p class="text-red-700 font-medium">{{ $message }}</p>
               </div>
-              <div class="px-4 py-2 border border-gray-300 rounded-lg bg-white">
-                <x-forms.radio id="business"
-                         name="is_business_order"
-                         value="1"
-                         class="text-sm text-gray-600"
-                         :checked="$form->is_business_order"
-                         x-bind:checked="form.is_business_order"
-                         @change="form.is_business_order = true"
-                >
-                  Zakelijk
-                </x-forms.radio>
+            </x-alert>
+          @enderror
+
+          <x-checkout-section
+            title="Persoonlijke gegevens"
+            titleClass="mb-3"
+            x-text="form.is_business_order ? 'Zakelijke gegevens' : 'Persoonlijke gegevens'"
+          >
+            <x-slot:header>
+              <div class="flex gap-4 mb-3 md:mb-4">
+                <div class="w-full md:w-fit px-4 py-2.5 border border-gray-300 rounded-lg bg-white">
+                  <x-forms.radio id="consumer"
+                           name="is_business_order"
+                           value="0"
+                           class="text-sm text-gray-600"
+                           :checked="!$form->is_business_order"
+                           x-bind:checked="!form.is_business_order"
+                           @change="form.is_business_order = false"
+                  >
+                    Particulier
+                  </x-forms.radio>
+                </div>
+                <div class="w-full md:w-fit px-4 py-2.5 border border-gray-300 rounded-lg bg-white">
+                  <x-forms.radio id="business"
+                           name="is_business_order"
+                           value="1"
+                           class="text-sm text-gray-600"
+                           :checked="$form->is_business_order"
+                           x-bind:checked="form.is_business_order"
+                           @change="form.is_business_order = true"
+                  >
+                    Zakelijk
+                  </x-forms.radio>
+                </div>
               </div>
+            </x-slot:header>
+
+            <div class="grid gap-4">
+              @include('partials.business-fields')
+              @include('partials.billing-fields')
             </div>
-          </x-slot:header>
+          </x-checkout-section>
 
-          <div class="grid gap-4">
-            @include('partials.business-fields')
-            @include('partials.billing-fields')
-          </div>
-        </x-checkout-section>
+          <x-checkout-section title="Verzendadres">
+            @include('partials.shipping-fields')
+          </x-checkout-section>
 
-        <x-checkout-section title="Verzendadres">
-          @include('partials.shipping-fields')
-        </x-checkout-section>
+          <x-checkout-section title="Bezorgmoment">
+            <livewire:delivery-options
+              :postalCode="$form->billing_postcode"
+              :houseNumber="$form->billing_house_number"
+              :houseNumberSuffix="$form->billing_house_number_suffix"
+              wire:model="deliverySelection"
+            />
+          </x-checkout-section>
 
-        <x-checkout-section title="Bezorgmoment">
-          <livewire:delivery-options
-            :postalCode="$form->billing_postcode"
-            :houseNumber="$form->billing_house_number"
-            :houseNumberSuffix="$form->billing_house_number_suffix"
-            wire:model="deliverySelection"
-          />
-        </x-checkout-section>
+          <x-checkout-section title="Betaalmethoden">
+            @include('woocommerce.checkout.payment-options')
+          </x-checkout-section>
 
-        <x-checkout-section title="Betaalmethoden">
-          @include('woocommerce.checkout.payment-options')
-        </x-checkout-section>
-
-        <x-button
-          hidden
-          type="submit"
-          class="flex items-center"
-          wire:loading.attr="disabled"
-          wire:loading.class="opacity-50 cursor-not-allowed"
-          wire:target="save"
-        >
-          <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
-          <span wire:loading.flex wire:target="save" class="items-center gap-2">
-            @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
-            Bestelling plaatsen..
-          </span>
-        </x-button>
+          <x-button
+            hidden
+            type="submit"
+            class="flex items-center"
+            wire:loading.attr="disabled"
+            wire:loading.class="opacity-50 cursor-not-allowed"
+            wire:target="save"
+          >
+            <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
+            <span wire:loading.flex wire:target="save" class="items-center gap-2">
+              @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+              Bestelling plaatsen..
+            </span>
+          </x-button>
+        </div>
       </div>
 
       {{-- Right side: Order Review --}}
-      <aside class="h-fit">
-        <x-checkout-order-review class="bg-white border border-gray-300 p-6 rounded-xl" />
+      <aside class="lg:sticky lg:top-6 h-fit">
+        <x-checkout-order-review class="bg-white md:border md:border-gray-300 md:px-6 md:pb-6 md:pt-5 md:rounded-xl" />
       </aside>
     </form>
     <x-checkout-footer class="-mx-4 px-4" />

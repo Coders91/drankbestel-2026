@@ -4,50 +4,44 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => 'grid content-center m-auto']) }}>
-  <h2 class="text-gray-900 text-xl mb-4 font-semibold">Overzicht</h2>
-
+  <h2 class="text-gray-900 text-xl mb-4 font-semibold">Bestelling</h2>
   {{-- Order Items --}}
-  <div class="space-y-4">
-    @foreach ($items as $item)
-      <div class="flex gap-4 pb-4 border-b border-gray-200 last:border-b-0">
-        <div class="shrink-0 w-26 h-26 bg-white rounded-lg border border-gray-100 flex items-center justify-center">
-          <x-image
-            class="w-full h-full object-contain p-1 rounded-lg"
-            alt="{{ $item->product->title }}"
-            id="{{ $item->product->imageId }}"
-          />
-        </div>
-        <div class="flex-1 min-w-0">
-          <h3 class="font-medium text-gray-900 truncate">{{ $item->product->name }}</h3>
-          @if ($item->product->contents)
-            <p class="text-sm text-gray-500">{{ $item->product->contents }}</p>
-          @endif
-          <div class="flex items-center justify-between mt-1">
-            <span class="text-sm text-gray-500">{{ $item->quantity }}x</span>
-            <span class="font-medium text-gray-900">{{ $item->lineSubtotal->formatted() }}</span>
-          </div>
-        </div>
-      </div>
+  <div class="max-h-sm overflow-y-auto" x-data="{expanded: false}">
+    @foreach ($visibleItems as $item)
+      @include('partials.order-review-item')
     @endforeach
+    @if($hiddenItems->isNotEmpty())
+      <div x-show="expanded" x-cloak x-collapse>
+        @foreach($hiddenItems as $item)
+            @include('partials.order-review-item')
+        @endforeach
+      </div>
+      <button type="button" @click="expanded = !expanded" class="group flex items-center gap-1 py-2 text-red-600 transition-colors">
+        <span class="flex items-center gap-2 text-sm group-hover:text-red-600" x-text="expanded ? 'Toon minder producten' : 'Toon alle producten'">
+          Toon alle producten
+        </span>
+          @svg('resources.images.icons.chevron-down', 'size-5 group-hover:stroke-red-600 transition-transform', [':class' => "{ 'rotate-180': expanded }"])
+      </button>
+    @endif
   </div>
 
   {{-- Totals --}}
-  <div class="space-y-4 pt-4 border-t border-gray-200">
+  <div class="space-y-2 mt-2 pt-4 border-t border-gray-200">
     {{-- Subtotal before discounts (only show if there are discounts) --}}
     @if ($totals->discount->amount->amount > 0)
       <div class="flex justify-between text-gray-900">
-        <span>{{ __('Subtotaal', 'sage') }} ({{ $totals->itemCount }} {{ $totals->itemCount === 1 ? 'product' : 'producten' }})</span>
+        <span>{{ __('Totaal producten', 'sage') }} ({{ $totals->itemCount }})</span>
         <span>{{ $totals->subtotalBeforeDiscounts->amount->formatted() }}</span>
       </div>
       {{-- Discount --}}
       <div class="flex justify-between text-gray-900">
         <span>{{ __('Korting', 'sage') }}</span>
-        <span class="text-green-600">-{{ $totals->discount->amount->formatted() }}</span>
+        <span class="text-green-600 font-medium">-{{ $totals->discount->amount->formatted() }}</span>
       </div>
     @else
       {{-- Subtotal (no discounts) --}}
       <div class="flex justify-between text-gray-900">
-        <span>{{ __('Subtotaal', 'sage') }} ({{ $totals->itemCount }} {{ $totals->itemCount === 1 ? 'product' : 'producten' }})</span>
+        <span>{{ __('Totaal producten', 'sage') }} ({{ $totals->itemCount }})</span>
         <span>{{ $totals->subtotal->amount->formatted() }}</span>
       </div>
     @endif
@@ -57,7 +51,7 @@
       <span>{{ __('Verzending', 'sage') }}</span>
       <span>
         @if (is_string($totals->shippingDisplay))
-          <span class="text-green-600">{{ $totals->shippingDisplay }}</span>
+          <span class="text-green-600 font-medium">{{ $totals->shippingDisplay }}</span>
         @else
           {{ $totals->shippingDisplay->amount->formatted() }}
         @endif
@@ -65,14 +59,12 @@
     </div>
 
     {{-- Total --}}
-    <div class="flex justify-between items-center pt-4" data-checkout-total="{{ number_format($totals->total->amount->decimal(), 2, '.', '') }}">
+    <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200" data-checkout-total="{{ number_format($totals->total->amount->decimal(), 2, '.', '') }}">
       <span class="text-lg font-semibold font-heading text-gray-900">{{ __('Totaal', 'sage') }}</span>
       <span class="text-lg font-semibold font-heading text-gray-900">{{ $totals->total->amount->formatted() }}</span>
     </div>
-  </div>
-
   {{-- Checkboxes --}}
-  <div class="space-y-4 pt-4 mt-6 border-t border-gray-200">
+  <div class="space-y-4 pt-4 mt-4 border-t border-gray-200">
     {{-- Age Check --}}
     <div>
       <x-forms.checkbox
@@ -82,7 +74,7 @@
         wire:model="form.age_check"
         @change="markTouched('age_check'); validateField($el)"
       >
-        <span class="text-gray-700">Ik bevestig dat ik 18 jaar of ouder ben</span> <span class="text-red-600">*</span>
+        <span class="text-gray-800">Ik bevestig dat ik 18 jaar of ouder ben</span>
       </x-forms.checkbox>
     </div>
 
@@ -94,17 +86,17 @@
         x-model="form.newsletter"
         wire:model="form.newsletter"
       >
-        <span class="text-gray-700">Ja, ik wil graag meer drankaanbiedingen ontvangen.</span>
+        <span class="text-gray-800">Ja, ik wil graag meer drankaanbiedingen ontvangen.</span>
       </x-forms.checkbox>
     </div>
+  </div>
 
     <x-button
       type="submit"
-      class="mt-10 flex items-center w-full text-lg"
+      class="mt-4 flex items-center w-full"
       wire:loading.attr="disabled"
       wire:loading.class="opacity-50 cursor-not-allowed"
       wire:target="save"
-      size="regular"
     >
       <span wire:loading.remove wire:target="save">Bestelling plaatsen</span>
       <span wire:loading.flex wire:target="save" class="flex items-center gap-2">
