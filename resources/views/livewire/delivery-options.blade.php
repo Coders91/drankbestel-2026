@@ -34,8 +34,7 @@
         {{-- Slides rendered via JavaScript --}}
       </div>
     </div>
-
-      <p class="mt-4 text-sm text-gray-900">Bij aflevering vindt leeftijdscontrole plaats.</p>
+    <p class="mt-4 text-sm text-gray-900">Bij aflevering vindt leeftijdscontrole plaats.</p>
   </div>
 
   {{-- Hidden input for form submission --}}
@@ -196,13 +195,12 @@ function deliveryOptions(config) {
           platform: 'myparcel',
           postal_code: postalCode,
           number: houseNumber + (suffix ? ' ' + suffix : ''),
-          deliverydays_window: this.settings.delivery_days_window || 10,
+          deliverydays_window: Math.min(this.settings.delivery_days_window || 10, 14),
           monday_delivery: this.settings.allow_monday_delivery ? '1' : '0',
           saturday_delivery: this.settings.allow_saturday_delivery ? '1' : '0',
-          evening_delivery: this.settings.allow_evening_delivery ? '1' : '0',
           cutoff_time: this.settings.cutoff_time || '17:00',
           carrier: this.settings.carrier || 'postnl',
-          excluded_delivery_types: this.getExcludedDeliveryTypes(),
+          exclude_delivery_type: this.getExcludedDeliveryTypes(),
         });
 
         const response = await fetch(`https://api.myparcel.nl/delivery_options?${params}`);
@@ -218,15 +216,24 @@ function deliveryOptions(config) {
           return;
         }
 
-        this.options = this.formatDeliveryOptions(deliveryData);
+        const maxOptions = this.settings.delivery_days_window || 10;
+        this.options = this.formatDeliveryOptions(deliveryData).slice(0, maxOptions);
         this.isLoading = false;
 
-        this.renderSlides(true);
-        this.initSwiper();
-
-        if (!preservedDate || !this.restoreSelection(preservedDate)) {
-          this.selectByIndex(0);
+        if (this.swiper) {
+          this.swiper.destroy(true, true);
+          this.swiper = null;
         }
+
+        this.renderSlides(true);
+
+        this.$nextTick(() => {
+          this.initSwiper();
+
+          if (!preservedDate || !this.restoreSelection(preservedDate)) {
+            this.selectByIndex(0);
+          }
+        });
       } catch (e) {
         console.error('Delivery options fetch error:', e);
         this.error = 'Kon bezorgtijden niet ophalen.';
@@ -253,8 +260,11 @@ function deliveryOptions(config) {
             : daysDiff === 2 ? `overmorgen`
             : dayName;
 
-          const timeSlot = (option.time || []).find(slot => (slot.type || 2) === 2);
-          if (!timeSlot) return null;
+          const timeSlots = option.time || [];
+          const timeSlot = timeSlots.find(slot => (slot.type || 2) === 2) || timeSlots[0];
+          if (!timeSlot) {
+            return null;
+          }
 
           return {
             date: option.date,

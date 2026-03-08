@@ -7,7 +7,7 @@
     <form method="post"
           id="checkout"
           name="checkout"
-          class="pt-6 lg:pt-10 grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8"
+          class="pt-6 lg:pt-10 grid lg:grid-cols-[1fr_384px] xl:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8"
           x-data="checkout()"
           @submit.prevent="submitForm()"
           @pageshow.window="$event.persisted && window.location.reload()"
@@ -112,7 +112,6 @@
   <script>
     function checkout() {
       return {
-        // Use global form validator
         ...formValidator({
           form: @json($form),
           rules: @json($form->rules()),
@@ -130,10 +129,8 @@
           });
         },
 
-        // Checkout-specific methods
         async submitForm() {
           if (this.validateAll('checkout')) {
-            // When Apple Pay is selected, hand off to the Apple Pay flow
             if (['applepay', 'mollie_applepay'].includes(this.selectedPaymentMethod)) {
               window.dispatchEvent(new CustomEvent('trigger-apple-pay'));
               return;

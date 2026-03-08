@@ -1,6 +1,6 @@
 @props([])
 
-<footer {{ $attributes->merge(['class' => 'mt-16 border-t border-gray-100']) }}>
+<footer {{ $attributes->merge(['class' => 'mt-12 lg:mt-16 border-t border-gray-100']) }}>
   <div class="py-8 grid gap-8">
     {{-- Help & contact --}}
     <div class="flex items-center justify-center gap-2 text-sm">
