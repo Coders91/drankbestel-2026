@@ -96,7 +96,7 @@ class Cart extends Component
 
         if ($quantity > $maxQty) {
             $quantity = $maxQty;
-            $this->messages['quantity'] = sprintf(
+            $this->messages['quantity_' . $cartItemKey] = sprintf(
                 __('Maximum beschikbare hoeveelheid voor %s is %d', 'sage'),
                 $product->get_name(),
                 $maxQty

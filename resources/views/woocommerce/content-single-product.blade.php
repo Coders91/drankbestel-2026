@@ -84,6 +84,11 @@ x-data="{
                   @svg('resources.images.icons.check-circle', 'size-5 text-green-600')
                   <span class="text-sm font-medium text-green-600">{{ __('Op voorraad', 'sage') }}</span>
               </div>
+            @else
+              <div class="mt-3 flex items-center gap-2">
+                  @svg('resources.images.icons.x-circle', 'size-5 text-red-600')
+                  <span class="text-sm font-medium text-red-600">{{ __('Niet op voorraad', 'sage') }}</span>
+              </div>
             @endif
         </div>
 
@@ -96,11 +101,7 @@ x-data="{
 
         {{-- Add to Cart Form --}}
         <div class="md:col-start-2">
-          @if($product->is_in_stock)
-            <livewire:add-to-cart :productId="$product->id" :isSingleProduct="true" />
-          @else
-            <h3 class="display-6">Uitverkocht</h3>
-          @endif
+          <livewire:add-to-cart :productId="$product->id" :isSingleProduct="true" :disabled="!$product->is_in_stock" />
           {{-- Trust Badges --}}
           <x-usps :usps="$product->usps" variant="horizontal" :columns="2" class="mt-6 mb-8"/>
           @include('partials.product-details')

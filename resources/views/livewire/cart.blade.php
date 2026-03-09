@@ -21,15 +21,8 @@
       {{-- Cart Items --}}
       <div>
         @foreach ($this->items as $item)
-          <x-cart-item :item="$item" />
+          <x-cart-item :item="$item" :message="$messages['quantity_' . $item->key] ?? null" />
         @endforeach
-
-        {{-- Messages --}}
-        @if (isset($messages['quantity']))
-          <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4 mb-4">
-            {{ $messages['quantity'] }}
-          </div>
-        @endif
 
         {{-- Continue Shopping --}}
         <x-icon-link :href="home_url()">Verder winkelen</x-icon-link>

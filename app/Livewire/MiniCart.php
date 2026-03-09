@@ -2,7 +2,8 @@
 
 namespace App\Livewire;
 
-use App\View\Models\CartTotals;
+use App\View\Models\Product;
+
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -11,12 +12,12 @@ class MiniCart extends Component
 {
     public bool $showToast = false;
 
-    public ?array $lastAdded = null;
+    public ?Product $lastAddedProduct = null;
 
     #[On('product-added-to-cart')]
     public function onProductAdded(array $data): void
     {
-        $this->lastAdded = $data;
+        $this->lastAddedProduct = Product::find($data['productId']);
         $this->showToast = true;
     }
 
@@ -37,13 +38,6 @@ class MiniCart extends Component
         $this->showToast = false;
 
         return $this->redirect(route('cart'));
-    }
-
-    public function goToCheckout(): mixed
-    {
-        $this->showToast = false;
-
-        return $this->redirect(route('checkout'));
     }
 
     #[Computed]
