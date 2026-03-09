@@ -5,15 +5,9 @@
 @source "../views/";
 @source "../../app/";
 
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
 @theme {
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
-  --animate-marquee: marquee 18s linear infinite;
   --color-gray-50: #fafafa;
   --color-gray-100: #e8edf5;
   --color-gray-200: #cfd5e2;
