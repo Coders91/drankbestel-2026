@@ -4,14 +4,15 @@
   <x-page-header class="mb-4" title="Winkelwagen" />
   @if ($this->isEmpty)
     {{-- Empty Cart State --}}
-    <div class="bg-white rounded-lg p-12 shadow-sm text-center">
-      <svg class="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-      </svg>
-      <h2 class="text-2xl font-bold font-heading mb-4">{{ __('Je winkelwagen is leeg', 'sage') }}</h2>
-      <p class="text-gray-800 mb-8">{{ __('Voeg producten toe aan je winkelwagen om door te gaan met winkelen.', 'sage') }}</p>
-      <x-icon-link :href="home_url()">Verder winkelen</x-icon-link>
-    </div>
+    <x-empty-state
+      icon="shopping-bag"
+      :title="__('Je winkelwagen is leeg', 'sage')"
+      :description="__('Voeg producten toe aan je winkelwagen om door te gaan met winkelen.', 'sage')"
+    >
+      <x-slot:action>
+        <x-icon-link :href="home_url()" class="inline-flex">Verder winkelen</x-icon-link>
+      </x-slot:action>
+    </x-empty-state>
   @else
     <p class="text-gray-800 mb-8">
       {{ sprintf(_n('Je hebt %d product in je winkelwagen', 'Je hebt %d producten in je winkelwagen', $this->totals->itemCount, 'sage'), $this->totals->itemCount) }}
