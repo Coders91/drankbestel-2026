@@ -7,7 +7,7 @@ use App\Support\Money;
 
 final readonly class UspService
 {
-    protected const CUTOFF_TIME = '18:00';
+    protected const CUTOFF_TIME = '17:00';
 
     protected const DAYS = [
         1 => 'maandag',
@@ -99,8 +99,9 @@ final readonly class UspService
     public static function isNextDayDelivery(): bool
     {
         $deliveryDay = self::getDeliveryDay();
-        $tomorrow = current_time('timestamp') + DAY_IN_SECONDS;
-        $tomorrowDayName = self::DAYS[date('N', $tomorrow)];
+        $now = new \DateTime('now', wp_timezone());
+        $tomorrow = $now->modify('+1 day');
+        $tomorrowDayName = self::DAYS[(int) $tomorrow->format('N')];
 
         return $deliveryDay === $tomorrowDayName;
     }
@@ -135,35 +136,28 @@ final readonly class UspService
      */
     protected static function calculateDeliveryDay(int $currentDay, string $currentTime): string
     {
-        $deliveryTimestamp = strtotime('tomorrow');
+        $tz = wp_timezone();
+        $now = new \DateTime('now', $tz);
         $isAfterCutoff = $currentTime > self::CUTOFF_TIME;
 
-        // Monday
-        if ($currentDay === 1) {
-            $deliveryTimestamp = $isAfterCutoff
-                ? strtotime('+2 days')
-                : strtotime('tomorrow');
+        // Saturday or Sunday → next tuesday
+        if ($currentDay >= 6) {
+            $delivery = new \DateTime('next tuesday', $tz);
         }
-        // Tuesday through Thursday
-        elseif ($currentDay >= 2 && $currentDay <= 4) {
-            $deliveryTimestamp = $isAfterCutoff
-                ? strtotime('+2 days')
-                : strtotime('tomorrow');
+        // Friday after cutoff → next tuesday
+        elseif ($currentDay === 5 && $isAfterCutoff) {
+            $delivery = new \DateTime('next tuesday', $tz);
         }
-        // Friday
-        elseif ($currentDay === 5) {
-            $deliveryTimestamp = $isAfterCutoff
-                ? strtotime('next tuesday')
-                : strtotime('tomorrow');
+        // Weekday after cutoff → +2 days
+        elseif ($isAfterCutoff) {
+            $delivery = (clone $now)->modify('+2 days');
         }
-        // Saturday or Sunday
+        // Weekday before cutoff → tomorrow
         else {
-            $deliveryTimestamp = strtotime('next tuesday');
+            $delivery = (clone $now)->modify('+1 day');
         }
 
-        $deliveryDayNumber = (int) date('N', $deliveryTimestamp);
-
-        return self::DAYS[$deliveryDayNumber];
+        return self::DAYS[(int) $delivery->format('N')];
     }
 
     /**
