@@ -6,6 +6,7 @@
 
 @php
     $menu = Navi::build($name);
+    $menuItems = $menu->isNotEmpty() ? collect($menu->all()) : collect();
 @endphp
 
 {{-- Mobile Menu Slide-out --}}
@@ -13,6 +14,25 @@
     x-show="mobileMenuOpen"
     x-cloak
     class="fixed inset-0 z-[100] lg:hidden"
+    x-data="{
+        activePanel: null,
+        activePanelLabel: '',
+        navigateTo(index, label) {
+            this.activePanel = index;
+            this.activePanelLabel = label;
+        },
+        navigateBack() {
+            this.activePanel = null;
+            this.activePanelLabel = '';
+        },
+        close() {
+            this.closeMobileMenu();
+            setTimeout(() => {
+                this.activePanel = null;
+                this.activePanelLabel = '';
+            }, 300);
+        }
+    }"
 >
     {{-- Backdrop --}}
     <div
@@ -24,7 +44,7 @@
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         class="absolute inset-0 bg-gray-900/30 backdrop-blur-sm"
-        @click="closeMobileMenu()"
+        @click="close()"
     ></div>
 
     {{-- Panel --}}
@@ -36,155 +56,113 @@
         x-transition:leave="transition-transform ease-in duration-200"
         x-transition:leave-start="translate-x-0"
         x-transition:leave-end="-translate-x-full"
-        class="absolute inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl flex flex-col"
+        class="absolute inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl flex flex-col overflow-hidden"
     >
         {{-- Header --}}
-        <header class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <a href="{{ home_url('/') }}" class="flex-shrink-0">
-                @svg('resources.images.logos.drankbestel', 'h-6 w-auto')
-            </a>
+        <header class="flex items-center justify-between px-6 py-3 border-b border-gray-200">
+            <div class="flex items-center gap-2">
+                <button
+                    x-show="activePanel !== null"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 -translate-x-2"
+                    x-transition:enter-end="opacity-100 translate-x-0"
+                    type="button"
+                    class="text-gray-500 hover:text-gray-700 transition-colors"
+                    @click="navigateBack()"
+                    aria-label="{{ __('Terug', 'sage') }}"
+                >
+                    @svg('resources.images.icons.arrow-left')
+                </button>
+                <h2
+                    class="text-lg font-semibold text-gray-900"
+                    x-text="activePanel !== null ? activePanelLabel : '{{ __('Menu', 'sage') }}'"
+                ></h2>
+            </div>
             <button
                 type="button"
                 class="p-2 -mr-2 text-gray-500 hover:text-gray-700 transition-colors"
-                @click="closeMobileMenu()"
+                @click="close()"
                 aria-label="{{ __('Sluit menu', 'sage') }}"
             >
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                @svg('resources.images.icons.x-close')
             </button>
         </header>
 
-        {{-- Navigation --}}
-        <nav class="flex-1 overflow-y-auto py-4">
-            @if ($menu->isNotEmpty())
-                <ul class="space-y-1">
-                    @foreach ($menu->all() as $item)
-                        @php
-                            $hasChildren = $item->children && count($item->children) > 0;
-                            $parentClasses = 'flex-1 flex items-center px-6 py-3 text-base font-medium transition-colors';
-                            $parentClasses .= $item->active ? ' text-red-600 bg-red-50' : ' text-gray-900 hover:bg-gray-50';
-                            $simpleClasses = 'block px-6 py-3 text-base font-medium transition-colors';
-                            $simpleClasses .= $item->active ? ' text-red-600 bg-red-50' : ' text-gray-900 hover:bg-gray-50';
-                        @endphp
+        {{-- Panels container --}}
+        <div class="relative flex-1 overflow-hidden">
 
-                        <li x-data="{ expanded: false }">
-                            @if ($hasChildren)
-                                {{-- Parent with children --}}
-                                <div class="flex items-center">
-                                    <a href="{{ $item->url }}" class="{{ $parentClasses }}">
-                                        {{ $item->label }}
-                                    </a>
-                                    <button
-                                        type="button"
-                                        class="px-4 py-3 text-gray-400 hover:text-gray-600 transition-colors"
-                                        @click="expanded = !expanded"
-                                        x-bind:aria-expanded="expanded"
-                                    >
-                                        <svg
-                                            class="w-5 h-5 transition-transform duration-200"
-                                            x-bind:class="{ 'rotate-180': expanded }"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                        >
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
-                                </div>
+            {{-- Root panel --}}
+            <div
+                class="absolute inset-0 transition-transform duration-300 ease-in-out"
+                :class="activePanel !== null ? '-translate-x-full' : 'translate-x-0'"
+            >
+                <nav class="h-full overflow-y-auto overscroll-contain py-2">
+                    @if ($menuItems->count())
+                        <ul>
+                            @foreach ($menuItems as $index => $item)
+                                @php
+                                    $hasChildren = $item->children && count($item->children) > 0;
+                                @endphp
 
-                                {{-- Children --}}
-                                <ul
-                                    x-show="expanded"
-                                    x-collapse
-                                    class="bg-gray-50 py-2"
-                                >
-                                    @foreach ($item->children as $child)
-                                        @php
-                                            $childClasses = 'block pl-10 pr-6 py-2.5 text-sm transition-colors';
-                                            $childClasses .= $child->active ? ' text-red-600 font-medium' : ' text-gray-600 hover:text-red-600';
-                                        @endphp
-                                        <li>
-                                            <a href="{{ $child->url }}" class="{{ $childClasses }}">
-                                                {{ $child->label }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                {{-- Simple link --}}
-                                <a href="{{ $item->url }}" class="{{ $simpleClasses }}">
-                                    {{ $item->label }}
-                                </a>
-                            @endif
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-
-            {{-- Additional Links --}}
-            <div class="mt-6 pt-6 border-t border-gray-100 px-6 space-y-4">
-                {{-- Categories from WooCommerce --}}
-                @if (isset($megaMenuCategories) && $megaMenuCategories->isNotEmpty())
-                    <div>
-                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                            {{ __('Categorieën', 'sage') }}
-                        </h3>
-                        <ul class="space-y-2">
-                            @foreach ($megaMenuCategories->take(6) as $category)
                                 <li>
-                                    <a
-                                        href="{{ $category['url'] }}"
-                                        class="text-sm text-gray-600 hover:text-red-600 transition-colors"
-                                    >
-                                        {{ $category['name'] }}
-                                    </a>
+                                    @if ($hasChildren)
+                                        <button
+                                            type="button"
+                                            class="flex items-center justify-between w-full px-6 py-3.5 text-base font-medium transition-colors {{ $item->active ? 'text-red-600' : 'text-gray-900 active:bg-gray-50' }}"
+                                            @click="navigateTo({{ $index }}, '{{ addslashes($item->label) }}')"
+                                        >
+                                            <span>{{ $item->label }}</span>
+                                            @svg('resources.images.icons.chevron-right', 'w-5 h-5 text-gray-400')
+                                        </button>
+                                    @else
+                                        <a
+                                            href="{{ $item->url }}"
+                                            class="block px-6 py-3.5 text-base font-medium transition-colors {{ $item->active ? 'text-red-600' : 'text-gray-900 active:bg-gray-50' }}"
+                                        >
+                                            {{ $item->label }}
+                                        </a>
+                                    @endif
                                 </li>
                             @endforeach
+                            <li>
+                              <a class="block px-6 py-3.5 text-base text-red-600 font-medium transition-colors" href="/aanbiedingen/">Aanbiedingen</a>
+                            </li>
                         </ul>
-                    </div>
-                @endif
+                    @endif
+                </nav>
+            </div>
 
-                {{-- Brands --}}
-                @if (isset($featuredBrands) && $featuredBrands->isNotEmpty())
-                    <div>
-                        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                            {{ __('Populaire Merken', 'sage') }}
-                        </h3>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach ($featuredBrands->take(6) as $brand)
-                                <a
-                                    href="{{ $brand['url'] }}"
-                                    class="inline-flex items-center px-3 py-1.5 bg-gray-100 rounded-full text-xs font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                                >
-                                    {{ $brand['name'] }}
-                                </a>
-                            @endforeach
+            {{-- Child panels --}}
+            @foreach ($menuItems as $index => $item)
+                @if ($item->children && count($item->children) > 0)
+                    <div
+                        class="absolute inset-0 transition-transform duration-300 ease-in-out"
+                        :class="activePanel === {{ $index }} ? 'translate-x-0' : 'translate-x-full'"
+                    >
+                        <div class="h-full overflow-y-auto overscroll-contain py-2">
+                            {{-- View all link --}}
+                            <a
+                                href="{{ $item->url }}"
+                                class="flex items-center gap-2 px-6 pt-3 font-semibold text-red-600 active:bg-red-50 transition-colors"
+                            >
+                                {{ __('Bekijk alles', 'sage') }}
+                            </a>
+                            <ul class="py-2">
+                                @foreach ($item->children as $child)
+                                    <li>
+                                        <a
+                                            href="{{ $child->url }}"
+                                            class="block px-6 py-3 text-base transition-colors {{ $child->active ? 'text-red-600 font-medium' : 'text-gray-700 active:bg-gray-50' }}"
+                                        >
+                                            {{ $child->label }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                 @endif
-            </div>
-        </nav>
-
-        {{-- Footer --}}
-        <footer class="px-6 py-4 border-t border-gray-100 bg-gray-50">
-            <div class="flex items-center justify-between text-sm">
-                <a
-                    href="{{ route('favorites') }}"
-                    class="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
-                >
-                    @svg('resources.images.icons.heart', 'w-5 h-5')
-                    <span>{{ __('Favorieten', 'sage') }}</span>
-                </a>
-                <a
-                    href="{{ route('account') }}"
-                    class="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
-                >
-                    @svg('resources.images.icons.user', 'w-5 h-5')
-                    <span>{{ __('Account', 'sage') }}</span>
-                </a>
-            </div>
-        </footer>
+            @endforeach
+        </div>
     </div>
 </div>

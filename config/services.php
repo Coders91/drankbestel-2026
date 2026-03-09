@@ -43,8 +43,8 @@ return [
 
     'lightspeed' => [
         'ideal_payment_id' => env('LIGHTSPEED_IDEAL_PAYMENT_ID', 13),
-        'delivery_costs_item_id' => env('LIGHTSPEED_DELIVERY_COSTS_ITEM_ID'),
-        'customer_id' => env('LIGHTSPEED_CUSTOMER_ID'),
+        'delivery_costs_item_id' => env('LIGHTSPEED_DELIVERY_COSTS_ITEM_ID', env('LIGHTSPEED_RETAIL_API_DELIVERYCOSTS_ID')),
+        'customer_id' => env('LIGHTSPEED_CUSTOMER_ID', env('LIGHTSPEED_RETAIL_API_CUSTOMER_ID')),
         'shop_id' => env('LIGHTSPEED_SHOP_ID', 1),
         'employee_id' => env('LIGHTSPEED_EMPLOYEE_ID', 1),
         'register_id' => env('LIGHTSPEED_REGISTER_ID', 1),
