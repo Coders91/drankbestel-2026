@@ -27,11 +27,6 @@ class ProductReviewPage extends Component
 
     public function mount(string $product_slug): void
     {
-        // Reject slugs ending with size patterns (e.g., -70cl, -100cl, -1l, -750ml)
-        if (preg_match('/-\d+(?:cl|ml|l|liter)$/i', $product_slug)) {
-            abort(404);
-        }
-
         // Find product by slug
         $args = [
             'name' => $product_slug,
