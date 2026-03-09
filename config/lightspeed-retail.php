@@ -31,5 +31,5 @@ return [
      * Set the type of cache store to use when processing the API leaking bucket.
      * You can choose a Cache Store value from your cache.php file
      */
-    'cache_store' => env('LIGHTSPEED_RETAIL_CACHE_STORE', 'redis'),
+    'cache_store' => env('LIGHTSPEED_RETAIL_CACHE_STORE', 'memcached'),
 ];

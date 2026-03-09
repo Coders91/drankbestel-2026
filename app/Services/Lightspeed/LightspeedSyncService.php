@@ -160,6 +160,10 @@ class LightspeedSyncService
             'load_relations' => $relations,
         ]);
 
+        if ($response instanceof \Illuminate\Support\Collection) {
+            return $response->toArray();
+        }
+
         return is_array($response) ? $response : [];
     }
 
