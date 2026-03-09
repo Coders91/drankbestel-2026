@@ -52,17 +52,16 @@ jobs:
           target: ${{ env.REMOTE_THEME_PATH }}
           overwrite: true
 
-      - name: Install composer dependencies and clear cache
+      - name: Clear cache
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          command_timeout: 120s
+          command_timeout: 60s
           script: |
             cd ${{ env.REMOTE_THEME_PATH }}
-            /opt/alt/php83/usr/bin/php $(which composer) install --no-dev --optimize-autoloader --no-interaction
-            /opt/alt/php83/usr/bin/php $(which wp) acorn optimize:clear
-            /opt/alt/php83/usr/bin/php $(which wp) acorn optimize
-            /opt/alt/php83/usr/bin/php $(which wp) cache flush
+            wp acorn optimize:clear
+            wp acorn optimize
+            wp cache flush

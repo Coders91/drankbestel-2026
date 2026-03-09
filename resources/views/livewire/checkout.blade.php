@@ -69,7 +69,7 @@
             @include('partials.shipping-fields')
           </x-checkout-section>
 
-          @island
+          @island(always:true)
             <x-checkout-section title="Bezorgmoment">
               <livewire:delivery-options
                 :postalCode="$form->billing_postcode"
@@ -134,7 +134,6 @@
           });
           // Sync Livewire business order state with Alpine
           this.$watch('form.is_business_order', (value) => {
-            console.log('form.is_business_order', value);
             this.$wire.set('form.is_business_order', value);
           })
         },
