@@ -4,7 +4,7 @@ namespace App\View\Models;
 
 use App\View\Models\Product;
 
-readonly class InvoiceLineItem
+readonly class InvoiceItem
 {
     public function __construct(
         public Product $product,

@@ -2,11 +2,10 @@
 
 namespace App\View\Models;
 
-use Illuminate\Support\Facades\Vite;
 use WC_Order;
 use WC_Order_Item_Product;
 
-readonly class InvoiceData
+readonly class Invoice
 {
     public function __construct(
         // Invoice identifiers
@@ -65,6 +64,19 @@ readonly class InvoiceData
         public ?string $footer_text,
     ) {}
 
+    private static function logoAsBase64(): ?string
+    {
+        $path = get_theme_file_path('resources/images/logos/drankbestel.svg');
+
+        if (! file_exists($path)) {
+            return null;
+        }
+
+        $svg = file_get_contents($path);
+
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
+    }
+
     public static function fromOrder(WC_Order $order, string $invoiceNumber, string $invoiceDate): self
     {
         $totalAmount = $order->get_total();
@@ -115,7 +127,7 @@ readonly class InvoiceData
 
                 $unitPriceIncl = $quantity > 0 ? $lineTotalIncl / $quantity : 0;
 
-                $items[] = new InvoiceLineItem(
+                $items[] = new InvoiceItem(
                     product: Product::find($item->get_product()),
                     name: $item->get_name(),
                     quantity: $quantity,
@@ -131,8 +143,8 @@ readonly class InvoiceData
 
         // 4. Fetch Company & Store Info
         $countries = WC()->countries->get_countries();
-        $storeAddress = get_option('woocommerce_store_address', '');
-        $storeAddress2 = get_option('woocommerce_store_address_2', '');
+        $storeAddress = get_option('woocommerce_store_address', 'Weimarstraat 156');
+        $storeAddress2 = get_option('woocommerce_store_address_2', '2562HD Den Haag');
         $fullCompanyAddress = trim($storeAddress . ($storeAddress2 ? ', ' . $storeAddress2 : ''));
 
         $storeCountryState = get_option('woocommerce_default_country', 'NL');
@@ -188,7 +200,7 @@ readonly class InvoiceData
             company_kvk: config('store.details.kvk'),
             company_phone: config('store.contact.phone'),
             company_email: config('store.contact.email') ?: get_option('woocommerce_email_from_address'),
-            company_logo: Vite::asset('resources/images/logos/drankbestel.svg'),
+            company_logo: self::logoAsBase64(),
             footer_text: config('services.invoice.footer_text'),
         );
     }

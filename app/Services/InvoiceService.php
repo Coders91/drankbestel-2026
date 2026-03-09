@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\View\Models\InvoiceData;
+use App\View\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\DomPDF\PDF as DomPDF;
 use Illuminate\Http\Response;
@@ -45,9 +45,9 @@ class InvoiceService
     /**
      * Build invoice data from WooCommerce order.
      */
-    public function buildInvoiceData(WC_Order $order): InvoiceData
+    public function buildInvoiceData(WC_Order $order): Invoice
     {
-        return InvoiceData::fromOrder(
+        return Invoice::fromOrder(
             $order,
             $this->getInvoiceNumber($order),
             $this->getInvoiceDate($order)
