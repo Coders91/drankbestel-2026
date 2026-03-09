@@ -372,12 +372,22 @@ class Checkout extends Component
             $order->add_item($item);
         }
 
-        // Add shipping method (if any)
+        // Add shipping from cart
+        $cart = WC()->cart;
+        $cart->calculate_shipping();
+        $cart->calculate_totals();
+
+        $shippingTotal = (float) $cart->get_shipping_total();
+        $shippingTax = (float) $cart->get_shipping_tax();
         $chosen_shipping = WC()->session->get('chosen_shipping_methods');
-        if ($chosen_shipping) {
+
+        if ($chosen_shipping && $shippingTotal > 0) {
             foreach ($chosen_shipping as $method_id) {
-                $rate = new WC_Shipping_Rate($method_id);
-                $order->add_shipping($rate);
+                $item = new \WC_Order_Item_Shipping();
+                $item->set_method_id($method_id);
+                $item->set_total($shippingTotal);
+                $item->set_taxes(['total' => [$shippingTax]]);
+                $order->add_item($item);
             }
         }
 
