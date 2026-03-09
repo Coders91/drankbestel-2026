@@ -4,7 +4,7 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => 'grid content-center m-auto']) }}>
-  <h2 class="text-gray-900 text-xl mb-4 font-semibold">Bestelling</h2>
+  <h2 class="text-gray-900 text-xl mb-4 font-semibold font-heading">Bestelling</h2>
   {{-- Order Items --}}
   <div class="max-h-sm overflow-y-auto" x-data="{expanded: false}">
     @foreach ($visibleItems as $item)

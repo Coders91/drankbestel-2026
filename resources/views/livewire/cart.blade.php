@@ -9,35 +9,31 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
       </svg>
       <h2 class="text-2xl font-bold font-heading mb-4">{{ __('Je winkelwagen is leeg', 'sage') }}</h2>
-      <p class="text-gray-600 mb-8">{{ __('Voeg producten toe aan je winkelwagen om door te gaan met winkelen.', 'sage') }}</p>
+      <p class="text-gray-800 mb-8">{{ __('Voeg producten toe aan je winkelwagen om door te gaan met winkelen.', 'sage') }}</p>
       <x-icon-link :href="home_url()">Verder winkelen</x-icon-link>
     </div>
   @else
-    <p class="text-gray-600 mb-8">
+    <p class="text-gray-800 mb-8">
       {{ sprintf(_n('Je hebt %d product in je winkelwagen', 'Je hebt %d producten in je winkelwagen', $this->totals->itemCount, 'sage'), $this->totals->itemCount) }}
     </p>
 
-    <div class="grid lg:grid-cols-[768px_1fr] gap-y-8 lg:gap-y-12 lg:gap-x-8">
+    <div class="grid lg:grid-cols-[1fr_384px] xl:grid-cols-[768px_1fr] gap-6 md:gap-y-8 lg:gap-y-12 lg:gap-x-8">
       {{-- Cart Items --}}
       <div>
         @foreach ($this->items as $item)
           <x-cart-item :item="$item" :message="$messages['quantity_' . $item->key] ?? null" />
         @endforeach
-
-        {{-- Continue Shopping --}}
-        <x-icon-link :href="home_url()">Verder winkelen</x-icon-link>
       </div>
 
       {{-- Order Summary --}}
       <div>
-        <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm sticky top-4">
-          <h2 class="text-gray-900 text-xl font-heading mb-4 font-semibold">{{ __('Overzicht', 'sage') }}</h2>
-
-          <div class="space-y-4 mb-6">
+        <div class="bg-white md:rounded-xl md:px-6 md:pb-6 md:pt-5 md:border md:border-gray-200 md:shadow-[0_2px_10px_rgba(0,0,0,0.04)] md:sticky md:top-4">
+          <h2 class="text-gray-900 text-xl mb-4 font-semibold font-heading">{{ __('Overzicht', 'sage') }}</h2>
+          <div class="space-y-2 mb-6">
             {{-- Subtotal before discounts (only show if there are discounts) --}}
             @if ($this->totals->discount->amount->amount > 0)
-              <div class="flex justify-between text-gray-600">
-                <span class="text-gray-600">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
+              <div class="flex justify-between text-gray-800">
+                <span class="text-gray-800">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
                 <span class="">{{ $this->totals->subtotalBeforeDiscounts->amount->formatted() }}</span>
               </div>
 
@@ -48,16 +44,16 @@
               </div>
             @else
               {{-- Subtotal (no discounts) --}}
-              <div class="flex justify-between text-gray-600">
-                <span class="text-gray-600">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
+              <div class="flex justify-between text-gray-800">
+                <span class="text-gray-800">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
                 <span class="">{{ $this->totals->subtotal->amount->formatted() }}</span>
               </div>
             @endif
 
             {{-- Shipping --}}
-            <div class="flex justify-between text-gray-600">
-              <span class="text-gray-600">{{ __('Verzending', 'sage') }}</span>
-              <span class=" {{ $this->totals->hasFreeShipping ? 'text-green-600' : '' }}">
+            <div class="flex justify-between pb-2 text-gray-800">
+              <span class="text-gray-800">{{ __('Verzending', 'sage') }}</span>
+              <span class=" {{ $this->totals->hasFreeShipping ? 'text-green-600 font-medium' : '' }}">
                 @if (is_string($this->totals->shippingDisplay))
                   {{ $this->totals->shippingDisplay }}
                 @else
@@ -76,33 +72,11 @@
           </div>
 
           {{-- Checkout Button --}}
-          <x-button class="w-full font-semibold uppercase font-heading mb-5" wire:click="proceedToCheckout">Afrekenen @svg('resources.images.icons.arrow-right')</x-button>
+          <x-button class="w-full font-semibold uppercase font-heading mb-6" wire:click="proceedToCheckout">Afrekenen @svg('resources.images.icons.arrow-right')</x-button>
 
           <div class="mb-6">
             @include('partials.payment-icons')
           </div>
-
-          {{-- Free Shipping Progress --}}
-          @if (!$this->freeShipping->qualifies)
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-4">
-              <div class="flex items-center justify-between mb-2">
-                <p class="text-sm font-semibold text-gray-800">
-                  {{ sprintf(__('Nog %s tot gratis verzending', 'sage'), $this->freeShipping->remainingFormatted->formatted()) }}
-                </p>
-                <span class="text-xs text-gray-600">{{ $this->freeShipping->percentage }}%</span>
-              </div>
-              {{-- Progress Bar --}}
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  class="bg-red-600 h-2.5 rounded-full transition-all duration-300"
-                  style="width: {{ $this->freeShipping->percentage }}%"
-                ></div>
-              </div>
-              <p class="text-xs text-gray-600 mt-2">
-                {{ sprintf(__('Gratis verzending vanaf %s', 'sage'), $this->freeShipping->minimumFormatted->formatted()) }}
-              </p>
-            </div>
-          @endif
 
           {{-- Applied Coupons --}}
           @if (count($this->coupons) > 0)
