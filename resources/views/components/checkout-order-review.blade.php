@@ -42,17 +42,12 @@
       {{-- Subtotal (no discounts) --}}
       <div class="flex justify-between text-gray-900">
         <span>{{ __('Totaal producten', 'sage') }} ({{ $totals->itemCount }})</span>
-        @if($this->form->is_business_order)
-          <span>{{ $totals->subtotalExclTax }}</span>
-        @else
-          <span>{{ $totals->subtotal->amount->formatted() }}</span>
-        @endif
+        <span x-show="form.is_business_order" x-cloak>{{ $totals->subtotalExclTax }}</span>
+        <span x-show="!form.is_business_order">{{ $totals->subtotal->amount->formatted() }}</span>
       </div>
-      <div class="flex justify-between text-gray-900">
-        @if($this->form->is_business_order)
-          <span>Btw</span>
-          <span>{{ $totals->tax->formatted() }}</span>
-        @endif
+      <div class="flex justify-between text-gray-900" x-show="form.is_business_order" x-cloak>
+        <span>Btw</span>
+        <span>{{ $totals->tax->formatted() }}</span>
       </div>
     @endif
 
@@ -73,9 +68,7 @@
       <span class="text-lg font-semibold font-heading text-gray-900">{{ __('Totaal', 'sage') }}</span>
       <span>
         <span class="text-lg font-semibold font-heading text-gray-900">{{ $totals->total->amount->formatted() }}</span>
-        @if($this->form->is_business_order)
-          <span class="block text-xs text-gray-600">inclusief btw </span>
-        @endif
+        <span class="block text-xs text-gray-600" x-show="form.is_business_order" x-cloak>inclusief btw</span>
       </span>
     </div>
   {{-- Checkboxes --}}
