@@ -19,21 +19,17 @@
   <div x-show="loaded" x-cloak>
     @if ($this->isEmpty)
       {{-- Empty State --}}
-      <div class="bg-white rounded-lg p-12 shadow-sm text-center">
-        <svg class="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-          />
-        </svg>
-        <h2 class="text-2xl font-bold font-heading mb-4">{{ __('Je hebt nog geen favorieten', 'sage') }}</h2>
-        <p class="text-gray-600 mb-8">{{ __('Voeg producten toe aan je favorieten door op het hartje te klikken.', 'sage') }}</p>
-        <x-button href="{{ wc_get_page_permalink('shop') }}">
-          {{ __('Bekijk Producten', 'sage') }}
-        </x-button>
-      </div>
+      <x-empty-state
+        icon="heart"
+        :title="__('Je hebt nog geen favorieten', 'sage')"
+        :description="__('Voeg producten toe aan je favorieten door op het hartje te klikken.', 'sage')"
+      >
+        <x-slot:action>
+          <x-button href="{{ wc_get_page_permalink('shop') }}">
+            {{ __('Bekijk Producten', 'sage') }}
+          </x-button>
+        </x-slot:action>
+      </x-empty-state>
     @else
       <p class="text-gray-600 mb-8">
         {{ sprintf(_n('%d product in je favorieten', '%d producten in je favorieten', count($this->products), 'sage'), count($this->products)) }}
