@@ -38,10 +38,12 @@
     Alpine.data('uspSlider', (usps) => ({
       usps: usps,
       current: 0,
+      previous: 0,
       timer: null,
 
       start() {
         this.timer = setInterval(() => {
+          this.previous = this.current;
           this.current = (this.current + 1) % this.usps.length;
         }, 4500);
       },
@@ -55,7 +57,11 @@
         if (diff > total / 2) offset = diff - total;
         if (diff < -total / 2) offset = diff + total;
 
-        return `transform: translateX(${offset * 100}%)`;
+        // Only animate current and outgoing slides, others jump instantly
+        const shouldAnimate = index === this.current || index === this.previous;
+        const transition = shouldAnimate ? '' : 'transition-duration: 0ms;';
+
+        return `transform: translateX(${offset * 100}%); ${transition}`;
       },
 
       destroy() {
