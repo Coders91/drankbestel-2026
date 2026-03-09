@@ -52,7 +52,16 @@ class DeliveryOptions extends Component
      */
     public function updateSelection(array $selection): void
     {
-        $this->deliverySelection = $selection;
+        $this->deliverySelection = [
+            'isPickup' => false,
+            'carrier' => $this->settings['carrier'] ?? 'postnl',
+            'package_type' => 'package',
+            'deliveryType' => 'standard',
+            'shipmentOptions' => ['same_day_delivery' => false],
+            'date' => $selection['date'],
+            'start' => $selection['start'] ?? null,
+            'end' => $selection['end'] ?? null,
+        ];
 
         if (function_exists('WC') && WC()->session) {
             WC()->session->set(self::SESSION_KEY, [

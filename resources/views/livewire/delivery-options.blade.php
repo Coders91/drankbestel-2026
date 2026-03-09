@@ -37,13 +37,6 @@
     <p class="mt-4 text-sm text-gray-900">Bij aflevering vindt leeftijdscontrole plaats.</p>
   </div>
 
-  {{-- Hidden input for form submission --}}
-  <input
-    x-show="selection"
-    type="hidden"
-    name="_myparcel_delivery_options"
-    :value="JSON.stringify(selection)"
-  >
 </div>
 
 <script>
@@ -293,11 +286,6 @@ function deliveryOptions(config) {
       const option = this.options[index];
 
       this.selection = {
-        isPickup: false,
-        carrier: this.settings.carrier || 'postnl',
-        package_type: 'package',
-        deliveryType: 'standard',
-        shipmentOptions: { same_day_delivery: false },
         date: option.date,
         start: option.start,
         end: option.end,
