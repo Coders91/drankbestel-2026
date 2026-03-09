@@ -1,4 +1,4 @@
-<x-usp-bar class="z-20 bg-red-600 text-white text-sm" :usps="App\Services\UspService::headerUspsTitles()" />
+<x-usp-bar class="z-20 bg-gray-900 text-white text-sm" :usps="App\Services\UspService::headerUspsTitles()" />
 
 {{-- Sticky Header Container --}}
 <header
@@ -66,6 +66,7 @@
         <x-navigation.mega-menu
             name="primary_navigation"
             :featured-brands="$featuredBrands"
+            :mega-menu-categories="$megaMenuCategories"
         />
     @endif
 </header>

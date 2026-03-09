@@ -6,3 +6,5 @@ import.meta.glob([
 // Import Swiper and make it globally available
 import Swiper from './swiper.js';
 window.Swiper = Swiper;
+
+import './flyout-menu.js';

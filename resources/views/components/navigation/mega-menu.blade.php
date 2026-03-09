@@ -1,6 +1,7 @@
 @props([
     'name' => 'primary_navigation',
     'featuredBrands' => null,
+    'megaMenuCategories' => null,
 ])
 
 @php
@@ -30,7 +31,8 @@
                     @php
                         $hasChildren = $item->children && count($item->children) > 0;
                         $isMegaPanel = strtolower($item->label) === 'gedestilleerd';
-                        $showDropdown = $hasChildren;
+                        $isFlyout = strtolower($item->label) === 'assortiment';
+                        $showDropdown = $hasChildren || $isFlyout;
                         $itemClasses = 'group relative flex items-center gap-6 py-4.5 text-sm font-medium transition-colors';
                         $itemClasses .= $item->active ? ' text-red-600' : ' text-gray-700 hover:text-red-600';
                         $indicatorClasses = 'absolute bottom-0 left-0 right-0 h-0.5 bg-red-600 transition-transform origin-left';
@@ -73,8 +75,20 @@
                             ></span>
                         </a>
 
-                        {{-- Dropdown / Mega Panel --}}
-                        @if ($isMegaPanel && $hasChildren)
+                        {{-- Dropdown / Mega Panel / Flyout --}}
+                        @if ($isFlyout && $megaMenuCategories)
+                            @php
+                                $flyoutCategories = $megaMenuCategories->filter(
+                                    fn($cat) => isset($cat['children']) && $cat['children']->isNotEmpty()
+                                )->values();
+                            @endphp
+                            @if ($flyoutCategories->isNotEmpty())
+                                <x-navigation.flyout-panel
+                                    :item-id="$item->id"
+                                    :categories="$flyoutCategories"
+                                />
+                            @endif
+                        @elseif ($isMegaPanel && $hasChildren)
                             @php
                                 // Build categories from menu children that link to product categories
                                 $megaPanelCategories = collect($item->children)

@@ -288,10 +288,10 @@
                           </tr>
                           <tr>
                             <td class="bg-main p-3">
-                              <div class="whitespace-nowrap font-semibold text-gray-400">Reeds voldaan:</div>
+                              <div class="whitespace-nowrap font-semibold text-white">Reeds voldaan:</div>
                             </td>
                             <td class="bg-main p-3 text-right">
-                              <div class="whitespace-nowrap font-semibold text-gray-400">{{ $invoice->total }}</div>
+                              <div class="whitespace-nowrap font-semibold text-white">{{ $invoice->total }}</div>
                             </td>
                           </tr>
                         </tbody>

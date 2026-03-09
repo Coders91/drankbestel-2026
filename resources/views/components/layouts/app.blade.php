@@ -6,6 +6,7 @@
     'main' => true,
     'sidebar' => false,
     'footer' => true,
+    'footerTop' => true,
 ])
 
 <html @php(language_attributes()) class="h-full">
@@ -81,6 +82,9 @@
       {{ $footer }}
     </footer>
   @else
+    @if($footerTop)
+      <x-usps :usps="\App\Services\UspService::productUsps()" variant="boxed" :columns="1" />
+    @endif
     @includeWhen($footer !== false, 'sections.footer')
   @endif
 

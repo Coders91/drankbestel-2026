@@ -1,5 +1,3 @@
-<x-usps :usps="\App\Services\UspService::productUsps()" variant="boxed" :columns="1" />
-
 <footer class="bg-gray-900">
     <div class="container">
         <div class="py-16 lg:py-20">
