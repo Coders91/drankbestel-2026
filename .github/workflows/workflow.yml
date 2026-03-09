@@ -62,6 +62,6 @@ jobs:
           command_timeout: 60s
           script: |
             cd ${{ env.REMOTE_THEME_PATH }}
-            wp acorn optimize:clear
-            wp acorn optimize
-            wp cache flush
+            php8.3 $(which wp) acorn optimize:clear
+            php8.3 $(which wp) acorn optimize
+            php8.3 $(which wp) cache flush
