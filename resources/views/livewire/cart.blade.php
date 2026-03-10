@@ -154,7 +154,7 @@
                 return {
                   ...formValidator({
                     form: { couponCode: '' },
-                    rules: { couponCode: ['required'] },
+                    rules: { couponCode: 'required' },
                     messages: { 'couponCode.required': '{{ __('Voer een kortingscode in.', 'sage') }}' }
                   })
                 };
