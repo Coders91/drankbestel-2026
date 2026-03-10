@@ -29,13 +29,14 @@
             </div>
             <x-button
                 type="submit"
+                class="relative"
                 wire:loading.attr="disabled"
                 wire:target="submit"
             >
-                <span wire:loading.remove wire:target="submit">
+                <span wire:loading.class="invisible" wire:target="submit">
                     {{ __('Aanmelden', 'sage') }}
                 </span>
-                <span wire:loading.flex wire:target="submit" class="items-center justify-center">
+                <span wire:loading.flex wire:target="submit" x-cloak class="absolute inset-0 items-center justify-center">
                     @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
                 </span>
             </x-button>

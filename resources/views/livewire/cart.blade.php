@@ -123,13 +123,14 @@
                   type="submit"
                   variant="secondary"
                   size="small"
+                  class="relative"
                   wire:loading.attr="disabled"
                   wire:target="applyCoupon"
                 >
-                  <span wire:loading.remove wire:target="applyCoupon">
+                  <span wire:loading.class="invisible" wire:target="applyCoupon">
                     {{ __('Invoeren', 'sage') }}
                   </span>
-                  <span wire:loading.flex wire:target="applyCoupon" class="items-center gap-2">
+                  <span wire:loading.flex wire:target="applyCoupon" x-cloak class="absolute inset-0 items-center justify-center">
                     @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
                   </span>
                 </x-button>
