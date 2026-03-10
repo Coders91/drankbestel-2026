@@ -102,17 +102,42 @@
             </div>
           @else
             {{-- Coupon Code Input --}}
-            <div class="border-t border-gray-200 pt-4">
+            <div class="border-t border-gray-200 pt-4" x-data="couponForm()">
               <h3 class="text-gray-900 text-lg font-heading mb-4 font-semibold">{{ __('Kortingscode', 'sage') }}</h3>
-              <form wire:submit="applyCoupon" class="flex gap-2">
+              <form
+                @submit.prevent="if(validateAll('couponForm')) $wire.applyCoupon()"
+                id="couponForm"
+                class="flex gap-2"
+              >
                 <x-forms.input-text
                   type="text"
                   wire:model="couponCode"
+                  name="couponCode"
                   placeholder="{{ __('Voer code in', 'sage') }}"
                   class="flex-1"
+                  x-bind:class="{'!border-red-600': errors.couponCode}"
+                  @input="markTouched('couponCode')"
+                  @blur="validateField($el)"
                 />
-                <x-button type="submit" variant="secondary" size="small">OK</x-button>
+                <x-button
+                  type="submit"
+                  variant="secondary"
+                  size="small"
+                  wire:loading.attr="disabled"
+                  wire:target="applyCoupon"
+                >
+                  <span wire:loading.remove wire:target="applyCoupon">
+                    {{ __('Invoeren', 'sage') }}
+                  </span>
+                  <span wire:loading.flex wire:target="applyCoupon" class="items-center gap-2">
+                    @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+                  </span>
+                </x-button>
               </form>
+
+              <template x-if="errors.couponCode">
+                <p x-text="errors.couponCode" class="text-red-600 text-sm mt-2"></p>
+              </template>
 
               @if (isset($messages['coupon_error']))
                 <p class="text-red-600 text-sm mt-2">{{ $messages['coupon_error'] }}</p>
@@ -122,6 +147,20 @@
                 <p class="text-green-600 text-sm mt-2">{{ $messages['coupon_success'] }}</p>
               @endif
             </div>
+
+            @pushonce('scripts')
+            <script>
+              function couponForm() {
+                return {
+                  ...formValidator({
+                    form: { couponCode: '' },
+                    rules: { couponCode: ['required'] },
+                    messages: { 'couponCode.required': '{{ __('Voer een kortingscode in.', 'sage') }}' }
+                  })
+                };
+              }
+            </script>
+            @endpushonce
           @endif
         </div>
       </div>
