@@ -12,7 +12,8 @@
         open: false,
         isDesktop: window.matchMedia('(min-width: 1024px)').matches,
         activeCount: {{ $activeCount }},
-        totalResults: {{ $totalResults }}
+        totalResults: {{ $totalResults }},
+        filterLoading: false,
     }"
     x-init="
         const mq = window.matchMedia('(min-width: 1024px)');
@@ -20,7 +21,8 @@
     "
     @keydown.escape.window="open = false"
     @filter-applied.window="open = false"
-    @filter-counts-updated.window="activeCount = $event.detail.activeCount; totalResults = $event.detail.totalResults"
+    @filter-apply.window="if (open && !isDesktop) filterLoading = true"
+    @filter-counts-updated.window="activeCount = $event.detail.activeCount; totalResults = $event.detail.totalResults; filterLoading = false"
 >
     {{-- Teleport fixed elements to body to escape z-[0] stacking context --}}
     <template x-teleport="body">
@@ -93,16 +95,31 @@
             </div>
 
             {{-- Mobile filter container (filters move here on mobile) --}}
-            <div id="mobile-filters-container" class="flex-1 overflow-y-auto px-4 py-4"></div>
+            <div class="relative flex-1 overflow-y-auto">
+                <div id="mobile-filters-container" class="px-4 py-4"></div>
+                <div
+                    x-show="filterLoading"
+                    x-transition.opacity
+                    x-cloak
+                    class="absolute inset-0 bg-white/50 flex items-center justify-center"
+                >
+                    @svg('resources.images.icons.loader', 'w-8 h-8 animate-spin')
+                </div>
+            </div>
 
             {{-- Footer with results button --}}
             <div class="px-4 py-4 border-t border-gray-200 bg-white">
                 <button
                     type="button"
                     @click="open = false"
-                    class="w-full px-6 py-3.5 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors"
+                    :disabled="filterLoading"
+                    class="w-full px-6 py-3.5 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <span x-text="'Toon ' + totalResults + ' producten'"></span>
+                    <span x-show="!filterLoading" x-text="'Toon ' + totalResults + ' producten'"></span>
+                    <span x-show="filterLoading" x-cloak class="flex items-center justify-center gap-2">
+                        @svg('resources.images.icons.loader', 'w-5 h-5 animate-spin')
+                        {{ __('Laden...', 'sage') }}
+                    </span>
                 </button>
             </div>
         </div>
