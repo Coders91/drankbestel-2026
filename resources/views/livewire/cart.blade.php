@@ -14,7 +14,7 @@
       </x-slot:action>
     </x-empty-state>
   @else
-    <p class="text-gray-800 mb-8">
+    <p class="text-gray-600 mb-8">
       {{ sprintf(_n('Je hebt %d product in je winkelwagen', 'Je hebt %d producten in je winkelwagen', $this->totals->itemCount, 'sage'), $this->totals->itemCount) }}
     </p>
 
@@ -29,7 +29,7 @@
       {{-- Order Summary --}}
       <div>
         <div class="bg-white md:rounded-xl md:px-6 md:pb-6 md:pt-5 md:border md:border-gray-200 md:shadow-[0_2px_10px_rgba(0,0,0,0.04)] md:sticky md:top-4">
-          <h2 class="text-gray-900 text-xl mb-4 font-semibold font-heading">{{ __('Overzicht', 'sage') }}</h2>
+          <h2 class="text-xl font-semibold mb-4">{{ __('Overzicht', 'sage') }}</h2>
           <div class="space-y-2 mb-6">
             {{-- Subtotal before discounts (only show if there are discounts) --}}
             @if ($this->totals->discount->amount->amount > 0)
@@ -73,96 +73,13 @@
           </div>
 
           {{-- Checkout Button --}}
-          <x-button class="w-full font-semibold uppercase font-heading mb-6" wire:click="proceedToCheckout">Afrekenen @svg('resources.images.icons.arrow-right')</x-button>
+          <x-button class="w-full" wire:click="proceedToCheckout">Afrekenen</x-button>
 
-          <div class="mb-6">
+          {{-- Coupon Code --}}
+          <x-coupon-form class="mt-4" :coupons="$this->coupons" :messages="$messages" />
+          <div class="pt-4 mt-4 border-t border-gray-200">
             @include('partials.payment-icons')
           </div>
-
-          {{-- Applied Coupons --}}
-          @if (count($this->coupons) > 0)
-            <div class="border-t border-gray-200 pt-4 mb-4">
-              <h3 class="text-gray-900 text-lg font-heading mb-4 font-semibold">{{ __('Toegepaste kortingscodes', 'sage') }}</h3>
-              @foreach ($this->coupons as $coupon)
-                <div class="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2 mb-2">
-                  <div>
-                    <span class="font-semibold text-green-800">{{ strtoupper($coupon->code) }}</span>
-                    <span class="text-green-600 text-sm ml-2">-{{ $coupon->amountFormatted }}</span>
-                  </div>
-                  <button
-                    type="button"
-                    wire:click="removeCoupon('{{ $coupon->code }}')"
-                    class="text-green-600 hover:text-red-600 transition"
-                    title="{{ __('Verwijderen', 'sage') }}"
-                  >
-                    @svg('resources.images.icons.x', 'size-6')
-                  </button>
-                </div>
-              @endforeach
-            </div>
-          @else
-            {{-- Coupon Code Input --}}
-            <div class="border-t border-gray-200 pt-4" x-data="couponForm()">
-              <h3 class="text-gray-900 text-lg font-heading mb-4 font-semibold">{{ __('Kortingscode', 'sage') }}</h3>
-              <form
-                @submit.prevent="if(validateAll('couponForm')) $wire.applyCoupon()"
-                id="couponForm"
-                class="flex gap-2"
-              >
-                <x-forms.input-text
-                  type="text"
-                  wire:model="couponCode"
-                  name="couponCode"
-                  placeholder="{{ __('Voer code in', 'sage') }}"
-                  class="flex-1"
-                  x-bind:class="{'!border-red-600': errors.couponCode}"
-                  @input="markTouched('couponCode')"
-                  @blur="validateField($el)"
-                />
-                <x-button
-                  type="submit"
-                  variant="secondary"
-                  size="small"
-                  class="relative"
-                  wire:loading.attr="disabled"
-                  wire:target="applyCoupon"
-                >
-                  <span wire:loading.class="invisible" wire:target="applyCoupon">
-                    {{ __('Invoeren', 'sage') }}
-                  </span>
-                  <span wire:loading.flex wire:target="applyCoupon" x-cloak class="absolute inset-0 items-center justify-center">
-                    @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
-                  </span>
-                </x-button>
-              </form>
-
-              <template x-if="errors.couponCode">
-                <p x-text="errors.couponCode" class="text-red-600 text-sm mt-2"></p>
-              </template>
-
-              @if (isset($messages['coupon_error']))
-                <p class="text-red-600 text-sm mt-2">{{ $messages['coupon_error'] }}</p>
-              @endif
-
-              @if (isset($messages['coupon_success']))
-                <p class="text-green-600 text-sm mt-2">{{ $messages['coupon_success'] }}</p>
-              @endif
-            </div>
-
-            @pushonce('scripts')
-            <script>
-              function couponForm() {
-                return {
-                  ...formValidator({
-                    form: { couponCode: '' },
-                    rules: { couponCode: 'required' },
-                    messages: { 'couponCode.required': '{{ __('Voer een kortingscode in.', 'sage') }}' }
-                  })
-                };
-              }
-            </script>
-            @endpushonce
-          @endif
         </div>
       </div>
     </div>

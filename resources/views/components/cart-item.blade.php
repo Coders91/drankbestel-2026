@@ -8,7 +8,7 @@
 ])
 
 <div
-  {{ $attributes->merge(['class' => 'relative bg-white border-b md:border border-gray-200 md:rounded-lg pb-4 md:p-6 not-last:mb-4 md:mb-8']) }}
+  {{ $attributes->merge(['class' => 'relative bg-white border-b md:border border-gray-200 md:rounded-lg pb-4 md:p-6 not-last:mb-4 not-last:md:mb-8']) }}
   wire:key="{{ $item->key }}"
   data-quantity="{{ $item->quantity }}"
   data-max-quantity="{{ $item->maxQuantity }}"
@@ -38,7 +38,7 @@
       <div class="flex md:flex-wrap justify-between items-start md:items-center mb-2">
         <div>
           <a href="{{ $item->product->url }}" class="flex-shrink-1 hover:text-red-600 transition">
-            <h3 class="text-base md:text-lg font-heading font-semibold">{{ $item->product->name }}</h3>
+            <h3 class="text-base font-semibold">{{ $item->product->name }}</h3>
           </a>
           @if ($item->product->contents)
             <p class="text-sm leading-6 text-gray-600">{{ $item->product->contents }}</p>
@@ -54,7 +54,7 @@
             type="button"
             x-on:click.prevent="toggleFavorite({{ $item->product->id }})"
             x-bind:title="isFavorite({{ $item->product->id }}) ? '{{ __('Verwijderen uit favorieten', 'sage') }}' : '{{ __('Toevoegen aan favorieten', 'sage') }}'"
-            class="max-md:p-1"
+            class="text-gray-700 max-md:p-1"
           >
             <span x-bind:class="isFavorite({{ $item->product->id }}) ? '*:text-red-600 *:fill-red-600' : '*:text-gray-800 *:hover:text-red-600'">
               @svg('resources.images.icons.heart', 'transition-colors')
@@ -64,7 +64,7 @@
             type="button"
             x-on:click="removing = true; $wire.removeItem('{{ $item->key }}')"
             x-bind:disabled="removing"
-            class="text-gray-700 hover:text-red-600 transition max-md:p-1 disabled:opacity-50 md:mr-2"
+            class="text-gray-700 hover:text-red-600 transition max-md:p-1 disabled:opacity-50 md:mr-3"
             title="{{ __('Verwijderen', 'sage') }}"
           >
             @svg('resources.images.icons.trash-01')
@@ -76,38 +76,38 @@
         <p class="text-red-600 text-sm mb-2">{{ __('Niet op voorraad', 'sage') }}</p>
       @endif
 
-      <div class="flex flex-wrap items-center justify-between gap-4 mt-2.5">
+      <div class="flex flex-wrap items-end justify-between gap-4 mt-2.5 text-gray-700">
         {{-- Quantity Controls --}}
-        <div class="flex items-center border border-gray-400 rounded-lg shadow-xs">
+        <div class="flex items-center justify-center min-h-12 min-w-32 border border-gray-400 rounded-lg shadow-xs">
           <button
             type="button"
             x-on:click="loading = 'decrease'; $wire.decreaseQuantity('{{ $item->key }}').then(() => loading = false)"
             x-bind:disabled="loading || atMin"
-            class="size-9 text-sm flex items-center justify-center rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+            class="size-10 text-sm flex items-center justify-center rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
           >
             <span class="sr-only">{{ __('Verlaag aantal', 'sage') }}</span>
             <span x-show="loading !== 'decrease'">
-              @svg('resources.images.icons.minus', 'size-3')
+              @svg('resources.images.icons.minus', 'size-6')
             </span>
             <span x-show="loading === 'decrease'" x-cloak>
               @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
             </span>
           </button>
-          <span class="size-9 text-sm flex items-center justify-center border-x border-gray-400 text-center font-semibold">
+          <span class="size-10 text-sm flex items-center justify-center text-center text-gray-900 font-semibold">
                       {{ $item->quantity }}
                     </span>
           <button
             type="button"
             x-on:click="loading = 'increase'; $wire.increaseQuantity('{{ $item->key }}').then(() => loading = false)"
             x-bind:disabled="loading || atMax"
-            class="size-9 text-sm flex items-center justify-center rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+            class="size-10 text-sm flex items-center justify-center rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
           >
             <span class="sr-only">{{ __('Verhoog aantal', 'sage') }}</span>
             <span x-show="loading !== 'increase'">
-              @svg('resources.images.icons.plus', 'size-3')
+              @svg('resources.images.icons.plus', 'size-6')
             </span>
             <span x-show="loading === 'increase'" x-cloak>
-              @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
+              @svg('resources.images.icons.loader', 'animate-spin size-4')
             </span>
           </button>
         </div>
@@ -118,11 +118,11 @@
 
         @if($item->product->is_on_sale)
           <div class="flex flex-col">
-            <span class="text-lg pr-4 font-semibold font-heading line-through text-gray-700">{{ $item->lineRegularTotal->formatted() }}</span>
+            <span class="pr-4 font-semibold font-heading line-through text-gray-700">{{ $item->lineRegularTotal->formatted() }}</span>
             <span class="font-semibold text-red-600 text-lg">{{ $item->lineSubtotal->formatted() }}</span>
           </div>
         @else
-          <span class="md:text-lg md:pr-4 font-semibold font-heading text-gray-900">{{ $item->lineSubtotal->formatted() }}</span>
+          <span class="md:pr-4 font-semibold font-heading text-gray-900">{{ $item->lineSubtotal->formatted() }}</span>
         @endif
       </div>
 

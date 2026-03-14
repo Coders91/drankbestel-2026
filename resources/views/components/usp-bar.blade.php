@@ -3,7 +3,7 @@
 ])
 
 <div
-  {{ $attributes->merge(['class' => 'py-1.5']) }}
+  {{ $attributes->merge(['class' => 'py-0.5 md:py-1.5']) }}
   x-data="uspSlider({{ json_encode(array_values($usps)) }})"
   x-init="start()"
 >
