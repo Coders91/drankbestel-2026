@@ -65,10 +65,12 @@
 
     {{-- Total --}}
     <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200" data-checkout-total="{{ number_format($totals->total->amount->decimal(), 2, '.', '') }}">
+      <span>
       <span class="text-lg font-semibold font-heading text-gray-900">{{ __('Totaal', 'sage') }}</span>
+      <span class="block text-xs text-gray-600">inclusief btw</span>
+      </span>
       <span>
         <span class="text-lg font-semibold font-heading text-gray-900">{{ $totals->total->amount->formatted() }}</span>
-        <span class="block text-xs text-gray-600" x-show="form.is_business_order" x-cloak>inclusief btw</span>
       </span>
     </div>
   {{-- Checkboxes --}}

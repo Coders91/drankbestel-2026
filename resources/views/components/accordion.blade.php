@@ -53,12 +53,11 @@
       <span {{ $title->attributes->class(["block w-fit {$titleClass}"]) }}>
         {{ $title }}
       </span>
-      @svg('resources.images.icons.chevron-up', $iconClass, [':class' => "{ 'rotate-180': activeAccordion !==
+      @svg('resources.images.icons.chevron-down', $iconClass, [':class' => "{ 'rotate-180': activeAccordion ===
       accordionId }"])
     </button>
   @endif
   <div data-accordion-content
-       class="mr-6"
        style="{{ $isOpen ? 'display:block' : 'display:none' }}"
        id="{{ $id }}"
        x-show="!isAccordionActive || activeAccordion === accordionId"

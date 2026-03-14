@@ -34,7 +34,7 @@
             {{-- Subtotal before discounts (only show if there are discounts) --}}
             @if ($this->totals->discount->amount->amount > 0)
               <div class="flex justify-between text-gray-800">
-                <span class="text-gray-800">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
+                <span class="text-gray-900">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
                 <span class="">{{ $this->totals->subtotalBeforeDiscounts->amount->formatted() }}</span>
               </div>
 
@@ -46,14 +46,14 @@
             @else
               {{-- Subtotal (no discounts) --}}
               <div class="flex justify-between text-gray-800">
-                <span class="text-gray-800">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
+                <span class="text-gray-900">{{ __('Totaal producten ' . '(' . $this->totals->itemCount . ')', 'sage') }}</span>
                 <span class="">{{ $this->totals->subtotal->amount->formatted() }}</span>
               </div>
             @endif
 
             {{-- Shipping --}}
             <div class="flex justify-between pb-2 text-gray-800">
-              <span class="text-gray-800">{{ __('Verzending', 'sage') }}</span>
+              <span class="text-gray-900">{{ __('Verzending', 'sage') }}</span>
               <span class=" {{ $this->totals->hasFreeShipping ? 'text-green-600 font-medium' : '' }}">
                 @if (is_string($this->totals->shippingDisplay))
                   {{ $this->totals->shippingDisplay }}

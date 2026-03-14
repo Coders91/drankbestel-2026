@@ -78,7 +78,7 @@
 
       <div class="flex flex-wrap items-end justify-between gap-4 mt-2.5 text-gray-700">
         {{-- Quantity Controls --}}
-        <div class="flex items-center justify-center min-h-12 min-w-32 border border-gray-400 rounded-lg shadow-xs">
+        <div class="flex items-center justify-center min-h-11 min-w-30 border border-gray-400 rounded-lg shadow-xs">
           <button
             type="button"
             x-on:click="loading = 'decrease'; $wire.decreaseQuantity('{{ $item->key }}').then(() => loading = false)"
@@ -87,7 +87,7 @@
           >
             <span class="sr-only">{{ __('Verlaag aantal', 'sage') }}</span>
             <span x-show="loading !== 'decrease'">
-              @svg('resources.images.icons.minus', 'size-6')
+              @svg('resources.images.icons.minus', 'size-5')
             </span>
             <span x-show="loading === 'decrease'" x-cloak>
               @svg('resources.images.icons.loader', 'animate-spin h-4 w-4')
@@ -104,7 +104,7 @@
           >
             <span class="sr-only">{{ __('Verhoog aantal', 'sage') }}</span>
             <span x-show="loading !== 'increase'">
-              @svg('resources.images.icons.plus', 'size-6')
+              @svg('resources.images.icons.plus', 'size-5')
             </span>
             <span x-show="loading === 'increase'" x-cloak>
               @svg('resources.images.icons.loader', 'animate-spin size-4')
@@ -118,8 +118,8 @@
 
         @if($item->product->is_on_sale)
           <div class="flex flex-col">
-            <span class="pr-4 font-semibold font-heading line-through text-gray-700">{{ $item->lineRegularTotal->formatted() }}</span>
-            <span class="font-semibold text-red-600 text-lg">{{ $item->lineSubtotal->formatted() }}</span>
+            <span class="pr-4 font-heading line-through text-gray-700">{{ $item->lineRegularTotal->formatted() }}</span>
+            <span class="font-semibold text-red-600">{{ $item->lineSubtotal->formatted() }}</span>
           </div>
         @else
           <span class="md:pr-4 font-semibold font-heading text-gray-900">{{ $item->lineSubtotal->formatted() }}</span>
