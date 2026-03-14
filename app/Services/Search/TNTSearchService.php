@@ -334,76 +334,29 @@ class TNTSearchService
 
     /**
      * Search - prefix matching is handled by PrefixTokenizer during indexing
-     * Runs separate searches for each synonym variant and merges results
      */
     protected function searchWithPrefix(string $query, int $limit): array
     {
-        $variants = $this->getQueryVariants($query);
+        // Expand query with synonyms
+        $expandedQuery = $this->expandSynonyms($query);
 
-        $allIds = [];
-
-        foreach ($variants as $variant) {
-            $results = $this->tnt->search($variant, $limit);
-
-            foreach ($results['ids'] ?? [] as $id) {
-                $allIds[$id] = true;
-            }
-        }
-
-        return ['ids' => array_keys($allIds)];
+        // PrefixTokenizer creates prefix tokens during indexing,
+        // so we just do a regular search
+        return $this->tnt->search($expandedQuery, $limit);
     }
 
     /**
-     * Generate query variants by substituting synonyms
-     * Handles both single-word and multi-word phrase synonyms
-     *
-     * e.g. "absolut vanille" with [vanille, vanilia] → ["absolut vanille", "absolut vanilia"]
-     * e.g. "absolut 100cl" with [100cl, 1 liter] → ["absolut 100cl", "absolut 1 liter"]
+     * Expand query with synonyms using SynonymsHandler
+     * Supports both single words and multi-word phrases
      */
-    protected function getQueryVariants(string $query): array
+    protected function expandSynonyms(string $query): string
     {
         $handler = SynonymsHandler::fromConfig();
 
         if (! $handler->hasSynonyms()) {
-            return [$query];
+            return $query;
         }
 
-        $query = mb_strtolower(trim($query));
-        $variants = [$query];
-
-        // Check multi-word phrase synonyms first (replace phrases in the full query string)
-        foreach ($handler->getMultiWordLookup() as $phrase => $synonyms) {
-            if (str_contains($query, $phrase)) {
-                foreach ($synonyms as $synonym) {
-                    if ($synonym !== $phrase) {
-                        $variants[] = str_replace($phrase, $synonym, $query);
-                    }
-                }
-            }
-        }
-
-        // Check single-word synonyms
-        $words = preg_split('/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY);
-
-        foreach ($words as $i => $word) {
-            $synonyms = $handler->getSynonyms($word);
-
-            if (empty($synonyms)) {
-                continue;
-            }
-
-            foreach ($synonyms as $synonym) {
-                if ($synonym === $word) {
-                    continue;
-                }
-
-                // Multi-word synonym replaces a single word (e.g. "100cl" → "1 liter")
-                $variant = $words;
-                $variant[$i] = $synonym;
-                $variants[] = implode(' ', $variant);
-            }
-        }
-
-        return array_unique($variants);
+        return $handler->applySynonyms($query);
     }
 }

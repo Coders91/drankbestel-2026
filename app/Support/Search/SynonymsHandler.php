@@ -174,14 +174,6 @@ class SynonymsHandler
     }
 
     /**
-     * Get the multi-word lookup table
-     */
-    public function getMultiWordLookup(): array
-    {
-        return $this->multiWordLookup;
-    }
-
-    /**
      * Check if handler has any synonyms loaded
      */
     public function hasSynonyms(): bool
