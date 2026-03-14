@@ -58,4 +58,4 @@ jobs:
             cd ${{ env.REMOTE_THEME_PATH }}
             wp acorn optimize:clear --skip-plugins=gateways
             wp acorn optimize --skip-plugins=gateways
-            wp cache flush
+            wp cache flush --skip-plugins=gateways
