@@ -2,7 +2,6 @@
 
 namespace App\Services\Search;
 
-use App\Support\Search\SynonymsHandler;
 use App\View\Models\Product;
 use App\View\Models\Search\ArticleResult;
 use App\View\Models\Search\BrandResult;
@@ -333,30 +332,11 @@ class TNTSearchService
     }
 
     /**
-     * Search - prefix matching is handled by PrefixTokenizer during indexing
+     * Search - prefix matching and synonym canonization are handled
+     * by PrefixTokenizer during both indexing and search
      */
     protected function searchWithPrefix(string $query, int $limit): array
     {
-        // Expand query with synonyms
-        $expandedQuery = $this->expandSynonyms($query);
-
-        // PrefixTokenizer creates prefix tokens during indexing,
-        // so we just do a regular search
-        return $this->tnt->search($expandedQuery, $limit);
-    }
-
-    /**
-     * Expand query with synonyms using SynonymsHandler
-     * Supports both single words and multi-word phrases
-     */
-    protected function expandSynonyms(string $query): string
-    {
-        $handler = SynonymsHandler::fromConfig();
-
-        if (! $handler->hasSynonyms()) {
-            return $query;
-        }
-
-        return $handler->applySynonyms($query);
+        return $this->tnt->search($query, $limit);
     }
 }

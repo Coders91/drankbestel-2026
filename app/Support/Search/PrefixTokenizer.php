@@ -23,6 +23,7 @@ class PrefixTokenizer implements TokenizerInterface
         $text = is_string($text) ? $text : '';
         $text = mb_strtolower($text);
         $text = $this->normalize($text);
+        $text = $this->canonizeSynonyms($text);
 
         // Split into words
         $words = preg_split(self::$pattern, $text, -1, PREG_SPLIT_NO_EMPTY);
@@ -55,6 +56,25 @@ class PrefixTokenizer implements TokenizerInterface
         }
 
         return array_values(array_unique(array_filter($tokens)));
+    }
+
+    /**
+     * Replace synonyms with their canonical form so both indexed
+     * text and search queries use the same tokens
+     */
+    protected function canonizeSynonyms(string $text): string
+    {
+        static $handler = null;
+
+        if ($handler === null) {
+            $handler = SynonymsHandler::fromConfig();
+        }
+
+        if (! $handler->hasSynonyms()) {
+            return $text;
+        }
+
+        return $handler->canonize($text);
     }
 
     /**
