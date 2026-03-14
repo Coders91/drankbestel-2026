@@ -156,16 +156,17 @@ add_action('widgets_init', function () {
     ] + $config);
 });
 
-add_action( 'woocommerce_admin_order_data_after_order_details', function( $order ) {
-    echo '<a href="' . $order->get_checkout_order_received_url() . '" target="_blank" class="button" style="margin-top:16px">' . __( 'Bekijk bedankpagina', 'woocommerce' ) . '</a>';
+add_action('woocommerce_admin_order_data_after_order_details', function ($order) {
+    echo '<a href="'.esc_url($order->get_checkout_order_received_url()).'" target="_blank" rel="noopener noreferrer" class="button" style="margin-top:16px">'.__('Bekijk bedankpagina', 'woocommerce').'</a>';
 });
 
 /**
  * Remove unwanted assets from WordPress & plugins
- *
  */
-add_action('wp_enqueue_scripts', function() {
-    if (is_admin()) return;
+add_action('wp_enqueue_scripts', function () {
+    if (is_admin()) {
+        return;
+    }
 
     // Remove WooCommerce styles
     wp_dequeue_style('woocommerce-general');
@@ -198,52 +199,20 @@ add_action('wp_enqueue_scripts', function() {
 }, 99);
 
 // Remove global styles
-remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
-remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
-
-// Clear the entire WP script queue right before output so no plugin scripts (including jQuery dependents) ever print
-add_action('wp_print_scripts', function () {
-    if (is_admin()) return;
-    global $wp_scripts;
-    $wp_scripts->queue = [];
-}, PHP_INT_MAX);
-
-// Remove jQuery
-add_action('wp_enqueue_scripts', function() {
-    if (is_admin()) return;
-    wp_dequeue_script('jquery');
-    wp_deregister_script('jquery');
-    wp_dequeue_script('jquery-migrate');
-    wp_deregister_script('jquery-migrate');
-    wp_dequeue_script('jquery-core');
-    wp_deregister_script('jquery-core');
-    wp_deregister_script('jquery-ui-core');
-    wp_dequeue_script('jquery-ui-core');
-    wp_deregister_script('jquery-ui-mouse');
-    wp_dequeue_script('jquery-ui-mouse');
-    wp_deregister_script('jquery-ui-menu');
-    wp_dequeue_script('jquery-ui-menu');
-    wp_deregister_script('jquery-ui-button');
-    wp_dequeue_script('jquery-ui-button');
-    wp_deregister_script('jquery-ui-draggable');
-    wp_dequeue_script('jquery-ui-draggable');
-    wp_deregister_script('jquery-ui-slider');
-    wp_dequeue_script('jquery-ui-slider');
-    wp_deregister_script('customize-base');
-    wp_dequeue_script('customize-base');
-}, 99);
+remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles');
+remove_action('wp_footer', 'wp_enqueue_global_styles', 1);
 
 // Filtereverything plugin
-add_action( 'wp_print_styles', function () {
-    wp_deregister_style( 'wpc-filter-everything' );
-    wp_dequeue_style( 'wpc-filter-everything' );
+add_action('wp_print_styles', function () {
+    wp_deregister_style('wpc-filter-everything');
+    wp_dequeue_style('wpc-filter-everything');
 
-    wp_deregister_style( 'wpc-filter-everything-custom' );
-    wp_dequeue_style( 'wpc-filter-everythomg-custom' );
+    wp_deregister_style('wpc-filter-everything-custom');
+    wp_dequeue_style('wpc-filter-everything-custom');
 
-    wp_deregister_style( 'wpc-widgets' );
-    wp_dequeue_style( 'wpc-widgets' );
-}, 999 );
+    wp_deregister_style('wpc-widgets');
+    wp_dequeue_style('wpc-widgets');
+}, 999);
 
 add_action('wp_print_scripts', function () {
     wp_deregister_script('wpc-filter-everything');
@@ -251,8 +220,10 @@ add_action('wp_print_scripts', function () {
 }, 999);
 
 // Remove block assets
-add_action('init', function() {
-    if (is_admin()) return;
+add_action('init', function () {
+    if (is_admin()) {
+        return;
+    }
     $blockStyles = [
         'wp-block-library',
         'wc-blocks-style',
@@ -292,17 +263,17 @@ add_action('init', function() {
         'wc-blocks-style-cart',
         'wc-blocks-style-checkout',
         'wc-blocks-style-mini-cart-contents',
-        'classic-theme-styles-inline'
+        'classic-theme-styles-inline',
     ];
 
-    foreach ( $blockStyles as $style ) {
-        wp_deregister_style( $style );
+    foreach ($blockStyles as $style) {
+        wp_deregister_style($style);
     }
 
 }, 99);
 
-add_action('admin_footer', function() {
-   echo '<style> .woo-permalink-manager-banner { display: none !important; }
+add_action('admin_footer', function () {
+    echo '<style> .woo-permalink-manager-banner { display: none !important; }
                  .fs-has-title.fs-slug-woo-permalink-manager.fs-type-plugin { display: none !important; }
-        </style>}';
+        </style>';
 }, 100);

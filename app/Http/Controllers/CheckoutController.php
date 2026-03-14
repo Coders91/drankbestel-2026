@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Livewire\Checkout;
-use DateTime;
-
 use App\View\Models\Order;
-
+use DateTime;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -63,6 +61,10 @@ class CheckoutController
             abort(404, 'Order not found');
         }
 
+        if ($order->get_order_key() !== $order_key) {
+            abort(404, 'Order not found');
+        }
+
         if ($this->isThankYouPageExpired($order)) {
             abort(403, 'Access to this page has expired');
         }
@@ -115,7 +117,7 @@ class CheckoutController
 
         $created_at = $order->get_date_created();
         $order_time = new DateTime($created_at->date('Y-m-d H:i:s'));
-        $current_time = new DateTime();
+        $current_time = new DateTime;
 
         $diff_in_minutes = ($current_time->getTimestamp() - $order_time->getTimestamp()) / 60;
 
