@@ -2,6 +2,7 @@
 
 namespace App\Services\Search;
 
+use App\Support\Search\SynonymsHandler;
 use App\View\Models\Product;
 use App\View\Models\Search\ArticleResult;
 use App\View\Models\Search\BrandResult;
@@ -345,38 +346,17 @@ class TNTSearchService
     }
 
     /**
-     * Expand query with synonyms
-     * Example: "whiskey" becomes "whiskey whisky" to match both spellings
+     * Expand query with synonyms using SynonymsHandler
+     * Supports both single words and multi-word phrases
      */
     protected function expandSynonyms(string $query): string
     {
-        $synonyms = config('search.synonyms', []);
-        if (empty($synonyms)) {
+        $handler = SynonymsHandler::fromConfig();
+
+        if (! $handler->hasSynonyms()) {
             return $query;
         }
 
-        $words = preg_split('/\s+/', mb_strtolower(trim($query)), -1, PREG_SPLIT_NO_EMPTY);
-        $expandedWords = [];
-
-        foreach ($words as $word) {
-            $expandedWords[] = $word; // Always include original word
-
-            // Check if this word has synonyms
-            foreach ($synonyms as $canonical => $variants) {
-                // If the word matches the canonical form, add variants
-                if ($word === $canonical) {
-                    $expandedWords = array_merge($expandedWords, $variants);
-                    break;
-                }
-
-                // If the word matches a variant, add the canonical form
-                if (in_array($word, $variants, true)) {
-                    $expandedWords[] = $canonical;
-                    break;
-                }
-            }
-        }
-
-        return implode(' ', array_unique($expandedWords));
+        return $handler->applySynonyms($query);
     }
 }
