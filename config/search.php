@@ -118,17 +118,17 @@ return [
     |
     */
 
-    'synonyms' => [
-        // Spelling variations
-        'whisky' => ['whiskey', 'wisky'],
-        'vodka' => ['wodka'],
+    'synonyms' => <<<'SYNONYMS'
+# Spellingvarianten
+whisky, whiskey, wisky
+vodka, wodka
 
-        // Brand variations (test with simple ones first)
-        'bacardi' => ['barcadi', 'bakardi'],
-        'jagermeister' => ['jägermeister', 'jager'],
+# Merkvarianten
+bacardi, barcadi, bakardi
+jagermeister, jägermeister, jager
 
-        // Simple drink types
-        'rum' => ['rhum'],
-        'gin' => ['jenever'],
-    ],
+# Dranksoorten
+rum, rhum
+gin, jenever
+SYNONYMS,
 ];

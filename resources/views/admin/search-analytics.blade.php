@@ -1,6 +1,5 @@
-<div class="wrap">
-    <h1>{{ __('Zoekanalyse', 'sage') }}</h1>
-    <p class="description">{{ __('Analyse van zoekopdrachten van de afgelopen 30 dagen', 'sage') }}</p>
+<div>
+    <p class="description" style="margin-top: 20px;">{{ __('Analyse van zoekopdrachten van de afgelopen 30 dagen', 'sage') }}</p>
 
     {{-- Stats Cards --}}
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">

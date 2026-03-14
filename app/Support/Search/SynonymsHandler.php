@@ -16,11 +16,15 @@ class SynonymsHandler
     }
 
     /**
-     * Create instance from config
+     * Create instance from WP option, falling back to config
      */
     public static function fromConfig(): self
     {
-        $synonyms = config('search.synonyms', '');
+        $synonyms = get_option('search_synonyms');
+
+        if ($synonyms === false) {
+            $synonyms = config('search.synonyms', '');
+        }
 
         return new self($synonyms);
     }

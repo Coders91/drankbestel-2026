@@ -6,6 +6,7 @@ use App\Services\MegaMenuService;
 use App\Services\MetaIndexService;
 use App\Services\Search\SearchAnalyticsService;
 use App\Services\Woocommerce\AggregatedRatingService;
+use App\Support\Search\SynonymsHandler;
 use Illuminate\Support\Facades\Cache;
 use Roots\Acorn\Sage\SageServiceProvider;
 
@@ -207,33 +208,71 @@ class ThemeServiceProvider extends SageServiceProvider
     }
 
     /**
-     * Register the search analytics admin page
+     * Register the search admin page
      */
     public function registerSearchAnalyticsPage(): void
     {
         add_submenu_page(
             'woocommerce',
-            __('Zoekanalyse', 'sage'),
-            __('Zoekanalyse', 'sage'),
+            __('Zoeken', 'sage'),
+            __('Zoeken', 'sage'),
             'manage_woocommerce',
             'search-analytics',
-            [$this, 'renderSearchAnalyticsPage']
+            [$this, 'renderSearchPage']
         );
     }
 
     /**
-     * Render the search analytics page
+     * Render the search admin page with tabs
      */
-    public function renderSearchAnalyticsPage(): void
+    public function renderSearchPage(): void
     {
-        if (!SearchAnalyticsService::tableExists()) {
-            echo '<div class="wrap">';
-            echo '<h1>' . esc_html__('Zoekanalyse', 'sage') . '</h1>';
+        $tab = sanitize_text_field($_GET['tab'] ?? 'analyse');
+
+        // Handle synonyms save
+        if ($tab === 'synoniemen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handleSynonymsSave();
+        }
+
+        $tabs = [
+            'analyse' => __('Analyse', 'sage'),
+            'synoniemen' => __('Synoniemen', 'sage'),
+        ];
+
+        $pageUrl = admin_url('admin.php?page=search-analytics');
+
+        echo '<div class="wrap">';
+        echo '<h1>' . esc_html__('Zoeken', 'sage') . '</h1>';
+
+        // Render tab navigation
+        echo '<nav class="nav-tab-wrapper">';
+        foreach ($tabs as $slug => $label) {
+            $active = $tab === $slug ? ' nav-tab-active' : '';
+            $url = $slug === 'analyse' ? $pageUrl : $pageUrl . '&tab=' . $slug;
+            echo '<a href="' . esc_url($url) . '" class="nav-tab' . $active . '">' . esc_html($label) . '</a>';
+        }
+        echo '</nav>';
+
+        // Render tab content
+        match ($tab) {
+            'synoniemen' => $this->renderSynonymsTab(),
+            default => $this->renderAnalyticsTab(),
+        };
+
+        echo '</div>';
+    }
+
+    /**
+     * Render the analytics tab content
+     */
+    protected function renderAnalyticsTab(): void
+    {
+        if (! SearchAnalyticsService::tableExists()) {
             echo '<div class="notice notice-warning"><p>';
             echo esc_html__('De zoekanalyse tabel bestaat nog niet. Voer het volgende commando uit:', 'sage');
             echo ' <code>wp acorn search:analytics:migrate</code>';
             echo '</p></div>';
-            echo '</div>';
+
             return;
         }
 
@@ -247,7 +286,41 @@ class ThemeServiceProvider extends SageServiceProvider
             'stats',
             'popularSearches',
             'zeroResultSearches',
-            'chartData'
+            'chartData',
         ))->render();
+    }
+
+    /**
+     * Render the synonyms configuration tab
+     */
+    protected function renderSynonymsTab(): void
+    {
+        $synonymsText = get_option('search_synonyms', config('search.synonyms', ''));
+        $handler = new SynonymsHandler($synonymsText);
+        $groups = $handler->getGroups();
+
+        echo view('admin.search-synonyms', compact(
+            'synonymsText',
+            'groups',
+        ))->render();
+    }
+
+    /**
+     * Handle saving synonyms from the admin form
+     */
+    protected function handleSynonymsSave(): void
+    {
+        if (! wp_verify_nonce($_POST['_wpnonce'] ?? '', 'save_search_synonyms')) {
+            wp_die(__('Ongeldige beveiligingstoken.', 'sage'));
+        }
+
+        $synonymsText = sanitize_textarea_field($_POST['synonyms'] ?? '');
+        update_option('search_synonyms', $synonymsText);
+
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-success is-dismissible"><p>';
+            echo esc_html__('Synoniemen opgeslagen.', 'sage');
+            echo '</p></div>';
+        });
     }
 }
