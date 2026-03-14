@@ -77,7 +77,7 @@
 
           {{-- Coupon Code --}}
           <x-coupon-form class="mt-4" :coupons="$this->coupons" :messages="$messages" />
-          <div class="pt-4 mt-4 border-t border-gray-200">
+          <div class="pt-6 mt-4 border-t border-gray-200">
             @include('partials.payment-icons')
           </div>
         </div>
