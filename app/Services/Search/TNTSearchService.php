@@ -197,7 +197,15 @@ class TNTSearchService
         $canonicalQuery = $handler->hasSynonyms() ? $handler->canonize($query) : $query;
         $queryWords = preg_split('/\s+/', $canonicalQuery);
 
-        usort($products, function ($a, $b) use ($handler, $canonicalQuery, $queryWords) {
+        // Pre-fetch attribute values for ranking boost
+        $attributeTaxonomies = $this->getSearchAttributeTaxonomies();
+        $attributeScores = [];
+
+        if (! empty($attributeTaxonomies)) {
+            $attributeScores = $this->scoreProductAttributes($products, $canonicalQuery, $queryWords, $attributeTaxonomies);
+        }
+
+        usort($products, function ($a, $b) use ($handler, $canonicalQuery, $queryWords, $attributeScores) {
             $titleA = mb_strtolower($a->title);
             $titleB = mb_strtolower($b->title);
 
@@ -235,10 +243,83 @@ class TNTSearchService
                 }
             }
 
+            // Attribute match boost
+            $scoreA += $attributeScores[$a->id] ?? 0;
+            $scoreB += $attributeScores[$b->id] ?? 0;
+
             return $scoreB <=> $scoreA; // Higher score first
         });
 
         return $products;
+    }
+
+    /**
+     * Score products based on attribute value matches with the query
+     */
+    protected function scoreProductAttributes(array $products, string $canonicalQuery, array $queryWords, array $taxonomies): array
+    {
+        $handler = $this->getSynonymsHandler();
+        $scores = [];
+
+        $productIds = array_map(fn($p) => $p->id, $products);
+
+        if (empty($productIds)) {
+            return $scores;
+        }
+
+        global $wpdb;
+
+        $ids = implode(',', array_map('intval', $productIds));
+        $taxonomyList = "'" . implode("','", array_map('esc_sql', $taxonomies)) . "'";
+
+        $rows = $wpdb->get_results("
+            SELECT tr.object_id as product_id, t.name, tt.taxonomy
+            FROM {$wpdb->term_relationships} tr
+            INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+            INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+            WHERE tr.object_id IN ({$ids})
+            AND tt.taxonomy IN ({$taxonomyList})
+        ");
+
+        foreach ($rows as $row) {
+            $attrValue = mb_strtolower($row->name);
+
+            if ($handler->hasSynonyms()) {
+                $attrValue = $handler->canonize($attrValue);
+            }
+
+            $productId = (int) $row->product_id;
+
+            foreach ($queryWords as $word) {
+                if (stripos($attrValue, $word) !== false) {
+                    $scores[$productId] = ($scores[$productId] ?? 0) + 75;
+                }
+
+                // Exact attribute match gets extra boost
+                if ($attrValue === $word) {
+                    $scores[$productId] = ($scores[$productId] ?? 0) + 150;
+                }
+            }
+        }
+
+        return $scores;
+    }
+
+    /**
+     * Get the selected attribute taxonomies for ranking
+     */
+    protected function getSearchAttributeTaxonomies(): array
+    {
+        static $taxonomies = null;
+
+        if ($taxonomies === null) {
+            $selected = get_option('search_attribute_taxonomies', []);
+            $taxonomies = is_array($selected)
+                ? array_map(fn($attr) => 'pa_' . $attr, $selected)
+                : [];
+        }
+
+        return $taxonomies;
     }
 
     protected function executeTaxonomySearch(string $query, string $indexName, int $limit, string $modelClass): array

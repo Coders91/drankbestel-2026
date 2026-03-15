@@ -234,9 +234,15 @@ class ThemeServiceProvider extends SageServiceProvider
             $this->handleSynonymsSave();
         }
 
+        // Handle attributes save
+        if ($tab === 'attributen' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handleAttributesSave();
+        }
+
         $tabs = [
             'analyse' => __('Analyse', 'sage'),
             'synoniemen' => __('Synoniemen', 'sage'),
+            'attributen' => __('Attributen', 'sage'),
         ];
 
         $pageUrl = admin_url('admin.php?page=search-analytics');
@@ -256,6 +262,7 @@ class ThemeServiceProvider extends SageServiceProvider
         // Render tab content
         match ($tab) {
             'synoniemen' => $this->renderSynonymsTab(),
+            'attributen' => $this->renderAttributesTab(),
             default => $this->renderAnalyticsTab(),
         };
 
@@ -308,6 +315,43 @@ class ThemeServiceProvider extends SageServiceProvider
     /**
      * Handle saving synonyms from the admin form
      */
+    /**
+     * Render the attributes configuration tab
+     */
+    protected function renderAttributesTab(): void
+    {
+        $attributeTaxonomies = wc_get_attribute_taxonomies();
+        $selectedAttributes = get_option('search_attribute_taxonomies', []);
+
+        if (! is_array($selectedAttributes)) {
+            $selectedAttributes = [];
+        }
+
+        echo view('admin.search-attributes', compact(
+            'attributeTaxonomies',
+            'selectedAttributes',
+        ))->render();
+    }
+
+    /**
+     * Handle saving attribute taxonomies from the admin form
+     */
+    protected function handleAttributesSave(): void
+    {
+        if (! wp_verify_nonce($_POST['_wpnonce'] ?? '', 'save_search_attributes')) {
+            wp_die(__('Ongeldige beveiligingstoken.', 'sage'));
+        }
+
+        $selected = array_map('sanitize_text_field', $_POST['attribute_taxonomies'] ?? []);
+        update_option('search_attribute_taxonomies', $selected);
+
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-success is-dismissible"><p>';
+            echo esc_html__('Attributen opgeslagen.', 'sage');
+            echo '</p></div>';
+        });
+    }
+
     protected function handleSynonymsSave(): void
     {
         if (! wp_verify_nonce($_POST['_wpnonce'] ?? '', 'save_search_synonyms')) {
