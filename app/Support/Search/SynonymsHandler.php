@@ -22,11 +22,11 @@ class SynonymsHandler
     {
         $synonyms = get_option('search_synonyms');
 
-        if ($synonyms === false) {
+        if (empty($synonyms)) {
             $synonyms = config('search.synonyms', '');
         }
 
-        return new self($synonyms);
+        return new self(is_string($synonyms) ? $synonyms : '');
     }
 
     /**
