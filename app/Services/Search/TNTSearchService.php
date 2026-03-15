@@ -420,23 +420,26 @@ class TNTSearchService
     }
 
     /**
-     * Search with synonym canonization
+     * Search with synonym expansion
      *
-     * PrefixTokenizer canonizes during indexing, but TNTSearch uses the
-     * default tokenizer for search queries, so we must canonize the
-     * query ourselves to match the canonical tokens in the index.
+     * Expands the query with all synonym variants so TNTSearch's OR mode
+     * matches documents containing any variant. This works without
+     * requiring index rebuilds when synonyms change.
      */
     protected function searchWithPrefix(string $query, int $limit): array
     {
-        $query = $this->canonizeQuery($query);
+        $query = $this->expandSynonyms($query);
 
         return $this->tnt->search($query, $limit);
     }
 
     /**
-     * Canonize query to match canonical tokens stored in the index
+     * Expand query with all synonym variants for OR matching
+     *
+     * "absolut vanilla" with synonyms [vanille, vanilia, vanilla] becomes
+     * "absolut vanilla vanille vanilia" so TNTSearch finds any variant.
      */
-    protected function canonizeQuery(string $query): string
+    protected function expandSynonyms(string $query): string
     {
         $handler = $this->getSynonymsHandler();
 
@@ -444,7 +447,7 @@ class TNTSearchService
             return $query;
         }
 
-        return $handler->canonize($query);
+        return $handler->applySynonyms($query);
     }
 
     protected function getSynonymsHandler(): SynonymsHandler
