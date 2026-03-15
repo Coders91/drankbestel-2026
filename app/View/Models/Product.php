@@ -255,7 +255,7 @@ class Product implements Wireable
 
     public static function fromLivewire($value): ?Product
     {
-        $product = wc_get_product($value);
+        $product = wc_get_product($value['id']);
         return $product ? self::find($product) : null;
     }
 }
