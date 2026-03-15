@@ -12,7 +12,7 @@
         <form class="space-y-6" @submit.prevent="if(validateAll('reviewForm')) $wire.submit()" id="reviewForm">
             <h2 class="text-xl font-semibold font-heading text-gray-900">
                 {{ __('Schrijf een review', 'sage') }}
-            </h4>
+            </h2>
 
             {{-- Rating Input --}}
             <div>

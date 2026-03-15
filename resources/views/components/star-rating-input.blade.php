@@ -21,7 +21,6 @@
                 class="sr-only"
                 x-model="selected"
                 @change="$dispatch('input', {{ $i }})"
-                {{ $attributes->whereStartsWith('wire:') }}
             />
             <div
                 class="transition-colors"
