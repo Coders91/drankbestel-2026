@@ -35,7 +35,7 @@ class OrganizationBuilder
                     ->postalCode($config['address']['zipcode'])
                     ->streetAddress($config['address']['street'])
             )
-            ->sameAs($config['social'] ?? [])
+            ->sameAs(array_values($config['social'] ?? []))
             ->legalName($config['details']['legal_name'])
             ->vatID($config['details']['btw'])
             ->areaServed($config['shipping']['destinations'] ?? 'NL')
