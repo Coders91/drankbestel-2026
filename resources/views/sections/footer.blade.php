@@ -85,7 +85,7 @@
                                 class="inline-flex items-center gap-3 text-gray-400 hover:text-white transition-colors duration-200 group"
                             >
                                 <span class="flex items-center justify-center w-9 h-9 bg-gray-800 group-hover:bg-red-600/20 rounded-lg transition-colors duration-200">
-                                    @svg('icons.mail', 'w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors')
+                                    @svg('resources.images.icons.mail', 'w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors')
                                 </span>
                                 <span class="text-sm">{{ config('store.contact.email') }}</span>
                             </a>
@@ -104,7 +104,7 @@
                                     class="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-blue-600/20 rounded-lg transition-all duration-200 group"
                                     aria-label="Facebook"
                                 >
-                                    @svg('icons.facebook', 'w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors')
+                                    @svg('resources.images.icons.facebook', 'w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors')
                                 </a>
                             @endif
                             @if (config('store.social.instagram'))
@@ -115,7 +115,7 @@
                                     class="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-pink-600/20 rounded-lg transition-all duration-200 group"
                                     aria-label="Instagram"
                                 >
-                                    @svg('icons.instagram', 'w-5 h-5 text-gray-400 group-hover:text-pink-500 transition-colors')
+                                    @svg('resources.images.icons.instagram', 'w-5 h-5 text-gray-400 group-hover:text-pink-500 transition-colors')
                                 </a>
                             @endif
                             @if (config('store.social.x'))
