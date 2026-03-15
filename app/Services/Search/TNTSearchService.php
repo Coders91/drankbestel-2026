@@ -2,6 +2,7 @@
 
 namespace App\Services\Search;
 
+use App\Support\Search\SearchTokenizer;
 use App\Support\Search\SynonymsHandler;
 use App\View\Models\Product;
 use App\View\Models\Search\ArticleResult;
@@ -429,6 +430,12 @@ class TNTSearchService
     protected function searchWithPrefix(string $query, int $limit): array
     {
         $query = $this->expandSynonyms($query);
+
+        // Use SearchTokenizer at search time to avoid prefix noise.
+        // PrefixTokenizer indexes prefixes (e.g., "vanilla" → [vanilla, vanil, van])
+        // so prefix searches work. But at search time, generating "van" from "vanilla"
+        // would match hundreds of unrelated products and push real matches out.
+        $this->tnt->tokenizer = new SearchTokenizer;
 
         return $this->tnt->search($query, $limit);
     }

@@ -4,6 +4,7 @@ namespace App\Console\Commands\Search;
 
 use App\Services\Search\SearchConfig;
 use App\Support\Search\PrefixTokenizer;
+use App\Support\Search\SearchTokenizer;
 use App\Support\Search\SynonymsHandler;
 use Illuminate\Console\Command;
 use TeamTNT\TNTSearch\TNTSearch;
@@ -44,160 +45,122 @@ class DebugSearchCommand extends Command
 
         $this->newLine();
 
-        // 2. Tokenizer output
-        $this->section('Tokenizer output');
-        $tokenizer = new PrefixTokenizer;
-        $queryTokens = $tokenizer->tokenize($expanded ?? $query);
-        $this->line('Query tokens (' . count($queryTokens) . '): [' . implode(', ', $queryTokens) . ']');
+        // 2. Tokenizer comparison
+        $this->section('Tokenizer comparison');
+        $expandedQuery = $expanded ?? $query;
+
+        $prefixTokenizer = new PrefixTokenizer;
+        $searchTokenizer = new SearchTokenizer;
+
+        $prefixTokens = $prefixTokenizer->tokenize($expandedQuery);
+        $searchTokens = $searchTokenizer->tokenize($expandedQuery);
+
+        $this->warn('PrefixTokenizer (OLD - used at search time):');
+        $this->line('  Tokens (' . count($prefixTokens) . '): [' . implode(', ', $prefixTokens) . ']');
+        $this->info('SearchTokenizer (NEW - no prefix noise):');
+        $this->line('  Tokens (' . count($searchTokens) . '): [' . implode(', ', $searchTokens) . ']');
         $this->newLine();
 
-        // 3. Raw TNTSearch results
-        $this->section('Raw TNTSearch results (products)');
+        // 3. Raw TNTSearch results with OLD tokenizer (PrefixTokenizer)
+        $this->section('Results with PrefixTokenizer (OLD)');
         try {
             $tnt->selectIndex($config->getIndexFile('products'));
+            $this->configureFuzzy($tnt, $config);
 
-            if ($config->fuzzyEnabled()) {
-                $tnt->fuzziness = true;
-                $tnt->fuzzy_prefix_length = $config->fuzzyPrefixLength();
-                $tnt->fuzzy_max_expansions = $config->fuzzyMaxExpansions();
-                $tnt->fuzzy_distance = $config->fuzzyDistance();
-                $this->line('Fuzzy search: ENABLED (distance=' . $config->fuzzyDistance() . ')');
-            } else {
-                $this->line('Fuzzy search: DISABLED');
-            }
-
-            // Search with expanded query
-            $expandedQuery = $handler->hasSynonyms() ? $handler->applySynonyms($query) : $query;
             $results = $tnt->search($expandedQuery, 50);
-
-            $this->line("Search query sent to TNT: \"{$expandedQuery}\"");
             $this->line('Results returned: ' . count($results['ids']));
-            $this->newLine();
-
-            if (!empty($results['ids'])) {
-                global $wpdb;
-
-                $ids = implode(',', array_map('intval', $results['ids']));
-                $rows = $wpdb->get_results("
-                    SELECT ID, post_title, post_status
-                    FROM {$wpdb->posts}
-                    WHERE ID IN ({$ids})
-                    ORDER BY FIELD(ID, {$ids})
-                ");
-
-                $this->table(
-                    ['#', 'ID', 'Title', 'Status'],
-                    array_map(fn($row, $i) => [
-                        $i + 1,
-                        $row->ID,
-                        $row->post_title,
-                        $row->post_status,
-                    ], $rows, array_keys($rows))
-                );
-            }
+            $this->printResults($results['ids']);
         } catch (\Throwable $e) {
             $this->error('TNTSearch error: ' . $e->getMessage());
         }
 
         $this->newLine();
 
-        // 4. Check if "monin vanilla" exists in the DB
-        $this->section('Database check for "monin vanilla"');
-        global $wpdb;
+        // 4. Raw TNTSearch results with NEW tokenizer (SearchTokenizer)
+        $this->section('Results with SearchTokenizer (NEW)');
+        try {
+            $tnt->selectIndex($config->getIndexFile('products'));
+            $this->configureFuzzy($tnt, $config);
+            $tnt->tokenizer = new SearchTokenizer;
 
-        $monin = $wpdb->get_results("
-            SELECT ID, post_title, post_status, post_type
-            FROM {$wpdb->posts}
-            WHERE post_title LIKE '%monin%vanilla%'
-            OR post_title LIKE '%vanilla%monin%'
-            ORDER BY post_title
-        ");
-
-        if (empty($monin)) {
-            $this->warn('No posts found with "monin" AND "vanilla" in the title.');
-
-            // Broader search
-            $this->line('Broader search for "monin":');
-            $broader = $wpdb->get_results("
-                SELECT ID, post_title, post_status, post_type
-                FROM {$wpdb->posts}
-                WHERE post_title LIKE '%monin%'
-                AND post_type = 'product'
-                ORDER BY post_title
-                LIMIT 20
-            ");
-            if (!empty($broader)) {
-                $this->table(
-                    ['ID', 'Title', 'Status', 'Type'],
-                    array_map(fn($row) => [$row->ID, $row->post_title, $row->post_status, $row->post_type], $broader)
-                );
-            }
-        } else {
-            $this->table(
-                ['ID', 'Title', 'Status', 'Type'],
-                array_map(fn($row) => [$row->ID, $row->post_title, $row->post_status, $row->post_type], $monin)
-            );
-
-            // Check if these IDs are in the TNTSearch results
-            $foundIds = $results['ids'] ?? [];
-            foreach ($monin as $row) {
-                $inResults = in_array($row->ID, $foundIds) ? 'YES' : 'NO';
-                $this->line("  ID {$row->ID} ({$row->post_title}) in search results: {$inResults}");
-            }
+            $resultsNew = $tnt->search($expandedQuery, 50);
+            $this->line('Results returned: ' . count($resultsNew['ids']));
+            $this->printResults($resultsNew['ids']);
+        } catch (\Throwable $e) {
+            $this->error('TNTSearch error: ' . $e->getMessage());
         }
 
         $this->newLine();
 
-        // 5. Check what's actually indexed for the missing product
-        $this->section('Index content check');
-        if (!empty($monin)) {
-            foreach ($monin as $row) {
-                if ($row->post_type !== 'product' || $row->post_status !== 'publish') {
-                    $this->warn("ID {$row->ID}: not a published product (status={$row->post_status}, type={$row->post_type})");
-                    continue;
-                }
+        // 5. Check if "monin vanilla" exists in the DB
+        $this->section('Database check');
+        global $wpdb;
 
-                $this->line("Checking what would be indexed for ID {$row->ID} ({$row->post_title}):");
+        $queryWords = preg_split('/\s+/', mb_strtolower($query));
+        $likeClause = implode(' AND ', array_map(fn($w) => "post_title LIKE '%{$w}%'", $queryWords));
 
-                $indexData = $wpdb->get_var($wpdb->prepare("
-                    SELECT CONCAT_WS(' ',
-                        p.post_title,
-                        p.post_excerpt,
-                        p.post_content,
-                        COALESCE(sku.meta_value, ''),
-                        COALESCE(contents.meta_value, ''),
-                        (
-                            SELECT GROUP_CONCAT(DISTINCT t.name SEPARATOR ' ')
-                            FROM {$wpdb->term_relationships} tr
-                            INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
-                            INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
-                            WHERE tr.object_id = p.ID
-                            AND tt.taxonomy LIKE 'pa_%%'
-                        )
-                    )
-                    FROM {$wpdb->posts} p
-                    LEFT JOIN {$wpdb->postmeta} sku ON p.ID = sku.post_id AND sku.meta_key = '_sku'
-                    LEFT JOIN {$wpdb->postmeta} contents ON p.ID = contents.post_id AND contents.meta_key = 'product_contents'
-                    WHERE p.ID = %d
-                ", $row->ID));
+        $dbResults = $wpdb->get_results("
+            SELECT ID, post_title, post_status, post_type
+            FROM {$wpdb->posts}
+            WHERE ({$likeClause})
+            AND post_type = 'product'
+            ORDER BY post_title
+            LIMIT 20
+        ");
 
-                if ($indexData) {
-                    // Show first 200 chars
-                    $preview = mb_substr($indexData, 0, 200);
-                    $this->line("  Index data preview: \"{$preview}...\"");
-
-                    // Tokenize and check for vanilla
-                    $tokens = $tokenizer->tokenize($indexData);
-                    $vanillaTokens = array_filter($tokens, fn($t) => str_contains($t, 'vanil') || str_contains($t, 'vanill'));
-                    $this->line('  Contains "vanilla" tokens: ' . (empty($vanillaTokens) ? 'NO' : implode(', ', $vanillaTokens)));
-                    $this->line('  Total tokens: ' . count($tokens));
-                } else {
-                    $this->warn("  No index data found for ID {$row->ID}");
-                }
-            }
+        if (empty($dbResults)) {
+            $this->warn('No products found matching all query words in title.');
+        } else {
+            $this->table(
+                ['ID', 'Title', 'Status', 'In OLD results', 'In NEW results'],
+                array_map(function ($row) use ($results, $resultsNew) {
+                    $oldIds = $results['ids'] ?? [];
+                    $newIds = $resultsNew['ids'] ?? [];
+                    return [
+                        $row->ID,
+                        $row->post_title,
+                        $row->post_status,
+                        in_array($row->ID, $oldIds) ? 'YES' : 'NO',
+                        in_array($row->ID, $newIds) ? 'YES' : 'NO',
+                    ];
+                }, $dbResults)
+            );
         }
 
         return Command::SUCCESS;
+    }
+
+    protected function printResults(array $ids): void
+    {
+        if (empty($ids)) {
+            $this->warn('No results.');
+            return;
+        }
+
+        global $wpdb;
+
+        $idList = implode(',', array_map('intval', $ids));
+        $rows = $wpdb->get_results("
+            SELECT ID, post_title
+            FROM {$wpdb->posts}
+            WHERE ID IN ({$idList})
+            ORDER BY FIELD(ID, {$idList})
+        ");
+
+        $this->table(
+            ['#', 'ID', 'Title'],
+            array_map(fn($row, $i) => [$i + 1, $row->ID, $row->post_title], $rows, array_keys($rows))
+        );
+    }
+
+    protected function configureFuzzy(TNTSearch $tnt, SearchConfig $config): void
+    {
+        if ($config->fuzzyEnabled()) {
+            $tnt->fuzziness = true;
+            $tnt->fuzzy_prefix_length = $config->fuzzyPrefixLength();
+            $tnt->fuzzy_max_expansions = $config->fuzzyMaxExpansions();
+            $tnt->fuzzy_distance = $config->fuzzyDistance();
+        }
     }
 
     protected function section(string $title): void
