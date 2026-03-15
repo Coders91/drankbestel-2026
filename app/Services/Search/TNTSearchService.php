@@ -159,18 +159,25 @@ class TNTSearchService
             // Get more results for re-ranking
             $results = $this->searchWithPrefix($query, $limit * 3);
 
-            if (empty($results['ids'])) {
+            $ids = $results['ids'] ?? [];
+
+            // Supplement with products matching by attribute value (e.g., pa_smaak = vanille)
+            // This ensures attribute matches aren't lost when TNTSearch's result limit cuts them off
+            $attributeIds = $this->findProductsByAttribute($query);
+            $ids = array_values(array_unique(array_merge($ids, $attributeIds)));
+
+            if (empty($ids)) {
                 return [];
             }
 
             global $wpdb;
 
-            $ids = implode(',', array_map('intval', $results['ids']));
+            $idList = implode(',', array_map('intval', $ids));
 
             $rows = $wpdb->get_results("
                 SELECT ID, post_title
                 FROM {$wpdb->posts}
-                WHERE ID IN ({$ids})
+                WHERE ID IN ({$idList})
             ");
 
             // Custom ranking: prioritize title prefix matches
@@ -321,6 +328,65 @@ class TNTSearchService
         }
 
         return $taxonomies;
+    }
+
+    /**
+     * Find published products that have a matching attribute value.
+     *
+     * Searches the configured attribute taxonomies (e.g., pa_smaak) for term names
+     * matching the query or its synonym variants. Returns product IDs.
+     */
+    protected function findProductsByAttribute(string $query): array
+    {
+        $taxonomies = $this->getSearchAttributeTaxonomies();
+
+        if (empty($taxonomies)) {
+            return [];
+        }
+
+        $handler = $this->getSynonymsHandler();
+        $query = mb_strtolower(trim($query));
+
+        // Collect all words to match: original query words + synonym variants
+        $words = preg_split('/\s+/', $query);
+        $searchTerms = $words;
+
+        if ($handler->hasSynonyms()) {
+            foreach ($words as $word) {
+                foreach ($handler->getSynonyms($word) as $synonym) {
+                    $searchTerms[] = $synonym;
+                }
+            }
+        }
+
+        $searchTerms = array_unique($searchTerms);
+
+        global $wpdb;
+
+        $taxonomyList = "'" . implode("','", array_map('esc_sql', $taxonomies)) . "'";
+
+        // Build LIKE conditions for each search term
+        $likeConditions = [];
+        foreach ($searchTerms as $term) {
+            $escaped = $wpdb->esc_like($term);
+            $likeConditions[] = $wpdb->prepare('t.name LIKE %s', "%{$escaped}%");
+        }
+
+        $likeClause = implode(' OR ', $likeConditions);
+
+        $ids = $wpdb->get_col("
+            SELECT DISTINCT tr.object_id
+            FROM {$wpdb->term_relationships} tr
+            INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+            INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+            INNER JOIN {$wpdb->posts} p ON tr.object_id = p.ID
+            WHERE tt.taxonomy IN ({$taxonomyList})
+            AND ({$likeClause})
+            AND p.post_type = 'product'
+            AND p.post_status = 'publish'
+        ");
+
+        return array_map('intval', $ids);
     }
 
     protected function executeTaxonomySearch(string $query, string $indexName, int $limit, string $modelClass): array
