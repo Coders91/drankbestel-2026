@@ -2,6 +2,7 @@
 
 namespace App\Services\Search;
 
+use App\Support\Search\SynonymsHandler;
 use App\View\Models\Product;
 use App\View\Models\Search\ArticleResult;
 use App\View\Models\Search\BrandResult;
@@ -191,39 +192,45 @@ class TNTSearchService
      */
     protected function rankByTitleMatch(array $products, string $query): array
     {
+        $handler = $this->getSynonymsHandler();
         $query = mb_strtolower(trim($query));
-        $queryWords = preg_split('/\s+/', $query);
+        $canonicalQuery = $handler->hasSynonyms() ? $handler->canonize($query) : $query;
+        $queryWords = preg_split('/\s+/', $canonicalQuery);
 
-        usort($products, function ($a, $b) use ($query, $queryWords) {
+        usort($products, function ($a, $b) use ($handler, $canonicalQuery, $queryWords) {
             $titleA = mb_strtolower($a->title);
             $titleB = mb_strtolower($b->title);
+
+            // Canonize titles so synonym variants match during ranking
+            $canonTitleA = $handler->hasSynonyms() ? $handler->canonize($titleA) : $titleA;
+            $canonTitleB = $handler->hasSynonyms() ? $handler->canonize($titleB) : $titleB;
 
             // Score based on how well the title matches the query
             $scoreA = 0;
             $scoreB = 0;
 
             // Exact title prefix match (highest priority)
-            if (str_starts_with($titleA, $query)) {
+            if (str_starts_with($canonTitleA, $canonicalQuery)) {
                 $scoreA += 1000;
             }
-            if (str_starts_with($titleB, $query)) {
+            if (str_starts_with($canonTitleB, $canonicalQuery)) {
                 $scoreB += 1000;
             }
 
             // Count how many query words appear in title
             foreach ($queryWords as $word) {
-                if (stripos($titleA, $word) !== false) {
+                if (stripos($canonTitleA, $word) !== false) {
                     $scoreA += 100;
                 }
-                if (stripos($titleB, $word) !== false) {
+                if (stripos($canonTitleB, $word) !== false) {
                     $scoreB += 100;
                 }
 
                 // Bonus for word appearing at start of title
-                if (str_starts_with($titleA, $word)) {
+                if (str_starts_with($canonTitleA, $word)) {
                     $scoreA += 50;
                 }
-                if (str_starts_with($titleB, $word)) {
+                if (str_starts_with($canonTitleB, $word)) {
                     $scoreB += 50;
                 }
             }
@@ -332,11 +339,37 @@ class TNTSearchService
     }
 
     /**
-     * Search - prefix matching and synonym canonization are handled
-     * by PrefixTokenizer during both indexing and search
+     * Search with synonym canonization
+     *
+     * PrefixTokenizer canonizes during indexing, but TNTSearch uses the
+     * default tokenizer for search queries, so we must canonize the
+     * query ourselves to match the canonical tokens in the index.
      */
     protected function searchWithPrefix(string $query, int $limit): array
     {
+        $query = $this->canonizeQuery($query);
+
         return $this->tnt->search($query, $limit);
+    }
+
+    /**
+     * Canonize query to match canonical tokens stored in the index
+     */
+    protected function canonizeQuery(string $query): string
+    {
+        $handler = $this->getSynonymsHandler();
+
+        if (! $handler->hasSynonyms()) {
+            return $query;
+        }
+
+        return $handler->canonize($query);
+    }
+
+    protected function getSynonymsHandler(): SynonymsHandler
+    {
+        static $handler = null;
+
+        return $handler ??= SynonymsHandler::fromConfig();
     }
 }
