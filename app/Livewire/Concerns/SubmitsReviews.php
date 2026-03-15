@@ -6,7 +6,7 @@ trait SubmitsReviews
 {
     protected function submitReview(): bool
     {
-        $this->validate();
+        $this->form->validate();
 
         $product = wc_get_product($this->productId);
 
