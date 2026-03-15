@@ -27,9 +27,10 @@ return [
     ],
 
     'social' => [
-        'https://x.com/drankbestelnl',
-        'https://nl.trustpilot.com/review/drankbestel.nl',
-        'https://instagram.com/drankbestel',
+        'facebook' => 'https://www.facebook.com/drankbestel',
+        'instagram' => 'https://instagram.com/drankbestel',
+        'x' => 'https://x.com/drankbestelnl',
+        'trustpilot' => 'https://nl.trustpilot.com/review/drankbestel.nl',
     ],
 
     'returns' => [
